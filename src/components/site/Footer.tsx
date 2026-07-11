@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { Instagram, Facebook, Youtube, MessageCircle, Lock } from "lucide-react";
 import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
+import iconInstagram from "@/assets/icon-instagram.png";
+import iconFacebook from "@/assets/icon-facebook.png";
+import iconWhatsapp from "@/assets/icon-whatsapp.png";
 
 export function Footer() {
   const [footerData, setFooterData] = useState(DEFAULT_HOME_PAGE_DATA.footer);
@@ -54,10 +57,10 @@ export function Footer() {
   }, []);
 
   const socialsMap = [
-    { icon: Instagram, url: footerData.instagramUrl, show: footerData.showInstagram !== false },
-    { icon: Facebook, url: footerData.facebookUrl, show: footerData.showFacebook !== false },
-    { icon: MessageCircle, url: footerData.whatsappUrl, show: footerData.showWhatsapp !== false },
-    { icon: Youtube, url: footerData.youtubeUrl, show: footerData.showYoutube !== false },
+    { icon: iconInstagram, label: "Instagram", url: footerData.instagramUrl, show: footerData.showInstagram !== false },
+    { icon: iconFacebook, label: "Facebook", url: footerData.facebookUrl, show: footerData.showFacebook !== false },
+    { icon: iconWhatsapp, label: "WhatsApp", url: footerData.whatsappUrl, show: footerData.showWhatsapp !== false },
+    { icon: Youtube, label: "YouTube", url: footerData.youtubeUrl, show: footerData.showYoutube !== false, isLucide: true },
   ];
 
   return (
@@ -78,18 +81,27 @@ export function Footer() {
                 {footerData.description}
               </p>
               {footerData.showSocials !== false && (
-                <div className="mt-5 flex gap-3">
+                <div className="mt-5 flex items-center gap-3">
                   {socialsMap.filter(s => s.show).map((social, i) => {
-                    const Icon = social.icon;
                     return (
                       <a
                         key={i}
                         href={social.url || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="grid h-9 w-9 place-items-center rounded-full border border-hairline text-white/70 transition-colors hover:border-brand hover:text-brand"
+                        className="transition-transform hover:scale-110 duration-200 shrink-0"
                       >
-                        <Icon className="h-4 w-4" />
+                        {social.isLucide ? (
+                          <div className="grid h-8 w-8 place-items-center rounded-full border border-hairline text-white/70 transition-colors hover:border-brand hover:text-brand">
+                            <Youtube className="h-4 w-4" />
+                          </div>
+                        ) : (
+                          <img
+                            src={social.icon}
+                            alt={social.label}
+                            className="h-8 w-8 object-contain rounded"
+                          />
+                        )}
                       </a>
                     );
                   })}
@@ -193,7 +205,7 @@ export function Footer() {
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.6.0
+          © 2024 Glasses. Todos os direitos reservados. | v1.6.1
         </p>
       </div>
     </footer>
