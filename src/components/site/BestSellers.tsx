@@ -28,7 +28,7 @@ function ProductCard({ product }: { product: any }) {
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-md">
-      <div className="relative bg-[#f6f6f6] p-6">
+      <div className="relative bg-white p-3 border-b border-border/40">
         <span className="absolute left-3 top-3 z-10 rounded bg-ink px-2 py-1 text-[11px] font-bold text-white">
           {product.discount}
         </span>
@@ -38,7 +38,7 @@ function ProductCard({ product }: { product: any }) {
           width={700}
           height={600}
           loading="lazy"
-          className="mx-auto h-36 w-full object-contain"
+          className="mx-auto h-40 w-full object-contain"
         />
       </div>
 
