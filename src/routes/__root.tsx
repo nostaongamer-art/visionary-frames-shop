@@ -81,19 +81,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Encontre o óculos perfeito para seu estilo. Mais de 500 modelos exclusivos, frete grátis para todo Brasil e até 12x sem juros na Glasses.",
+          "Encontre o óculos perfeito para seu estilo. Mais de 200 modelos exclusivos, frete grátis para todo Brasil e até 12x sem juros na Glasses.",
       },
       { name: "author", content: "Glasses" },
       { property: "og:title", content: "Glasses — Óculos com Estilo | Armações e Solar Premium" },
       {
         property: "og:description",
         content:
-          "Encontre o óculos perfeito para seu estilo. Mais de 500 modelos exclusivos, frete grátis para todo Brasil e até 12x sem juros na Glasses.",
+          "Encontre o óculos perfeito para seu estilo. Mais de 200 modelos exclusivos, frete grátis para todo Brasil e até 12x sem juros na Glasses.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Glasses — Óculos com Estilo | Armações e Solar Premium" },
-      { name: "twitter:description", content: "Encontre o óculos perfeito para seu estilo. Mais de 500 modelos exclusivos, frete grátis para todo Brasil e até 12x sem juros na Glasses." },
+      { name: "twitter:description", content: "Encontre o óculos perfeito para seu estilo. Mais de 200 modelos exclusivos, frete grátis para todo Brasil e até 12x sem juros na Glasses." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/191437c3-a1c8-4a7d-b64c-5cb883e49b57/id-preview-aa4b4e2b--3d190ce2-acb1-4707-92e7-b7e726860b15.lovable.app-1783728966766.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/191437c3-a1c8-4a7d-b64c-5cb883e49b57/id-preview-aa4b4e2b--3d190ce2-acb1-4707-92e7-b7e726860b15.lovable.app-1783728966766.png" },
     ],

@@ -38,7 +38,7 @@ export function Hero() {
                 Para Seu Estilo
               </h1>
               <p className="mt-5 max-w-md text-sm text-white/70 sm:text-base">
-                Mais de 500 modelos exclusivos para transformar sua aparência e sua confiança.
+                Mais de 200 modelos exclusivos para transformar sua aparência e sua confiança.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
