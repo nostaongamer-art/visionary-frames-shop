@@ -25,10 +25,10 @@ function Login() {
     setLoading(true);
 
     // Bypass / Fallback de teste local
-    if (email === "admin@glasses.com" && password === "admin") {
+    if (email === "osprepara2@gmail.com" && password === "Vitoriadaluz1#$") {
       // Mock da sessão local (salvo no localStorage para simular login)
       localStorage.setItem("admin_auth_bypass", "true");
-      toast.success("Login efetuado com sucesso (modo de teste)!");
+      toast.success("Login efetuado com sucesso!");
       setLoading(false);
       navigate({ to: "/admin" });
       return;
@@ -125,7 +125,7 @@ function Login() {
         <div className="mt-6 border-t border-[#282C32]/35 pt-4 text-center">
           <p className="text-[10px] text-white/40 leading-relaxed">
             Utilize as credenciais do Supabase ou o acesso rápido de teste:<br />
-            <span className="font-mono text-[#FF8A00]">admin@glasses.com</span> / <span className="font-mono text-[#FF8A00]">admin</span>
+            <span className="font-mono text-[#FF8A00]">osprepara2@gmail.com</span> / <span className="font-mono text-[#FF8A00]">Vitoriadaluz1#$</span>
           </p>
         </div>
       </div>
