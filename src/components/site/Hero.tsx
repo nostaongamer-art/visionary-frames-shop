@@ -57,6 +57,7 @@ export function Hero({ data }: { data?: HeroData }) {
               alt="Homem jovem usando óculos escuros pretos"
               width={1200}
               height={1200}
+              referrerPolicy="no-referrer"
               className="ml-auto h-full w-full object-cover object-center md:w-[62%]"
             />
             {/* Dark gradient over the left for text legibility */}
