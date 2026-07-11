@@ -32,7 +32,7 @@ export interface HomePageData {
       oldPrice: string;
       price: string;
       installment: string;
-      imageKey: string; // fallback matching key in local images
+      imageKey: string;
       imageUrl?: string;
     }>;
   };
@@ -52,6 +52,21 @@ export interface HomePageData {
     placeholder: string;
     buttonText: string;
     imageUrl?: string;
+  };
+  footer: {
+    description: string;
+    instagramUrl: string;
+    facebookUrl: string;
+    whatsappUrl: string;
+    youtubeUrl: string;
+    institucionalTitle: string;
+    institucionalLinks: Array<{ label: string; href: string }>;
+    ajudaTitle: string;
+    ajudaLinks: Array<{ label: string; href: string }>;
+    atendimentoTitle: string;
+    atendimentoLines: Array<string>;
+    paymentsTitle: string;
+    payments: Array<string>;
   };
 }
 
@@ -157,6 +172,38 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     buttonText: "CADASTRAR",
     imageUrl: "",
   },
+  footer: {
+    description: "A Glasses nasceu para transformar seu estilo e sua visão. Aqui você encontra os melhores óculos com qualidade e preço justo.",
+    instagramUrl: "#",
+    facebookUrl: "#",
+    whatsappUrl: "#",
+    youtubeUrl: "#",
+    institucionalTitle: "INSTITUCIONAL",
+    institucionalLinks: [
+      { label: "Sobre Nós", href: "#" },
+      { label: "Nossa Loja", href: "#" },
+      { label: "Política de Privacidade", href: "#" },
+      { label: "Trocas e Devoluções", href: "#" },
+      { label: "Termos de Uso", href: "#" },
+    ],
+    ajudaTitle: "AJUDA",
+    ajudaLinks: [
+      { label: "Como Comprar", href: "#" },
+      { label: "Formas de Pagamento", href: "#" },
+      { label: "Prazos de Entrega", href: "#" },
+      { label: "Rastreamento", href: "#" },
+      { label: "Perguntas Frequentes", href: "#" },
+    ],
+    atendimentoTitle: "ATENDIMENTO",
+    atendimentoLines: [
+      "WhatsApp",
+      "E-mail",
+      "Horário de Atendimento",
+      "Seg a Sex 08h às 18h",
+    ],
+    paymentsTitle: "FORMAS DE PAGAMENTO",
+    payments: ["Visa", "Master", "Amex", "Boleto", "Pix"],
+  },
 };
 
 /**
@@ -214,6 +261,7 @@ function mergeWithDefaults(saved: any): HomePageData {
       }))
     },
     newsletter: { ...DEFAULT_HOME_PAGE_DATA.newsletter, ...saved.newsletter },
+    footer: { ...DEFAULT_HOME_PAGE_DATA.footer, ...saved.footer },
   };
 }
 

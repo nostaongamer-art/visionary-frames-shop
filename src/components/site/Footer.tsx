@@ -1,39 +1,65 @@
+import { useState, useEffect } from "react";
 import { Instagram, Facebook, Youtube, MessageCircle, Lock } from "lucide-react";
-
-const INSTITUCIONAL = [
-  "Sobre Nós",
-  "Nossa Loja",
-  "Política de Privacidade",
-  "Trocas e Devoluções",
-  "Termos de Uso",
-];
-const AJUDA = [
-  "Como Comprar",
-  "Formas de Pagamento",
-  "Prazos de Entrega",
-  "Rastreamento",
-  "Perguntas Frequentes",
-];
-const PAYMENTS = ["Visa", "Master", "Amex", "Boleto", "Pix"];
-
-function Column({ title, links }: { title: string; links: string[] }) {
-  return (
-    <div>
-      <h3 className="mb-4 text-sm font-bold tracking-wide text-white">{title}</h3>
-      <ul className="space-y-2.5">
-        {links.map((link) => (
-          <li key={link}>
-            <a href="#" className="text-sm text-white/60 transition-colors hover:text-brand">
-              {link}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA } from "@/lib/home-service";
 
 export function Footer() {
+  const [footerData, setFooterData] = useState(DEFAULT_HOME_PAGE_DATA.footer);
+
+  useEffect(() => {
+    // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.footer) {
+            setFooterData(parsed.footer);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to read from localStorage in Footer:", e);
+      }
+    }
+
+    // 2. Fetch do banco de dados para garantir que está atualizado
+    async function loadFooter() {
+      try {
+        const data = await fetchHomePageContent();
+        if (data && data.footer) {
+          setFooterData(data.footer);
+        }
+      } catch (e) {
+        console.error("Failed to fetch footer content:", e);
+      }
+    }
+
+    loadFooter();
+
+    // 3. Ouvir alterações feitas na área administrativa no mesmo navegador
+    const handleStorageChange = () => {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.footer) {
+            setFooterData(parsed.footer);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const socialsMap = [
+    { icon: Instagram, url: footerData.instagramUrl },
+    { icon: Facebook, url: footerData.facebookUrl },
+    { icon: MessageCircle, url: footerData.whatsappUrl },
+    { icon: Youtube, url: footerData.youtubeUrl },
+  ];
+
   return (
     <footer className="bg-ink">
       <div className="mx-auto max-w-[1240px] px-4 py-14 sm:px-6">
@@ -48,41 +74,84 @@ export function Footer() {
               ÓCULOS COM ESTILO
             </p>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
-              A Glasses nasceu para transformar seu estilo e sua visão. Aqui você encontra os
-              melhores óculos com qualidade e preço justo.
+              {footerData.description}
             </p>
             <div className="mt-5 flex gap-3">
-              {[Instagram, Facebook, MessageCircle, Youtube].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="grid h-9 w-9 place-items-center rounded-full border border-hairline text-white/70 transition-colors hover:border-brand hover:text-brand"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
+              {socialsMap.map((social, i) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={i}
+                    href={social.url || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="grid h-9 w-9 place-items-center rounded-full border border-hairline text-white/70 transition-colors hover:border-brand hover:text-brand"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          <Column title="INSTITUCIONAL" links={INSTITUCIONAL} />
-          <Column title="AJUDA" links={AJUDA} />
-
+          {/* Column 2: Institucional */}
           <div>
-            <h3 className="mb-4 text-sm font-bold tracking-wide text-white">ATENDIMENTO</h3>
-            <ul className="space-y-2.5 text-sm text-white/60">
-              <li>WhatsApp</li>
-              <li>E-mail</li>
-              <li>Horário de Atendimento</li>
-              <li className="font-semibold text-white">Seg a Sex 08h às 18h</li>
+            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+              {footerData.institucionalTitle}
+            </h3>
+            <ul className="space-y-2.5">
+              {footerData.institucionalLinks.map((link, idx) => (
+                <li key={idx}>
+                  <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Column 3: Ajuda */}
           <div>
-            <h3 className="mb-4 text-sm font-bold tracking-wide text-white">FORMAS DE PAGAMENTO</h3>
+            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+              {footerData.ajudaTitle}
+            </h3>
+            <ul className="space-y-2.5">
+              {footerData.ajudaLinks.map((link, idx) => (
+                <li key={idx}>
+                  <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Atendimento */}
+          <div>
+            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+              {footerData.atendimentoTitle}
+            </h3>
+            <ul className="space-y-2.5 text-sm text-white/60">
+              {footerData.atendimentoLines.map((line, idx) => {
+                const isLast = idx === footerData.atendimentoLines.length - 1;
+                return (
+                  <li key={idx} className={isLast ? "font-semibold text-white mt-1" : ""}>
+                    {line}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Column 5: Formas de Pagamento */}
+          <div>
+            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+              {footerData.paymentsTitle}
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {PAYMENTS.map((p) => (
+              {footerData.payments.map((p, idx) => (
                 <span
-                  key={p}
+                  key={idx}
                   className="rounded border border-hairline bg-ink-2 px-2.5 py-1.5 text-[11px] font-semibold text-white/80"
                 >
                   {p}
@@ -91,7 +160,7 @@ export function Footer() {
             </div>
             <div className="mt-4 flex items-center gap-2 text-white/70">
               <Lock className="h-4 w-4 text-brand" />
-              <span className="text-xs font-bold tracking-wide">COMPRA 100% SEGURA</span>
+              <span className="text-xs font-bold tracking-wide uppercase">COMPRA 100% SEGURA</span>
             </div>
           </div>
         </div>
@@ -99,7 +168,7 @@ export function Footer() {
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.4.1
+          © 2024 Glasses. Todos os direitos reservados. | v1.5.0
         </p>
       </div>
     </footer>

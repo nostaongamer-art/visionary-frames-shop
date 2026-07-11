@@ -3,13 +3,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { toast } from "sonner";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type TabType = "promo" | "hero" | "categories" | "products" | "testimonials" | "newsletter";
+type TabType = "promo" | "hero" | "categories" | "products" | "testimonials" | "newsletter" | "footer";
 
 function Admin() {
   const navigate = useNavigate();
@@ -281,6 +281,15 @@ function Admin() {
           >
             <Mail className="h-4 w-4 shrink-0" />
             Newsletter
+          </button>
+          <button
+            onClick={() => setActiveTab("footer")}
+            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
+              activeTab === "footer" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <Layout className="h-4 w-4 shrink-0" />
+            Rodapé (Footer)
           </button>
         </div>
 
@@ -816,6 +825,276 @@ function Admin() {
                   }))
                 }
               />
+            </div>
+          )}
+
+          {/* TAB 7: Rodapé (Footer) */}
+          {activeTab === "footer" && (
+            <div className="flex flex-col gap-6">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Configurações do Rodapé (Footer)
+              </h3>
+
+              {/* Coluna 1: Sobre */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 1: Sobre a Loja</h4>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Descrição da Loja</label>
+                  <textarea
+                    value={data.footer?.description || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, description: e.target.value },
+                      }))
+                    }
+                    rows={3}
+                    className="w-full p-3 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link do Instagram</label>
+                    <input
+                      type="text"
+                      value={data.footer?.instagramUrl || ""}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          footer: { ...prev.footer, instagramUrl: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link do Facebook</label>
+                    <input
+                      type="text"
+                      value={data.footer?.facebookUrl || ""}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          footer: { ...prev.footer, facebookUrl: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link do WhatsApp</label>
+                    <input
+                      type="text"
+                      value={data.footer?.whatsappUrl || ""}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          footer: { ...prev.footer, whatsappUrl: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link do YouTube</label>
+                    <input
+                      type="text"
+                      value={data.footer?.youtubeUrl || ""}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          footer: { ...prev.footer, youtubeUrl: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Coluna 2: Institucional */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 2: Institucional</h4>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
+                  <input
+                    type="text"
+                    value={data.footer?.institucionalTitle || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, institucionalTitle: e.target.value },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+                {data.footer?.institucionalLinks.map((link, idx) => (
+                  <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-3 border-l border-white/10">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Texto do Link {idx + 1}</label>
+                      <input
+                        type="text"
+                        value={link.label}
+                        onChange={(e) => {
+                          const newLinks = [...data.footer.institucionalLinks];
+                          newLinks[idx] = { ...link, label: e.target.value };
+                          setData((prev) => ({
+                            ...prev,
+                            footer: { ...prev.footer, institucionalLinks: newLinks },
+                          }));
+                        }}
+                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
+                      <input
+                        type="text"
+                        value={link.href}
+                        onChange={(e) => {
+                          const newLinks = [...data.footer.institucionalLinks];
+                          newLinks[idx] = { ...link, href: e.target.value };
+                          setData((prev) => ({
+                            ...prev,
+                            footer: { ...prev.footer, institucionalLinks: newLinks },
+                          }));
+                        }}
+                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Coluna 3: Ajuda */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 3: Ajuda</h4>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
+                  <input
+                    type="text"
+                    value={data.footer?.ajudaTitle || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, ajudaTitle: e.target.value },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+                {data.footer?.ajudaLinks.map((link, idx) => (
+                  <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-3 border-l border-white/10">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Texto do Link {idx + 1}</label>
+                      <input
+                        type="text"
+                        value={link.label}
+                        onChange={(e) => {
+                          const newLinks = [...data.footer.ajudaLinks];
+                          newLinks[idx] = { ...link, label: e.target.value };
+                          setData((prev) => ({
+                            ...prev,
+                            footer: { ...prev.footer, ajudaLinks: newLinks },
+                          }));
+                        }}
+                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
+                      <input
+                        type="text"
+                        value={link.href}
+                        onChange={(e) => {
+                          const newLinks = [...data.footer.ajudaLinks];
+                          newLinks[idx] = { ...link, href: e.target.value };
+                          setData((prev) => ({
+                            ...prev,
+                            footer: { ...prev.footer, ajudaLinks: newLinks },
+                          }));
+                        }}
+                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Coluna 4: Atendimento */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 4: Atendimento</h4>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
+                  <input
+                    type="text"
+                    value={data.footer?.atendimentoTitle || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, atendimentoTitle: e.target.value },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+                {data.footer?.atendimentoLines.map((line, idx) => (
+                  <div key={idx} className="flex flex-col gap-1.5 pl-3 border-l border-white/10">
+                    <label className="text-[10px] font-bold text-white/60">Linha {idx + 1}</label>
+                    <input
+                      type="text"
+                      value={line}
+                      onChange={(e) => {
+                        const newLines = [...data.footer.atendimentoLines];
+                        newLines[idx] = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          footer: { ...prev.footer, atendimentoLines: newLines },
+                        }));
+                      }}
+                      className="w-full h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Coluna 5: Formas de Pagamento */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 5: Formas de Pagamento</h4>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
+                  <input
+                    type="text"
+                    value={data.footer?.paymentsTitle || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, paymentsTitle: e.target.value },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+                {data.footer?.payments.map((p, idx) => (
+                  <div key={idx} className="flex flex-col gap-1.5 pl-3 border-l border-white/10">
+                    <label className="text-[10px] font-bold text-white/60">Selo {idx + 1}</label>
+                    <input
+                      type="text"
+                      value={p}
+                      onChange={(e) => {
+                        const newPayments = [...data.footer.payments];
+                        newPayments[idx] = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          footer: { ...prev.footer, payments: newPayments },
+                        }));
+                      }}
+                      className="w-full h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
