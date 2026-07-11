@@ -173,14 +173,14 @@ export function getDirectDriveUrl(url: string): string {
     const regD = /\/file\/d\/([a-zA-Z0-9_-]+)/;
     const matchD = trimmed.match(regD);
     if (matchD && matchD[1]) {
-      return `https://docs.google.com/uc?export=download&id=${matchD[1]}`;
+      return `https://lh3.googleusercontent.com/d/${matchD[1]}`;
     }
     
     // Query format: ?id=FILE_ID
     const regId = /[?&]id=([a-zA-Z0-9_-]+)/;
     const matchId = trimmed.match(regId);
     if (matchId && matchId[1]) {
-      return `https://docs.google.com/uc?export=download&id=${matchId[1]}`;
+      return `https://lh3.googleusercontent.com/d/${matchId[1]}`;
     }
     
     // Folders path should not be loaded directly as an image, return original

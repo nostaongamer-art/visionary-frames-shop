@@ -102,6 +102,12 @@ function Admin() {
     recommendedSize: string;
   }) => {
     const directUrl = getDirectDriveUrl(value);
+    const [imageError, setImageError] = useState(false);
+
+    useEffect(() => {
+      setImageError(false);
+    }, [value]);
+
     return (
       <div className="border border-[#282C32]/45 rounded p-4 bg-[#15181D]/30 flex flex-col gap-3">
         <div className="flex flex-col gap-1">
@@ -125,18 +131,31 @@ function Admin() {
         {value && (
           <div className="flex items-center gap-3 bg-[#15181D]/80 p-2.5 rounded border border-white/5">
             <div className="h-14 w-14 bg-white/5 border border-white/10 rounded flex items-center justify-center overflow-hidden shrink-0">
-              <img
-                src={directUrl}
-                alt="Preview"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = "none";
-                }}
-                className="h-full w-full object-contain"
-              />
+              {imageError ? (
+                <div className="h-full w-full flex items-center justify-center bg-red-500/10 text-red-500 p-1 text-[8px] text-center font-bold">
+                  Erro Link
+                </div>
+              ) : (
+                <img
+                  src={directUrl}
+                  alt="Preview"
+                  onError={() => setImageError(true)}
+                  className="h-full w-full object-contain"
+                />
+              )}
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] font-bold text-white/70">Pré-visualização da Imagem</span>
-              <span className="text-[9px] text-[#666A72] truncate max-w-[250px] md:max-w-[400px]">
+              {imageError ? (
+                <span className="text-[9px] text-red-400 font-bold leading-tight">
+                  Atenção: Mude a permissão do arquivo no Drive para "Qualquer pessoa com o link"!
+                </span>
+              ) : (
+                <span className="text-[9px] text-emerald-400 font-medium">
+                  Link convertido e pronto para o site.
+                </span>
+              )}
+              <span className="text-[9px] text-[#666A72] truncate max-w-[250px] md:max-w-[400px] mt-0.5">
                 {directUrl}
               </span>
             </div>
