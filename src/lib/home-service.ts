@@ -11,6 +11,15 @@ export interface HomePageData {
     buttonLink: string;
     secondaryButtonText: string;
     secondaryButtonLink: string;
+    imageUrl?: string;
+  };
+  categories: {
+    list: Array<{
+      title: string;
+      description: string;
+      imageKey: string;
+      imageUrl?: string;
+    }>;
   };
   bestSellers: {
     title: string;
@@ -24,6 +33,7 @@ export interface HomePageData {
       price: string;
       installment: string;
       imageKey: string; // fallback matching key in local images
+      imageUrl?: string;
     }>;
   };
   testimonials: {
@@ -33,6 +43,7 @@ export interface HomePageData {
       name: string;
       text: string;
       imageKey: string;
+      imageUrl?: string;
     }>;
   };
   newsletter: {
@@ -40,6 +51,7 @@ export interface HomePageData {
     subtitle: string;
     placeholder: string;
     buttonText: string;
+    imageUrl?: string;
   };
 }
 
@@ -54,6 +66,15 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     buttonLink: "#mais-vendidos",
     secondaryButtonText: "VER COLEÇÃO",
     secondaryButtonLink: "#categorias",
+    imageUrl: "",
+  },
+  categories: {
+    list: [
+      { title: "MASCULINO", description: "Estilo e atitude em cada detalhe", imageKey: "catMasc", imageUrl: "" },
+      { title: "FEMININO", description: "Sofisticação que realça sua beleza", imageKey: "catFem", imageUrl: "" },
+      { title: "SOLAR", description: "Proteção e estilo para todos os dias", imageKey: "catSolar", imageUrl: "" },
+      { title: "PREMIUM", description: "Exclusividade e design premium", imageKey: "catPrem", imageUrl: "" },
+    ],
   },
   bestSellers: {
     title: "Mais Vendidos",
@@ -68,6 +89,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
         price: "R$ 199,90",
         installment: "12x de R$ 19,90",
         imageKey: "prod1",
+        imageUrl: "",
       },
       {
         id: 2,
@@ -78,6 +100,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
         price: "R$ 254,90",
         installment: "12x de R$ 25,49",
         imageKey: "prod2",
+        imageUrl: "",
       },
       {
         id: 3,
@@ -88,6 +111,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
         price: "R$ 149,90",
         installment: "12x de R$ 14,90",
         imageKey: "prod3",
+        imageUrl: "",
       },
       {
         id: 4,
@@ -98,6 +122,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
         price: "R$ 269,90",
         installment: "12x de R$ 26,99",
         imageKey: "prod4",
+        imageUrl: "",
       },
     ],
   },
@@ -109,16 +134,19 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
         name: "Juliana M.",
         text: "Amei meu óculos! Chegou super rápido e a qualidade é incrível. Já virei cliente fiel da Glasses!",
         imageKey: "client1",
+        imageUrl: "",
       },
       {
         name: "Ricardo S.",
         text: "A qualidade dos óculos é excelente. O modelo solar polarizado protege muito bem nos dias quentes.",
         imageKey: "client2",
+        imageUrl: "",
       },
       {
         name: "Thiago L.",
         text: "Muito satisfeito! Entrega pontual, óculos bem embalado e design super moderno. Recomendo a todos.",
         imageKey: "client3",
+        imageUrl: "",
       },
     ],
   },
@@ -127,8 +155,42 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     subtitle: "Cadastre-se para receber ofertas exclusivas e descontos em primeira mão",
     placeholder: "Digite seu melhor e-mail",
     buttonText: "CADASTRAR",
+    imageUrl: "",
   },
 };
+
+/**
+ * Converts a Google Drive shareable link into a direct download/image render link
+ */
+export function getDirectDriveUrl(url: string): string {
+  if (!url) return "";
+  
+  // Trim spaces
+  const trimmed = url.trim();
+  
+  if (trimmed.includes("drive.google.com") || trimmed.includes("docs.google.com")) {
+    // Standard format: /file/d/FILE_ID/view
+    const regD = /\/file\/d\/([a-zA-Z0-9_-]+)/;
+    const matchD = trimmed.match(regD);
+    if (matchD && matchD[1]) {
+      return `https://docs.google.com/uc?export=download&id=${matchD[1]}`;
+    }
+    
+    // Query format: ?id=FILE_ID
+    const regId = /[?&]id=([a-zA-Z0-9_-]+)/;
+    const matchId = trimmed.match(regId);
+    if (matchId && matchId[1]) {
+      return `https://docs.google.com/uc?export=download&id=${matchId[1]}`;
+    }
+    
+    // Folders path should not be loaded directly as an image, return original
+    if (trimmed.includes("/folders/")) {
+      return trimmed;
+    }
+  }
+  
+  return trimmed;
+}
 
 export async function fetchHomePageContent(): Promise<HomePageData> {
   try {
@@ -143,7 +205,32 @@ export async function fetchHomePageContent(): Promise<HomePageData> {
       return DEFAULT_HOME_PAGE_DATA;
     }
 
-    return (data.content as unknown) as HomePageData;
+    // Ensure newly added fields (like categories or imageUrls) have local defaults if not present in saved JSON
+    const saved = data.content as any;
+    const merged: HomePageData = {
+      promoBar: saved.promoBar || DEFAULT_HOME_PAGE_DATA.promoBar,
+      hero: { ...DEFAULT_HOME_PAGE_DATA.hero, ...saved.hero },
+      categories: saved.categories || DEFAULT_HOME_PAGE_DATA.categories,
+      bestSellers: {
+        title: saved.bestSellers?.title || DEFAULT_HOME_PAGE_DATA.bestSellers.title,
+        subtitle: saved.bestSellers?.subtitle || DEFAULT_HOME_PAGE_DATA.bestSellers.subtitle,
+        products: (saved.bestSellers?.products || DEFAULT_HOME_PAGE_DATA.bestSellers.products).map((prod: any, idx: number) => ({
+          ...DEFAULT_HOME_PAGE_DATA.bestSellers.products[idx],
+          ...prod
+        }))
+      },
+      testimonials: {
+        title: saved.testimonials?.title || DEFAULT_HOME_PAGE_DATA.testimonials.title,
+        subtitle: saved.testimonials?.subtitle || DEFAULT_HOME_PAGE_DATA.testimonials.subtitle,
+        list: (saved.testimonials?.list || DEFAULT_HOME_PAGE_DATA.testimonials.list).map((t: any, idx: number) => ({
+          ...DEFAULT_HOME_PAGE_DATA.testimonials.list[idx],
+          ...t
+        }))
+      },
+      newsletter: { ...DEFAULT_HOME_PAGE_DATA.newsletter, ...saved.newsletter },
+    };
+
+    return merged;
   } catch (err) {
     console.error("Failed to fetch home page content:", err);
     return DEFAULT_HOME_PAGE_DATA;

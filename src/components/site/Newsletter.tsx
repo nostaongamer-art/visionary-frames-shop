@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Ticket, Bell, Sparkles } from "lucide-react";
 import couple from "@/assets/newsletter-couple.jpg";
+import { getDirectDriveUrl } from "@/lib/home-service";
 
 const PERKS = [
   { icon: Ticket, label: "Cupons Exclusivos" },
@@ -13,6 +14,7 @@ export interface NewsletterData {
   subtitle: string;
   placeholder: string;
   buttonText: string;
+  imageUrl?: string;
 }
 
 export function Newsletter({ data }: { data?: NewsletterData }) {
@@ -24,6 +26,7 @@ export function Newsletter({ data }: { data?: NewsletterData }) {
   const subtitle = data?.subtitle || "Receba promoções exclusivas e lançamentos!";
   const placeholder = data?.placeholder || "Seu melhor e-mail";
   const buttonText = data?.buttonText || "EU QUERO!";
+  const imageSrc = (data?.imageUrl && getDirectDriveUrl(data.imageUrl)) || couple;
 
   const renderTitle = (text: string) => {
     return text.split("\n").map((line, i) => (
@@ -51,7 +54,7 @@ export function Newsletter({ data }: { data?: NewsletterData }) {
         {/* Left image */}
         <div className="overflow-hidden rounded-lg">
           <img
-            src={couple}
+            src={imageSrc}
             alt="Homem e mulher usando óculos"
             width={700}
             height={700}

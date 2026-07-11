@@ -35,7 +35,7 @@ function Index() {
         <Header />
         <main>
           <Hero data={homeData.hero} />
-          <Categories />
+          <Categories data={homeData.categories} />
           <BestSellers data={homeData.bestSellers} />
           <FlashBanner />
           <Testimonials data={homeData.testimonials} />

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Star, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 import { PRODUCTS, type Product } from "@/lib/shop-data";
 import { useCart } from "@/hooks/use-cart";
+import { getDirectDriveUrl } from "@/lib/home-service";
 
 const IMAGE_MAP: Record<string, string> = {
   prod1: PRODUCTS[0].image,
@@ -23,7 +24,7 @@ function Stars() {
 function ProductCard({ product }: { product: any }) {
   const { addItem } = useCart();
   const [liked, setLiked] = useState(false);
-  const imageSrc = IMAGE_MAP[product.imageKey] || product.image || PRODUCTS[product.id - 1]?.image;
+  const imageSrc = (product.imageUrl && getDirectDriveUrl(product.imageUrl)) || IMAGE_MAP[product.imageKey] || product.image || PRODUCTS[product.id - 1]?.image;
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-md">

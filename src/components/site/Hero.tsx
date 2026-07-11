@@ -1,5 +1,6 @@
 import { ArrowRight, Truck, ShieldCheck, Users, CreditCard } from "lucide-react";
 import heroMan from "@/assets/hero-man.jpg";
+import { getDirectDriveUrl } from "@/lib/home-service";
 
 const BENEFITS = [
   { icon: Truck, title: "FRETE GRÁTIS", subtitle: "Para todo Brasil" },
@@ -15,6 +16,7 @@ export interface HeroData {
   buttonLink: string;
   secondaryButtonText: string;
   secondaryButtonLink: string;
+  imageUrl?: string;
 }
 
 export function Hero({ data }: { data?: HeroData }) {
@@ -24,6 +26,7 @@ export function Hero({ data }: { data?: HeroData }) {
   const buttonLink = data?.buttonLink || "#mais-vendidos";
   const secondaryButtonText = data?.secondaryButtonText || "VER COLEÇÃO";
   const secondaryButtonLink = data?.secondaryButtonLink || "#categorias";
+  const imageSrc = (data?.imageUrl && getDirectDriveUrl(data.imageUrl)) || heroMan;
 
   const renderTitle = (text: string) => {
     return text.split("\n").map((line, i) => {
@@ -50,7 +53,7 @@ export function Hero({ data }: { data?: HeroData }) {
           {/* Background image on the right */}
           <div className="absolute inset-0">
             <img
-              src={heroMan}
+              src={imageSrc}
               alt="Homem jovem usando óculos escuros pretos"
               width={1200}
               height={1200}

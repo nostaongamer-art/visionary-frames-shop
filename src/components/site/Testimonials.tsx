@@ -1,5 +1,6 @@
 import { Star, ArrowRight } from "lucide-react";
 import { TESTIMONIALS, BRANDS } from "@/lib/shop-data";
+import { getDirectDriveUrl } from "@/lib/home-service";
 
 const CLIENT_IMAGE_MAP: Record<string, string> = {
   client1: TESTIMONIALS[0]?.image || "",
@@ -58,7 +59,7 @@ export function Testimonials({ data }: { data?: TestimonialsData }) {
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {list.map((t, idx) => {
-              const imageSrc = CLIENT_IMAGE_MAP[t.imageKey] || TESTIMONIALS[idx]?.image;
+              const imageSrc = (t.imageUrl && getDirectDriveUrl(t.imageUrl)) || CLIENT_IMAGE_MAP[t.imageKey] || TESTIMONIALS[idx]?.image;
               return (
                 <div
                   key={t.name}
