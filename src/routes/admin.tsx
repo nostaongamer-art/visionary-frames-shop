@@ -165,6 +165,36 @@ function Admin() {
     );
   };
 
+  // Helper component for toggle switch
+  const ToggleSwitch = ({
+    label,
+    checked,
+    onChange,
+  }: {
+    label: string;
+    checked: boolean;
+    onChange: (val: boolean) => void;
+  }) => {
+    return (
+      <div className="flex items-center justify-between p-3 rounded bg-[#15181D]/85 border border-[#282C32]/45">
+        <span className="text-[11px] font-semibold text-white/85">{label}</span>
+        <button
+          type="button"
+          onClick={() => onChange(!checked)}
+          className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+            checked ? "bg-[#FF8A00]" : "bg-white/10"
+          }`}
+        >
+          <span
+            className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+              checked ? "translate-x-5" : "translate-x-0"
+            }`}
+          />
+        </button>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#080A0D] flex items-center justify-center text-white select-none">
@@ -834,6 +864,73 @@ function Admin() {
               <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
                 Configurações do Rodapé (Footer)
               </h3>
+
+              {/* Visibilidade das Colunas */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Visibilidade das Colunas</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  <ToggleSwitch
+                    label="Coluna 1: Sobre a Loja"
+                    checked={data.footer?.showSobre !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, showSobre: val },
+                      }))
+                    }
+                  />
+                  <ToggleSwitch
+                    label="Ícones de Redes Sociais"
+                    checked={data.footer?.showSocials !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, showSocials: val },
+                      }))
+                    }
+                  />
+                  <ToggleSwitch
+                    label="Coluna 2: Institucional"
+                    checked={data.footer?.showInstitucional !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, showInstitucional: val },
+                      }))
+                    }
+                  />
+                  <ToggleSwitch
+                    label="Coluna 3: Ajuda"
+                    checked={data.footer?.showAjuda !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, showAjuda: val },
+                      }))
+                    }
+                  />
+                  <ToggleSwitch
+                    label="Coluna 4: Atendimento"
+                    checked={data.footer?.showAtendimento !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, showAtendimento: val },
+                      }))
+                    }
+                  />
+                  <ToggleSwitch
+                    label="Coluna 5: Pagamentos"
+                    checked={data.footer?.showPayments !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        footer: { ...prev.footer, showPayments: val },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
 
               {/* Coluna 1: Sobre */}
               <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">

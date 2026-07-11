@@ -65,110 +65,122 @@ export function Footer() {
       <div className="mx-auto max-w-[1240px] px-4 py-14 sm:px-6">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand column */}
-          <div className="lg:col-span-1">
-            <span className="font-display text-2xl font-extrabold tracking-tight">
-              <span className="text-brand">Gl</span>
-              <span className="text-white">asses</span>
-            </span>
-            <p className="mt-0.5 text-[9px] font-semibold tracking-[0.2em] text-white/60">
-              ÓCULOS COM ESTILO
-            </p>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
-              {footerData.description}
-            </p>
-            <div className="mt-5 flex gap-3">
-              {socialsMap.map((social, i) => {
-                const Icon = social.icon;
-                return (
-                  <a
-                    key={i}
-                    href={social.url || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="grid h-9 w-9 place-items-center rounded-full border border-hairline text-white/70 transition-colors hover:border-brand hover:text-brand"
-                  >
-                    <Icon className="h-4 w-4" />
-                  </a>
-                );
-              })}
+          {footerData.showSobre !== false && (
+            <div className="lg:col-span-1">
+              <span className="font-display text-2xl font-extrabold tracking-tight">
+                <span className="text-brand">Gl</span>
+                <span className="text-white">asses</span>
+              </span>
+              <p className="mt-0.5 text-[9px] font-semibold tracking-[0.2em] text-white/60">
+                ÓCULOS COM ESTILO
+              </p>
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
+                {footerData.description}
+              </p>
+              {footerData.showSocials !== false && (
+                <div className="mt-5 flex gap-3">
+                  {socialsMap.map((social, i) => {
+                    const Icon = social.icon;
+                    return (
+                      <a
+                        key={i}
+                        href={social.url || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="grid h-9 w-9 place-items-center rounded-full border border-hairline text-white/70 transition-colors hover:border-brand hover:text-brand"
+                      >
+                        <Icon className="h-4 w-4" />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Column 2: Institucional */}
-          <div>
-            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
-              {footerData.institucionalTitle}
-            </h3>
-            <ul className="space-y-2.5">
-              {footerData.institucionalLinks.map((link, idx) => (
-                <li key={idx}>
-                  <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {footerData.showInstitucional !== false && (
+            <div>
+              <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+                {footerData.institucionalTitle}
+              </h3>
+              <ul className="space-y-2.5">
+                {footerData.institucionalLinks.map((link, idx) => (
+                  <li key={idx}>
+                    <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Column 3: Ajuda */}
-          <div>
-            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
-              {footerData.ajudaTitle}
-            </h3>
-            <ul className="space-y-2.5">
-              {footerData.ajudaLinks.map((link, idx) => (
-                <li key={idx}>
-                  <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {footerData.showAjuda !== false && (
+            <div>
+              <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+                {footerData.ajudaTitle}
+              </h3>
+              <ul className="space-y-2.5">
+                {footerData.ajudaLinks.map((link, idx) => (
+                  <li key={idx}>
+                    <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Column 4: Atendimento */}
-          <div>
-            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
-              {footerData.atendimentoTitle}
-            </h3>
-            <ul className="space-y-2.5 text-sm text-white/60">
-              {footerData.atendimentoLines.map((line, idx) => {
-                const isLast = idx === footerData.atendimentoLines.length - 1;
-                return (
-                  <li key={idx} className={isLast ? "font-semibold text-white mt-1" : ""}>
-                    {line}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          {footerData.showAtendimento !== false && (
+            <div>
+              <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+                {footerData.atendimentoTitle}
+              </h3>
+              <ul className="space-y-2.5 text-sm text-white/60">
+                {footerData.atendimentoLines.map((line, idx) => {
+                  const isLast = idx === footerData.atendimentoLines.length - 1;
+                  return (
+                    <li key={idx} className={isLast ? "font-semibold text-white mt-1" : ""}>
+                      {line}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
 
           {/* Column 5: Formas de Pagamento */}
-          <div>
-            <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
-              {footerData.paymentsTitle}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {footerData.payments.map((p, idx) => (
-                <span
-                  key={idx}
-                  className="rounded border border-hairline bg-ink-2 px-2.5 py-1.5 text-[11px] font-semibold text-white/80"
-                >
-                  {p}
-                </span>
-              ))}
+          {footerData.showPayments !== false && (
+            <div>
+              <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
+                {footerData.paymentsTitle}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {footerData.payments.map((p, idx) => (
+                  <span
+                    key={idx}
+                    className="rounded border border-hairline bg-ink-2 px-2.5 py-1.5 text-[11px] font-semibold text-white/80"
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-white/70">
+                <Lock className="h-4 w-4 text-brand" />
+                <span className="text-xs font-bold tracking-wide uppercase">COMPRA 100% SEGURA</span>
+              </div>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-white/70">
-              <Lock className="h-4 w-4 text-brand" />
-              <span className="text-xs font-bold tracking-wide uppercase">COMPRA 100% SEGURA</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.5.0
+          © 2024 Glasses. Todos os direitos reservados. | v1.5.1
         </p>
       </div>
     </footer>

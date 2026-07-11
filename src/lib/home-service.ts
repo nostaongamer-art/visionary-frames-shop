@@ -54,6 +54,12 @@ export interface HomePageData {
     imageUrl?: string;
   };
   footer: {
+    showSobre?: boolean;
+    showSocials?: boolean;
+    showInstitucional?: boolean;
+    showAjuda?: boolean;
+    showAtendimento?: boolean;
+    showPayments?: boolean;
     description: string;
     instagramUrl: string;
     facebookUrl: string;
@@ -173,6 +179,12 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     imageUrl: "",
   },
   footer: {
+    showSobre: true,
+    showSocials: true,
+    showInstitucional: true,
+    showAjuda: true,
+    showAtendimento: true,
+    showPayments: true,
     description: "A Glasses nasceu para transformar seu estilo e sua visão. Aqui você encontra os melhores óculos com qualidade e preço justo.",
     instagramUrl: "#",
     facebookUrl: "#",
