@@ -51,18 +51,20 @@ export function Hero({ data }: { data?: HeroData }) {
         {/* Hero content */}
         <div className="relative min-h-[560px] overflow-hidden md:min-h-[600px]">
           {/* Background image on the right */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-ink">
             <img
               src={imageSrc}
               alt="Homem jovem usando óculos escuros pretos"
               width={1200}
               height={1200}
               referrerPolicy="no-referrer"
-              className="ml-auto h-full w-full object-cover object-center md:w-[62%]"
+              className="h-full w-full object-cover object-right"
             />
-            {/* Dark gradient over the left for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-transparent md:via-ink/70" />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent md:hidden" />
+            {/* Gradient from left to right for text readability and side blending */}
+            <div className="absolute inset-y-0 left-0 w-full md:w-[70%] bg-gradient-to-r from-ink via-ink/90 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/40 to-transparent z-0" />
+            {/* Gradient from bottom to top to fade out the image bottom crop line */}
+            <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-ink via-ink/80 to-transparent z-20" />
           </div>
 
           <div className="relative mx-auto flex h-full max-w-[1240px] items-center px-4 py-16 sm:px-6">
