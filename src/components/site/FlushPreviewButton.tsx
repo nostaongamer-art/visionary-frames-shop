@@ -7,10 +7,10 @@ export function FlushPreviewButton() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // Only show when the Vite HMR flush endpoint is reachable (dev/preview).
-    fetch("/__hmr_gate", { method: "GET" })
-      .then((res) => setVisible(res.ok))
-      .catch(() => setVisible(false));
+    // Show only in dev/preview environments (localhost or Lovable preview).
+    const hostname = window.location.hostname;
+    const isDev = hostname === "localhost" || hostname.includes("lovableproject.com") || hostname.includes("lovable.app");
+    setVisible(isDev);
   }, []);
 
   if (!visible) return null;
