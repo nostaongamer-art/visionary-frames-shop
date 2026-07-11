@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { FlushPreviewButton } from "../components/site/FlushPreviewButton";
 
 function NotFoundComponent() {
   return (
@@ -136,6 +137,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Dev-only helper to flush the HMR gate without spending credits. */}
+      <FlushPreviewButton />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
