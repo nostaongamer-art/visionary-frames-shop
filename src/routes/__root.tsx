@@ -137,6 +137,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Dev-only helper to flush the HMR gate without spending credits. */}
+      <FlushPreviewButton />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
