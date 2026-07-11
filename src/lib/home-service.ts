@@ -62,17 +62,21 @@ export interface HomePageData {
     showPayments?: boolean;
     description: string;
     instagramUrl: string;
+    showInstagram?: boolean;
     facebookUrl: string;
+    showFacebook?: boolean;
     whatsappUrl: string;
+    showWhatsapp?: boolean;
     youtubeUrl: string;
+    showYoutube?: boolean;
     institucionalTitle: string;
-    institucionalLinks: Array<{ label: string; href: string }>;
+    institucionalLinks: Array<{ label: string; href: string; show?: boolean }>;
     ajudaTitle: string;
-    ajudaLinks: Array<{ label: string; href: string }>;
+    ajudaLinks: Array<{ label: string; href: string; show?: boolean }>;
     atendimentoTitle: string;
-    atendimentoLines: Array<string>;
+    atendimentoLines: Array<{ text: string; show?: boolean }>;
     paymentsTitle: string;
-    payments: Array<string>;
+    payments: Array<{ label: string; imageUrl?: string; show?: boolean }>;
   };
 }
 
@@ -187,34 +191,44 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     showPayments: true,
     description: "A Glasses nasceu para transformar seu estilo e sua visão. Aqui você encontra os melhores óculos com qualidade e preço justo.",
     instagramUrl: "#",
+    showInstagram: true,
     facebookUrl: "#",
+    showFacebook: true,
     whatsappUrl: "#",
+    showWhatsapp: true,
     youtubeUrl: "#",
+    showYoutube: true,
     institucionalTitle: "INSTITUCIONAL",
     institucionalLinks: [
-      { label: "Sobre Nós", href: "#" },
-      { label: "Nossa Loja", href: "#" },
-      { label: "Política de Privacidade", href: "#" },
-      { label: "Trocas e Devoluções", href: "#" },
-      { label: "Termos de Uso", href: "#" },
+      { label: "Sobre Nós", href: "#", show: true },
+      { label: "Nossa Loja", href: "#", show: true },
+      { label: "Política de Privacidade", href: "#", show: true },
+      { label: "Trocas e Devoluções", href: "#", show: true },
+      { label: "Termos de Uso", href: "#", show: true },
     ],
     ajudaTitle: "AJUDA",
     ajudaLinks: [
-      { label: "Como Comprar", href: "#" },
-      { label: "Formas de Pagamento", href: "#" },
-      { label: "Prazos de Entrega", href: "#" },
-      { label: "Rastreamento", href: "#" },
-      { label: "Perguntas Frequentes", href: "#" },
+      { label: "Como Comprar", href: "#", show: true },
+      { label: "Formas de Pagamento", href: "#", show: true },
+      { label: "Prazos de Entrega", href: "#", show: true },
+      { label: "Rastreamento", href: "#", show: true },
+      { label: "Perguntas Frequentes", href: "#", show: true },
     ],
     atendimentoTitle: "ATENDIMENTO",
     atendimentoLines: [
-      "WhatsApp",
-      "E-mail",
-      "Horário de Atendimento",
-      "Seg a Sex 08h às 18h",
+      { text: "WhatsApp", show: true },
+      { text: "E-mail", show: true },
+      { text: "Horário de Atendimento", show: true },
+      { text: "Seg a Sex 08h às 18h", show: true },
     ],
     paymentsTitle: "FORMAS DE PAGAMENTO",
-    payments: ["Visa", "Master", "Amex", "Boleto", "Pix"],
+    payments: [
+      { label: "Visa", imageUrl: "", show: true },
+      { label: "Master", imageUrl: "", show: true },
+      { label: "Amex", imageUrl: "", show: true },
+      { label: "Boleto", imageUrl: "", show: true },
+      { label: "Pix", imageUrl: "", show: true },
+    ],
   },
 };
 
@@ -252,6 +266,53 @@ export function getDirectDriveUrl(url: string): string {
 }
 
 function mergeWithDefaults(saved: any): HomePageData {
+  // Safe helper to merge arrays of links
+  const mergeLinks = (savedLinks: any[], defaultLinks: any[]) => {
+    if (!Array.isArray(savedLinks)) return defaultLinks;
+    return defaultLinks.map((defaultLink, idx) => {
+      const savedLink = savedLinks[idx] || {};
+      return {
+        label: savedLink.label !== undefined ? savedLink.label : defaultLink.label,
+        href: savedLink.href !== undefined ? savedLink.href : defaultLink.href,
+        show: savedLink.show !== undefined ? savedLink.show : true,
+      };
+    });
+  };
+
+  // Safe helper for atendimento lines
+  const mergeAtendimento = (savedLines: any[], defaultLines: any[]) => {
+    if (!Array.isArray(savedLines)) return defaultLines;
+    return defaultLines.map((defaultLine, idx) => {
+      const savedLine = savedLines[idx];
+      if (typeof savedLine === "string") {
+        return { text: savedLine, show: true };
+      }
+      return {
+        text: savedLine?.text !== undefined ? savedLine.text : defaultLine.text,
+        show: savedLine?.show !== undefined ? savedLine.show : true,
+      };
+    });
+  };
+
+  // Safe helper for payments
+  const mergePayments = (savedPayments: any[], defaultPayments: any[]) => {
+    if (!Array.isArray(savedPayments)) return defaultPayments;
+    return defaultPayments.map((defaultPayment, idx) => {
+      const savedPayment = savedPayments[idx];
+      if (typeof savedPayment === "string") {
+        return { label: savedPayment, imageUrl: "", show: true };
+      }
+      return {
+        label: savedPayment?.label !== undefined ? savedPayment.label : defaultPayment.label,
+        imageUrl: savedPayment?.imageUrl !== undefined ? savedPayment.imageUrl : defaultPayment.imageUrl,
+        show: savedPayment?.show !== undefined ? savedPayment.show : true,
+      };
+    });
+  };
+
+  const defaultFooter = DEFAULT_HOME_PAGE_DATA.footer;
+  const savedFooter = saved.footer || {};
+
   return {
     promoBar: saved.promoBar || DEFAULT_HOME_PAGE_DATA.promoBar,
     hero: { ...DEFAULT_HOME_PAGE_DATA.hero, ...saved.hero },
@@ -273,7 +334,31 @@ function mergeWithDefaults(saved: any): HomePageData {
       }))
     },
     newsletter: { ...DEFAULT_HOME_PAGE_DATA.newsletter, ...saved.newsletter },
-    footer: { ...DEFAULT_HOME_PAGE_DATA.footer, ...saved.footer },
+    footer: {
+      showSobre: savedFooter.showSobre !== undefined ? savedFooter.showSobre : defaultFooter.showSobre,
+      showSocials: savedFooter.showSocials !== undefined ? savedFooter.showSocials : defaultFooter.showSocials,
+      showInstitucional: savedFooter.showInstitucional !== undefined ? savedFooter.showInstitucional : defaultFooter.showInstitucional,
+      showAjuda: savedFooter.showAjuda !== undefined ? savedFooter.showAjuda : defaultFooter.showAjuda,
+      showAtendimento: savedFooter.showAtendimento !== undefined ? savedFooter.showAtendimento : defaultFooter.showAtendimento,
+      showPayments: savedFooter.showPayments !== undefined ? savedFooter.showPayments : defaultFooter.showPayments,
+      description: savedFooter.description !== undefined ? savedFooter.description : defaultFooter.description,
+      instagramUrl: savedFooter.instagramUrl !== undefined ? savedFooter.instagramUrl : defaultFooter.instagramUrl,
+      showInstagram: savedFooter.showInstagram !== undefined ? savedFooter.showInstagram : defaultFooter.showInstagram,
+      facebookUrl: savedFooter.facebookUrl !== undefined ? savedFooter.facebookUrl : defaultFooter.facebookUrl,
+      showFacebook: savedFooter.showFacebook !== undefined ? savedFooter.showFacebook : defaultFooter.showFacebook,
+      whatsappUrl: savedFooter.whatsappUrl !== undefined ? savedFooter.whatsappUrl : defaultFooter.whatsappUrl,
+      showWhatsapp: savedFooter.showWhatsapp !== undefined ? savedFooter.showWhatsapp : defaultFooter.showWhatsapp,
+      youtubeUrl: savedFooter.youtubeUrl !== undefined ? savedFooter.youtubeUrl : defaultFooter.youtubeUrl,
+      showYoutube: savedFooter.showYoutube !== undefined ? savedFooter.showYoutube : defaultFooter.showYoutube,
+      institucionalTitle: savedFooter.institucionalTitle !== undefined ? savedFooter.institucionalTitle : defaultFooter.institucionalTitle,
+      institucionalLinks: mergeLinks(savedFooter.institucionalLinks, defaultFooter.institucionalLinks),
+      ajudaTitle: savedFooter.ajudaTitle !== undefined ? savedFooter.ajudaTitle : defaultFooter.ajudaTitle,
+      ajudaLinks: mergeLinks(savedFooter.ajudaLinks, defaultFooter.ajudaLinks),
+      atendimentoTitle: savedFooter.atendimentoTitle !== undefined ? savedFooter.atendimentoTitle : defaultFooter.atendimentoTitle,
+      atendimentoLines: mergeAtendimento(savedFooter.atendimentoLines, defaultFooter.atendimentoLines),
+      paymentsTitle: savedFooter.paymentsTitle !== undefined ? savedFooter.paymentsTitle : defaultFooter.paymentsTitle,
+      payments: mergePayments(savedFooter.payments, defaultFooter.payments),
+    },
   };
 }
 

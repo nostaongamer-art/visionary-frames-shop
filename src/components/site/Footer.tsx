@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Instagram, Facebook, Youtube, MessageCircle, Lock } from "lucide-react";
-import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA } from "@/lib/home-service";
+import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 
 export function Footer() {
   const [footerData, setFooterData] = useState(DEFAULT_HOME_PAGE_DATA.footer);
@@ -54,10 +54,10 @@ export function Footer() {
   }, []);
 
   const socialsMap = [
-    { icon: Instagram, url: footerData.instagramUrl },
-    { icon: Facebook, url: footerData.facebookUrl },
-    { icon: MessageCircle, url: footerData.whatsappUrl },
-    { icon: Youtube, url: footerData.youtubeUrl },
+    { icon: Instagram, url: footerData.instagramUrl, show: footerData.showInstagram !== false },
+    { icon: Facebook, url: footerData.facebookUrl, show: footerData.showFacebook !== false },
+    { icon: MessageCircle, url: footerData.whatsappUrl, show: footerData.showWhatsapp !== false },
+    { icon: Youtube, url: footerData.youtubeUrl, show: footerData.showYoutube !== false },
   ];
 
   return (
@@ -79,7 +79,7 @@ export function Footer() {
               </p>
               {footerData.showSocials !== false && (
                 <div className="mt-5 flex gap-3">
-                  {socialsMap.map((social, i) => {
+                  {socialsMap.filter(s => s.show).map((social, i) => {
                     const Icon = social.icon;
                     return (
                       <a
@@ -105,7 +105,7 @@ export function Footer() {
                 {footerData.institucionalTitle}
               </h3>
               <ul className="space-y-2.5">
-                {footerData.institucionalLinks.map((link, idx) => (
+                {footerData.institucionalLinks.filter(l => l.show !== false).map((link, idx) => (
                   <li key={idx}>
                     <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
                       {link.label}
@@ -123,7 +123,7 @@ export function Footer() {
                 {footerData.ajudaTitle}
               </h3>
               <ul className="space-y-2.5">
-                {footerData.ajudaLinks.map((link, idx) => (
+                {footerData.ajudaLinks.filter(l => l.show !== false).map((link, idx) => (
                   <li key={idx}>
                     <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
                       {link.label}
@@ -141,11 +141,11 @@ export function Footer() {
                 {footerData.atendimentoTitle}
               </h3>
               <ul className="space-y-2.5 text-sm text-white/60">
-                {footerData.atendimentoLines.map((line, idx) => {
-                  const isLast = idx === footerData.atendimentoLines.length - 1;
+                {footerData.atendimentoLines.filter(line => line.show !== false).map((line, idx, arr) => {
+                  const isLast = idx === arr.length - 1;
                   return (
                     <li key={idx} className={isLast ? "font-semibold text-white mt-1" : ""}>
-                      {line}
+                      {line.text}
                     </li>
                   );
                 })}
@@ -159,15 +159,28 @@ export function Footer() {
               <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
                 {footerData.paymentsTitle}
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {footerData.payments.map((p, idx) => (
-                  <span
-                    key={idx}
-                    className="rounded border border-hairline bg-ink-2 px-2.5 py-1.5 text-[11px] font-semibold text-white/80"
-                  >
-                    {p}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-2 items-center">
+                {footerData.payments.filter(p => p.show !== false).map((p, idx) => {
+                  if (p.imageUrl) {
+                    return (
+                      <img
+                        key={idx}
+                        src={getDirectDriveUrl(p.imageUrl)}
+                        alt={p.label}
+                        className="h-8 max-w-[60px] object-contain rounded bg-white p-0.5 border border-hairline"
+                        referrerPolicy="no-referrer"
+                      />
+                    );
+                  }
+                  return (
+                    <span
+                      key={idx}
+                      className="rounded border border-hairline bg-ink-2 px-2.5 py-1.5 text-[11px] font-semibold text-white/80"
+                    >
+                      {p.label}
+                    </span>
+                  );
+                })}
               </div>
               <div className="mt-4 flex items-center gap-2 text-white/70">
                 <Lock className="h-4 w-4 text-brand" />
@@ -180,7 +193,7 @@ export function Footer() {
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.5.1
+          © 2024 Glasses. Todos os direitos reservados. | v1.6.0
         </p>
       </div>
     </footer>

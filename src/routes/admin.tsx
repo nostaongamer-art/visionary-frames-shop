@@ -949,9 +949,32 @@ function Admin() {
                     className="w-full p-3 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-white/70">Link do Instagram</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-white/70">Link do Instagram</label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-white/60">Ativo</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setData((prev) => ({
+                              ...prev,
+                              footer: { ...prev.footer, showInstagram: prev.footer?.showInstagram !== false ? false : true },
+                            }))
+                          }
+                          className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                            data.footer?.showInstagram !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              data.footer?.showInstagram !== false ? "translate-x-4" : "translate-x-0"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={data.footer?.instagramUrl || ""}
@@ -965,7 +988,30 @@ function Admin() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-white/70">Link do Facebook</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-white/70">Link do Facebook</label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-white/60">Ativo</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setData((prev) => ({
+                              ...prev,
+                              footer: { ...prev.footer, showFacebook: prev.footer?.showFacebook !== false ? false : true },
+                            }))
+                          }
+                          className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                            data.footer?.showFacebook !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              data.footer?.showFacebook !== false ? "translate-x-4" : "translate-x-0"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={data.footer?.facebookUrl || ""}
@@ -979,7 +1025,30 @@ function Admin() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-white/70">Link do WhatsApp</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-white/70">Link do WhatsApp</label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-white/60">Ativo</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setData((prev) => ({
+                              ...prev,
+                              footer: { ...prev.footer, showWhatsapp: prev.footer?.showWhatsapp !== false ? false : true },
+                            }))
+                          }
+                          className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                            data.footer?.showWhatsapp !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              data.footer?.showWhatsapp !== false ? "translate-x-4" : "translate-x-0"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={data.footer?.whatsappUrl || ""}
@@ -993,7 +1062,30 @@ function Admin() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-white/70">Link do YouTube</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-white/70">Link do YouTube</label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-white/60">Ativo</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setData((prev) => ({
+                              ...prev,
+                              footer: { ...prev.footer, showYoutube: prev.footer?.showYoutube !== false ? false : true },
+                            }))
+                          }
+                          className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                            data.footer?.showYoutube !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              data.footer?.showYoutube !== false ? "translate-x-4" : "translate-x-0"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={data.footer?.youtubeUrl || ""}
@@ -1026,42 +1118,72 @@ function Admin() {
                     className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                   />
                 </div>
-                {data.footer?.institucionalLinks.map((link, idx) => (
-                  <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-3 border-l border-white/10">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-white/60">Texto do Link {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={link.label}
-                        onChange={(e) => {
-                          const newLinks = [...data.footer.institucionalLinks];
-                          newLinks[idx] = { ...link, label: e.target.value };
-                          setData((prev) => ({
-                            ...prev,
-                            footer: { ...prev.footer, institucionalLinks: newLinks },
-                          }));
-                        }}
-                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                      />
+                <div className="flex flex-col gap-4 mt-2">
+                  {data.footer?.institucionalLinks.map((link, idx) => (
+                    <div key={idx} className="border-l-2 border-brand/25 pl-4 py-1.5 flex flex-col gap-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase">Link {idx + 1}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-white/60 font-medium">Exibir Opção</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newLinks = [...data.footer.institucionalLinks];
+                              newLinks[idx] = { ...link, show: link.show !== false ? false : true };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, institucionalLinks: newLinks },
+                              }));
+                            }}
+                            className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                              link.show !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                            }`}
+                          >
+                            <span
+                              className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                link.show !== false ? "translate-x-4" : "translate-x-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Texto do Link</label>
+                          <input
+                            type="text"
+                            value={link.label}
+                            onChange={(e) => {
+                              const newLinks = [...data.footer.institucionalLinks];
+                              newLinks[idx] = { ...link, label: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, institucionalLinks: newLinks },
+                              }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
+                          <input
+                            type="text"
+                            value={link.href}
+                            onChange={(e) => {
+                              const newLinks = [...data.footer.institucionalLinks];
+                              newLinks[idx] = { ...link, href: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, institucionalLinks: newLinks },
+                              }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
-                      <input
-                        type="text"
-                        value={link.href}
-                        onChange={(e) => {
-                          const newLinks = [...data.footer.institucionalLinks];
-                          newLinks[idx] = { ...link, href: e.target.value };
-                          setData((prev) => ({
-                            ...prev,
-                            footer: { ...prev.footer, institucionalLinks: newLinks },
-                          }));
-                        }}
-                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                      />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               {/* Coluna 3: Ajuda */}
@@ -1081,42 +1203,72 @@ function Admin() {
                     className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                   />
                 </div>
-                {data.footer?.ajudaLinks.map((link, idx) => (
-                  <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-3 border-l border-white/10">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-white/60">Texto do Link {idx + 1}</label>
-                      <input
-                        type="text"
-                        value={link.label}
-                        onChange={(e) => {
-                          const newLinks = [...data.footer.ajudaLinks];
-                          newLinks[idx] = { ...link, label: e.target.value };
-                          setData((prev) => ({
-                            ...prev,
-                            footer: { ...prev.footer, ajudaLinks: newLinks },
-                          }));
-                        }}
-                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                      />
+                <div className="flex flex-col gap-4 mt-2">
+                  {data.footer?.ajudaLinks.map((link, idx) => (
+                    <div key={idx} className="border-l-2 border-brand/25 pl-4 py-1.5 flex flex-col gap-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase">Link {idx + 1}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-white/60 font-medium">Exibir Opção</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newLinks = [...data.footer.ajudaLinks];
+                              newLinks[idx] = { ...link, show: link.show !== false ? false : true };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, ajudaLinks: newLinks },
+                              }));
+                            }}
+                            className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                              link.show !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                            }`}
+                          >
+                            <span
+                              className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                link.show !== false ? "translate-x-4" : "translate-x-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Texto do Link</label>
+                          <input
+                            type="text"
+                            value={link.label}
+                            onChange={(e) => {
+                              const newLinks = [...data.footer.ajudaLinks];
+                              newLinks[idx] = { ...link, label: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, ajudaLinks: newLinks },
+                              }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
+                          <input
+                            type="text"
+                            value={link.href}
+                            onChange={(e) => {
+                              const newLinks = [...data.footer.ajudaLinks];
+                              newLinks[idx] = { ...link, href: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, ajudaLinks: newLinks },
+                              }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
-                      <input
-                        type="text"
-                        value={link.href}
-                        onChange={(e) => {
-                          const newLinks = [...data.footer.ajudaLinks];
-                          newLinks[idx] = { ...link, href: e.target.value };
-                          setData((prev) => ({
-                            ...prev,
-                            footer: { ...prev.footer, ajudaLinks: newLinks },
-                          }));
-                        }}
-                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                      />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               {/* Coluna 4: Atendimento */}
@@ -1136,24 +1288,51 @@ function Admin() {
                     className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                   />
                 </div>
-                {data.footer?.atendimentoLines.map((line, idx) => (
-                  <div key={idx} className="flex flex-col gap-1.5 pl-3 border-l border-white/10">
-                    <label className="text-[10px] font-bold text-white/60">Linha {idx + 1}</label>
-                    <input
-                      type="text"
-                      value={line}
-                      onChange={(e) => {
-                        const newLines = [...data.footer.atendimentoLines];
-                        newLines[idx] = e.target.value;
-                        setData((prev) => ({
-                          ...prev,
-                          footer: { ...prev.footer, atendimentoLines: newLines },
-                        }));
-                      }}
-                      className="w-full h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                    />
-                  </div>
-                ))}
+                <div className="flex flex-col gap-4 mt-2">
+                  {data.footer?.atendimentoLines.map((line, idx) => (
+                    <div key={idx} className="border-l-2 border-brand/25 pl-4 py-1.5 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase font-mono">Linha {idx + 1}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-white/60 font-medium">Exibir Opção</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newLines = [...data.footer.atendimentoLines];
+                              newLines[idx] = { ...line, show: line.show !== false ? false : true };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, atendimentoLines: newLines },
+                              }));
+                            }}
+                            className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                              line.show !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                            }`}
+                          >
+                            <span
+                              className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                line.show !== false ? "translate-x-4" : "translate-x-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+                      <input
+                        type="text"
+                        value={line.text}
+                        onChange={(e) => {
+                          const newLines = [...data.footer.atendimentoLines];
+                          newLines[idx] = { ...line, text: e.target.value };
+                          setData((prev) => ({
+                            ...prev,
+                            footer: { ...prev.footer, atendimentoLines: newLines },
+                          }));
+                        }}
+                        className="w-full h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Coluna 5: Formas de Pagamento */}
@@ -1173,24 +1352,87 @@ function Admin() {
                     className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                   />
                 </div>
-                {data.footer?.payments.map((p, idx) => (
-                  <div key={idx} className="flex flex-col gap-1.5 pl-3 border-l border-white/10">
-                    <label className="text-[10px] font-bold text-white/60">Selo {idx + 1}</label>
-                    <input
-                      type="text"
-                      value={p}
-                      onChange={(e) => {
-                        const newPayments = [...data.footer.payments];
-                        newPayments[idx] = e.target.value;
-                        setData((prev) => ({
-                          ...prev,
-                          footer: { ...prev.footer, payments: newPayments },
-                        }));
-                      }}
-                      className="w-full h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                    />
-                  </div>
-                ))}
+                <div className="flex flex-col gap-4 mt-2">
+                  {data.footer?.payments.map((p, idx) => (
+                    <div key={idx} className="border-l-2 border-brand/25 pl-4 py-2.5 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase font-mono">Bandeira / Método {idx + 1}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-white/60 font-medium">Exibir Opção</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newPayments = [...data.footer.payments];
+                              newPayments[idx] = { ...p, show: p.show !== false ? false : true };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, payments: newPayments },
+                              }));
+                            }}
+                            className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                              p.show !== false ? "bg-[#FF8A00]" : "bg-white/10"
+                            }`}
+                          >
+                            <span
+                              className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                p.show !== false ? "translate-x-4" : "translate-x-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Nome (Ex: Visa, Pix)</label>
+                          <input
+                            type="text"
+                            value={p.label}
+                            onChange={(e) => {
+                              const newPayments = [...data.footer.payments];
+                              newPayments[idx] = { ...p, label: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, payments: newPayments },
+                              }));
+                            }}
+                            className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Imagem (Link Google Drive - Opcional)</label>
+                          <input
+                            type="text"
+                            value={p.imageUrl || ""}
+                            onChange={(e) => {
+                              const newPayments = [...data.footer.payments];
+                              newPayments[idx] = { ...p, imageUrl: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                footer: { ...prev.footer, payments: newPayments },
+                              }));
+                            }}
+                            placeholder="Cole o link do Drive para exibir imagem da bandeira"
+                            className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                      {p.imageUrl && (
+                        <div className="flex items-center gap-2 bg-[#15181D]/50 p-2 rounded border border-white/5 w-fit">
+                          <span className="text-[9px] text-white/60">Pré-visualização:</span>
+                          <img
+                            src={getDirectDriveUrl(p.imageUrl)}
+                            alt={p.label}
+                            className="h-6 max-w-[50px] object-contain rounded bg-white p-0.5 border border-white/10"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
