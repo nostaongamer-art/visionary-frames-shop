@@ -3,6 +3,13 @@ import { Star, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 import { PRODUCTS, type Product } from "@/lib/shop-data";
 import { useCart } from "@/hooks/use-cart";
 
+const IMAGE_MAP: Record<string, string> = {
+  prod1: PRODUCTS[0].image,
+  prod2: PRODUCTS[1].image,
+  prod3: PRODUCTS[2].image,
+  prod4: PRODUCTS[3].image,
+};
+
 function Stars() {
   return (
     <div className="flex items-center gap-0.5">
@@ -13,9 +20,10 @@ function Stars() {
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: any }) {
   const { addItem } = useCart();
   const [liked, setLiked] = useState(false);
+  const imageSrc = IMAGE_MAP[product.imageKey] || product.image || PRODUCTS[product.id - 1]?.image;
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-md">
@@ -24,7 +32,7 @@ function ProductCard({ product }: { product: Product }) {
           {product.discount}
         </span>
         <img
-          src={product.image}
+          src={imageSrc}
           alt={product.name}
           width={700}
           height={600}
@@ -80,22 +88,42 @@ function SeeAllButton() {
   );
 }
 
-export function BestSellers() {
+export interface BestSellersData {
+  title: string;
+  subtitle: string;
+  products: Array<{
+    id: number;
+    name: string;
+    discount: string;
+    reviews: string;
+    oldPrice: string;
+    price: string;
+    installment: string;
+    imageKey: string;
+  }>;
+}
+
+export function BestSellers({ data }: { data?: BestSellersData }) {
+  const title = data?.title || "Mais Vendidos";
+  const subtitle = data?.subtitle || "Os modelos favoritos de nossos clientes com descontos especiais";
+  const products = data?.products || PRODUCTS;
+
   return (
     <section id="mais-vendidos" className="bg-white py-14">
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
         <div className="relative mb-8 text-center">
           <p className="text-xs font-bold tracking-[0.2em] text-brand">ESCOLHAS QUE ENCANTAM</p>
           <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">
-            Mais Vendidos
+            {title}
           </h2>
+          <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">{subtitle}</p>
           <div className="mt-4 flex justify-center sm:absolute sm:right-0 sm:top-1/2 sm:mt-0 sm:-translate-y-1/2">
             <SeeAllButton />
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {PRODUCTS.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

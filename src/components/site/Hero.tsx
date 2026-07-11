@@ -8,7 +8,40 @@ const BENEFITS = [
   { icon: CreditCard, title: "ATÉ 12X SEM JUROS", subtitle: "No cartão de crédito" },
 ];
 
-export function Hero() {
+export interface HeroData {
+  title: string;
+  subtitle: string;
+  buttonText: string;
+  buttonLink: string;
+  secondaryButtonText: string;
+  secondaryButtonLink: string;
+}
+
+export function Hero({ data }: { data?: HeroData }) {
+  const title = data?.title || "Encontre o\nÓculos Perfeito\nPara Seu Estilo";
+  const subtitle = data?.subtitle || "Mais de 200 modelos exclusivos para transformar sua aparência e sua confiança.";
+  const buttonText = data?.buttonText || "COMPRAR AGORA";
+  const buttonLink = data?.buttonLink || "#mais-vendidos";
+  const secondaryButtonText = data?.secondaryButtonText || "VER COLEÇÃO";
+  const secondaryButtonLink = data?.secondaryButtonLink || "#categorias";
+
+  const renderTitle = (text: string) => {
+    return text.split("\n").map((line, i) => {
+      if (line.trim().toLowerCase() === "óculos perfeito") {
+        return (
+          <span key={i} className="text-brand block">
+            {line}
+          </span>
+        );
+      }
+      return (
+        <span key={i} className="block">
+          {line}
+        </span>
+      );
+    });
+  };
+
   return (
     <section id="top" className="relative bg-ink">
       <div className="relative">
@@ -31,28 +64,24 @@ export function Hero() {
           <div className="relative mx-auto flex h-full max-w-[1240px] items-center px-4 py-16 sm:px-6">
             <div className="max-w-xl">
               <h1 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Encontre o
-                <br />
-                <span className="text-brand">Óculos Perfeito</span>
-                <br />
-                Para Seu Estilo
+                {renderTitle(title)}
               </h1>
               <p className="mt-5 max-w-md text-sm text-white/70 sm:text-base">
-                Mais de 200 modelos exclusivos para transformar sua aparência e sua confiança.
+                {subtitle}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="#mais-vendidos"
+                  href={buttonLink}
                   className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
                 >
-                  COMPRAR AGORA
+                  {buttonText}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
-                  href="#categorias"
+                  href={secondaryButtonLink}
                   className="inline-flex cursor-pointer items-center justify-center rounded-md border border-white/40 bg-transparent px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:border-brand hover:text-brand"
                 >
-                  VER COLEÇÃO
+                  {secondaryButtonText}
                 </a>
               </div>
             </div>

@@ -8,10 +8,30 @@ const PERKS = [
   { icon: Sparkles, label: "Conteúdos de Estilo" },
 ];
 
-export function Newsletter() {
+export interface NewsletterData {
+  title: string;
+  subtitle: string;
+  placeholder: string;
+  buttonText: string;
+}
+
+export function Newsletter({ data }: { data?: NewsletterData }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+
+  const title = data?.title || "10% OFF NA SUA\nPRIMEIRA COMPRA";
+  const subtitle = data?.subtitle || "Receba promoções exclusivas e lançamentos!";
+  const placeholder = data?.placeholder || "Seu melhor e-mail";
+  const buttonText = data?.buttonText || "EU QUERO!";
+
+  const renderTitle = (text: string) => {
+    return text.split("\n").map((line, i) => (
+      <span key={i} className="block">
+        {line}
+      </span>
+    ));
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,25 +64,23 @@ export function Newsletter() {
         <div className="flex flex-col justify-center">
           <p className="text-xs font-bold tracking-[0.2em] text-brand">CADASTRE-SE E GANHE</p>
           <h2 className="mt-1 font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-            10% OFF NA SUA
-            <br />
-            PRIMEIRA COMPRA
+            {renderTitle(title)}
           </h2>
-          <p className="mt-2 text-sm text-white/60">Receba promoções exclusivas e lançamentos!</p>
+          <p className="mt-2 text-sm text-white/60">{subtitle}</p>
 
           <form onSubmit={submit} className="mt-5 flex flex-col gap-3 sm:flex-row">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Seu melhor e-mail"
+              placeholder={placeholder}
               className="flex-1 rounded-md border border-hairline bg-ink-2 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-brand focus:outline-none"
             />
             <button
               type="submit"
               className="cursor-pointer rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
             >
-              EU QUERO!
+              {buttonText}
             </button>
           </form>
           {error && <p className="mt-2 text-xs text-destructive">{error}</p>}

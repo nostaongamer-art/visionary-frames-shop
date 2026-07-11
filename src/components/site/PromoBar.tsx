@@ -11,7 +11,7 @@ function Unit({ value, label }: { value: string; label: string }) {
   );
 }
 
-export function PromoBar() {
+export function PromoBar({ text }: { text?: string }) {
   const { hours, minutes, seconds } = useCountdown();
   const [open, setOpen] = useState(true);
 
@@ -23,7 +23,7 @@ export function PromoBar() {
         <div className="flex items-center gap-2 text-center">
           <Clock className="hidden h-4 w-4 shrink-0 sm:block" />
           <p className="text-[11px] font-semibold tracking-wide sm:text-xs">
-            PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS
+            {text || "PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS"}
           </p>
         </div>
         <div className="flex items-center gap-3">
