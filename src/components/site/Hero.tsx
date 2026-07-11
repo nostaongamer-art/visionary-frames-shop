@@ -51,7 +51,7 @@ export function Hero({ data }: { data?: HeroData }) {
         {/* Hero content */}
         <div className="relative min-h-[560px] overflow-hidden md:min-h-[600px]">
           {/* Background image on the right */}
-          <div className="absolute inset-0 bg-ink">
+          <div className="absolute inset-0 bg-ink z-0">
             <img
               src={imageSrc}
               alt="Homem jovem usando óculos escuros pretos"
@@ -61,13 +61,13 @@ export function Hero({ data }: { data?: HeroData }) {
               className="h-full w-full object-cover object-right"
             />
             {/* Gradient from left to right for text readability and side blending */}
-            <div className="absolute inset-y-0 left-0 w-full md:w-[70%] bg-gradient-to-r from-ink via-ink/90 to-transparent z-10" />
-            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/40 to-transparent z-0" />
+            <div className="absolute inset-y-0 left-0 w-full md:w-[70%] bg-gradient-to-r from-ink via-ink/90 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/40 to-transparent" />
             {/* Gradient from bottom to top to fade out the image bottom crop line */}
-            <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-ink via-ink/80 to-transparent z-20" />
+            <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-ink via-ink/80 to-transparent" />
           </div>
-
-          <div className="relative mx-auto flex h-full max-w-[1240px] items-center px-4 py-16 sm:px-6">
+ 
+          <div className="relative z-10 mx-auto flex h-full max-w-[1240px] items-center px-4 py-16 sm:px-6">
             <div className="max-w-xl">
               <h1 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
                 {renderTitle(title)}
@@ -93,9 +93,9 @@ export function Hero({ data }: { data?: HeroData }) {
             </div>
           </div>
         </div>
-
+ 
         {/* Benefits bar overlapping bottom of hero */}
-        <div className="relative z-10 mx-auto -mt-8 max-w-[1240px] px-4 pb-8 sm:px-6">
+        <div className="relative z-20 mx-auto -mt-8 max-w-[1240px] px-4 pb-8 sm:px-6">
           <div className="grid grid-cols-2 gap-y-6 rounded-lg border border-hairline/70 bg-ink-2 p-6 shadow-lg md:grid-cols-4 md:divide-x md:divide-hairline/60">
             {BENEFITS.map(({ icon: Icon, title, subtitle }) => (
               <div key={title} className="flex items-center gap-3 px-2 md:px-5">
