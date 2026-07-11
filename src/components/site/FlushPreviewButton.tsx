@@ -33,7 +33,7 @@ export function FlushPreviewButton() {
       type="button"
       onClick={handleFlush}
       title="Flush preview (atualizar HMR)"
-      className="fixed left-3 top-12 z-[100] inline-flex items-center gap-1.5 rounded-md bg-brand px-2.5 py-1.5 text-xs font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+      className="fixed left-3 top-3 z-[100] inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-brand px-2.5 py-1.5 text-xs font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
     >
       <Zap className="h-3.5 w-3.5" />
       {status === "flushing" && "Flush..."}
