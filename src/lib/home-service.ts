@@ -192,7 +192,45 @@ export function getDirectDriveUrl(url: string): string {
   return trimmed;
 }
 
+function mergeWithDefaults(saved: any): HomePageData {
+  return {
+    promoBar: saved.promoBar || DEFAULT_HOME_PAGE_DATA.promoBar,
+    hero: { ...DEFAULT_HOME_PAGE_DATA.hero, ...saved.hero },
+    categories: saved.categories || DEFAULT_HOME_PAGE_DATA.categories,
+    bestSellers: {
+      title: saved.bestSellers?.title || DEFAULT_HOME_PAGE_DATA.bestSellers.title,
+      subtitle: saved.bestSellers?.subtitle || DEFAULT_HOME_PAGE_DATA.bestSellers.subtitle,
+      products: (saved.bestSellers?.products || DEFAULT_HOME_PAGE_DATA.bestSellers.products).map((prod: any, idx: number) => ({
+        ...DEFAULT_HOME_PAGE_DATA.bestSellers.products[idx],
+        ...prod
+      }))
+    },
+    testimonials: {
+      title: saved.testimonials?.title || DEFAULT_HOME_PAGE_DATA.testimonials.title,
+      subtitle: saved.testimonials?.subtitle || DEFAULT_HOME_PAGE_DATA.testimonials.subtitle,
+      list: (saved.testimonials?.list || DEFAULT_HOME_PAGE_DATA.testimonials.list).map((t: any, idx: number) => ({
+        ...DEFAULT_HOME_PAGE_DATA.testimonials.list[idx],
+        ...t
+      }))
+    },
+    newsletter: { ...DEFAULT_HOME_PAGE_DATA.newsletter, ...saved.newsletter },
+  };
+}
+
 export async function fetchHomePageContent(): Promise<HomePageData> {
+  // 1. Tentar ler do localStorage primeiro para carregamento instantâneo no cliente
+  let localFallback: HomePageData | null = null;
+  if (typeof window !== "undefined") {
+    try {
+      const cached = localStorage.getItem("glasses_home_page_content");
+      if (cached) {
+        localFallback = JSON.parse(cached);
+      }
+    } catch (e) {
+      console.error("Failed to read from localStorage:", e);
+    }
+  }
+
   try {
     const { data, error } = await supabase
       .from("home_page_content")
@@ -201,43 +239,48 @@ export async function fetchHomePageContent(): Promise<HomePageData> {
       .single();
 
     if (error || !data) {
-      console.log("No home page content found in Supabase. Using fallback local data.");
-      return DEFAULT_HOME_PAGE_DATA;
+      console.log("No home page content found in Supabase. Using fallback.", error);
+      return localFallback || DEFAULT_HOME_PAGE_DATA;
     }
 
-    // Ensure newly added fields (like categories or imageUrls) have local defaults if not present in saved JSON
     const saved = data.content as any;
-    const merged: HomePageData = {
-      promoBar: saved.promoBar || DEFAULT_HOME_PAGE_DATA.promoBar,
-      hero: { ...DEFAULT_HOME_PAGE_DATA.hero, ...saved.hero },
-      categories: saved.categories || DEFAULT_HOME_PAGE_DATA.categories,
-      bestSellers: {
-        title: saved.bestSellers?.title || DEFAULT_HOME_PAGE_DATA.bestSellers.title,
-        subtitle: saved.bestSellers?.subtitle || DEFAULT_HOME_PAGE_DATA.bestSellers.subtitle,
-        products: (saved.bestSellers?.products || DEFAULT_HOME_PAGE_DATA.bestSellers.products).map((prod: any, idx: number) => ({
-          ...DEFAULT_HOME_PAGE_DATA.bestSellers.products[idx],
-          ...prod
-        }))
-      },
-      testimonials: {
-        title: saved.testimonials?.title || DEFAULT_HOME_PAGE_DATA.testimonials.title,
-        subtitle: saved.testimonials?.subtitle || DEFAULT_HOME_PAGE_DATA.testimonials.subtitle,
-        list: (saved.testimonials?.list || DEFAULT_HOME_PAGE_DATA.testimonials.list).map((t: any, idx: number) => ({
-          ...DEFAULT_HOME_PAGE_DATA.testimonials.list[idx],
-          ...t
-        }))
-      },
-      newsletter: { ...DEFAULT_HOME_PAGE_DATA.newsletter, ...saved.newsletter },
-    };
+    const merged = mergeWithDefaults(saved);
+
+    // Salvar no localStorage local
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("glasses_home_page_content", JSON.stringify(merged));
+      } catch (e) {
+        console.error("Failed to write to localStorage:", e);
+      }
+    }
 
     return merged;
   } catch (err) {
     console.error("Failed to fetch home page content:", err);
-    return DEFAULT_HOME_PAGE_DATA;
+    return localFallback || DEFAULT_HOME_PAGE_DATA;
   }
 }
 
-export async function saveHomePageContent(content: HomePageData): Promise<boolean> {
+export interface SaveResult {
+  success: boolean;
+  error?: string;
+  isLocalOnly?: boolean;
+}
+
+export async function saveHomePageContent(content: HomePageData): Promise<SaveResult> {
+  // Salvar no localStorage local imediatamente para atualização rápida do cliente
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem("glasses_home_page_content", JSON.stringify(content));
+      
+      // Emit a storage event or dispatch custom event to notify components in current page
+      window.dispatchEvent(new Event("storage"));
+    } catch (e) {
+      console.error("Failed to write to localStorage during save:", e);
+    }
+  }
+
   try {
     const { error } = await supabase.from("home_page_content").upsert({
       id: "home",
@@ -246,13 +289,13 @@ export async function saveHomePageContent(content: HomePageData): Promise<boolea
     });
 
     if (error) {
-      console.error("Error upserting home page content:", error);
-      throw error;
+      console.error("Error upserting home page content to Supabase:", error);
+      return { success: true, isLocalOnly: true, error: error.message };
     }
 
-    return true;
-  } catch (err) {
-    console.error("Failed to save home page content:", err);
-    return false;
+    return { success: true };
+  } catch (err: any) {
+    console.error("Failed to save home page content to Supabase:", err);
+    return { success: true, isLocalOnly: true, error: err.message || "Erro desconhecido" };
   }
 }

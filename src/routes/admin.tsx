@@ -43,13 +43,19 @@ function Admin() {
 
   const handleSave = async () => {
     setSaving(true);
-    const success = await saveHomePageContent(data);
+    const result = await saveHomePageContent(data);
     setSaving(false);
 
-    if (success) {
-      toast.success("Alterações salvas com sucesso no Supabase!");
+    if (result.success) {
+      if (result.isLocalOnly) {
+        toast.warning(
+          `Salvo temporariamente no navegador! Sincronização falhou: ${result.error || "Sem permissão"}. Certifique-se de que a tabela home_page_content e as permissões RLS foram criadas no Supabase.`
+        );
+      } else {
+        toast.success("Alterações salvas com sucesso no Supabase e na nuvem!");
+      }
     } else {
-      toast.error("Erro ao salvar alterações no Supabase. Verifique se o SQL foi rodado.");
+      toast.error(`Erro ao salvar: ${result.error || "Erro desconhecido"}`);
     }
   };
 
