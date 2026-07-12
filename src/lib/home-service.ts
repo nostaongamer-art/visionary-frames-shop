@@ -2,7 +2,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface HomePageData {
   promoBar: {
+    show?: boolean;
     text: string;
+    showTimer?: boolean;
+    timerDuration?: number;
   };
   hero: {
     title: string;
@@ -12,6 +15,15 @@ export interface HomePageData {
     secondaryButtonText: string;
     secondaryButtonLink: string;
     imageUrl?: string;
+    showBenefits?: boolean;
+    benefits?: Array<{
+      title: string;
+      subtitle: string;
+    }>;
+    titleFont?: string;
+    subtitleFont?: string;
+    buttonFont?: string;
+    secondaryButtonFont?: string;
   };
   categories: {
     list: Array<{
@@ -82,7 +94,10 @@ export interface HomePageData {
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   promoBar: {
+    show: true,
     text: "PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS",
+    showTimer: true,
+    timerDuration: 2 * 3600 + 15 * 60 + 30, // 8130 seconds
   },
   hero: {
     title: "Encontre o\nÓculos Perfeito\nPara Seu Estilo",
@@ -92,6 +107,17 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     secondaryButtonText: "VER COLEÇÃO",
     secondaryButtonLink: "#categorias",
     imageUrl: "",
+    showBenefits: true,
+    benefits: [
+      { title: "FRETE GRÁTIS", subtitle: "Para todo Brasil" },
+      { title: "TROCA GARANTIDA", subtitle: "Até 7 dias após o recebimento" },
+      { title: "10.000+ CLIENTES", subtitle: "Satisfeitos" },
+      { title: "ATÉ 12X SEM JUROS", subtitle: "No cartão de crédito" },
+    ],
+    titleFont: "default",
+    subtitleFont: "default",
+    buttonFont: "default",
+    secondaryButtonFont: "default",
   },
   categories: {
     list: [
@@ -281,7 +307,7 @@ function mergeWithDefaults(saved: any): HomePageData {
 
   // Safe helper for atendimento lines
   const mergeAtendimento = (savedLines: any[], defaultLines: any[]) => {
-    if (!Array.isArray(savedLines)) return defaultLines;
+    if (!Array.isArray(savedLines)) return defaultLinks;
     return defaultLines.map((defaultLine, idx) => {
       const savedLine = savedLines[idx];
       if (typeof savedLine === "string") {
@@ -314,8 +340,28 @@ function mergeWithDefaults(saved: any): HomePageData {
   const savedFooter = saved.footer || {};
 
   return {
-    promoBar: saved.promoBar || DEFAULT_HOME_PAGE_DATA.promoBar,
-    hero: { ...DEFAULT_HOME_PAGE_DATA.hero, ...saved.hero },
+    promoBar: {
+      show: saved.promoBar?.show !== undefined ? saved.promoBar.show : true,
+      text: saved.promoBar?.text !== undefined ? saved.promoBar.text : DEFAULT_HOME_PAGE_DATA.promoBar.text,
+      showTimer: saved.promoBar?.showTimer !== undefined ? saved.promoBar.showTimer : true,
+      timerDuration: saved.promoBar?.timerDuration !== undefined ? saved.promoBar.timerDuration : DEFAULT_HOME_PAGE_DATA.promoBar.timerDuration,
+    },
+    hero: {
+      ...DEFAULT_HOME_PAGE_DATA.hero,
+      ...saved.hero,
+      showBenefits: saved.hero?.showBenefits !== undefined ? saved.hero.showBenefits : true,
+      benefits: Array.isArray(saved.hero?.benefits) ? DEFAULT_HOME_PAGE_DATA.hero.benefits!.map((defaultBenefit, idx) => {
+        const savedBenefit = saved.hero.benefits[idx] || {};
+        return {
+          title: savedBenefit.title !== undefined ? savedBenefit.title : defaultBenefit.title,
+          subtitle: savedBenefit.subtitle !== undefined ? savedBenefit.subtitle : defaultBenefit.subtitle,
+        };
+      }) : DEFAULT_HOME_PAGE_DATA.hero.benefits,
+      titleFont: saved.hero?.titleFont || "default",
+      subtitleFont: saved.hero?.subtitleFont || "default",
+      buttonFont: saved.hero?.buttonFont || "default",
+      secondaryButtonFont: saved.hero?.secondaryButtonFont || "default",
+    },
     categories: saved.categories || DEFAULT_HOME_PAGE_DATA.categories,
     bestSellers: {
       title: saved.bestSellers?.title || DEFAULT_HOME_PAGE_DATA.bestSellers.title,

@@ -5,6 +5,59 @@ import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_P
 import { toast } from "sonner";
 import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout } from "lucide-react";
 
+const GOOGLE_FONTS_LIST = [
+  { value: "default", label: "Padrão do Site (Outfit/Inter)" },
+  { value: "Playfair Display", label: "Playfair Display (Serif Elegante)" },
+  { value: "Montserrat", label: "Montserrat (Sans Moderno)" },
+  { value: "Lora", label: "Lora (Serif Clássico)" },
+  { value: "Cinzel", label: "Cinzel (Romano Luxo)" },
+  { value: "Cormorant Garamond", label: "Cormorant Garamond (Serif Fino)" },
+  { value: "Syne", label: "Syne (Display Artístico)" },
+  { value: "Oswald", label: "Oswald (Condensado Forte)" },
+  { value: "Outfit", label: "Outfit (Geométrico Limpo)" },
+  { value: "Plus Jakarta Sans", label: "Plus Jakarta Sans (Moderno Clean)" },
+  { value: "Libre Baskerville", label: "Libre Baskerville (Serif Tradicional)" },
+  { value: "DM Serif Display", label: "DM Serif Display (Serif Impacto)" },
+  { value: "Bodoni Moda", label: "Bodoni Moda (Moda & Luxo)" },
+  { value: "Poppins", label: "Poppins (Geométrico Arredondado)" },
+  { value: "Merriweather", label: "Merriweather (Serif Editorial)" },
+  { value: "Raleway", label: "Raleway (Sans Sofisticado)" },
+  { value: "Cardo", label: "Cardo (Serif Antigo)" },
+  { value: "Prata", label: "Prata (Didone Elegante)" },
+  { value: "Unbounded", label: "Unbounded (Sans Negrito Moderno)" },
+  { value: "Archivo", label: "Archivo (Sans Técnico)" },
+  { value: "Julius Sans One", label: "Julius Sans One (Minimalista Fino)" },
+  { value: "Tenor Sans", label: "Tenor Sans (Feminino Elegante)" },
+  { value: "Italiana", label: "Italiana (Design Italiano)" },
+  { value: "Marcellus", label: "Marcellus (Romano Monumental)" },
+  { value: "Gilda Display", label: "Gilda Display (Fino & Delicado)" },
+  { value: "Forum", label: "Forum (Proporções Clássicas)" },
+  { value: "Antic Didone", label: "Antic Didone (Contraste Luxo)" },
+  { value: "Oranienbaum", label: "Oranienbaum (Serif Clássico Contraste)" },
+  { value: "Castoro", label: "Castoro (Orgânico Serif)" },
+  { value: "Lustria", label: "Lustria (Serif Amplo)" },
+  { value: "Spectral", label: "Spectral (Editorial Premium)" },
+  { value: "Sorts Mill Goudy", label: "Sorts Mill Goudy (Serif Suave)" },
+  { value: "Crimson Pro", label: "Crimson Pro (Serif Humanista)" },
+  { value: "Volkhov", label: "Volkhov (Serif Estruturado)" },
+  { value: "Alice", label: "Alice (Fantasia Serif)" },
+  { value: "Playfair", label: "Playfair (Display Serif)" },
+  { value: "Domine", label: "Domine (Serif Leitura)" },
+  { value: "Fraunces", label: "Fraunces (Expansivo & Vintage)" },
+  { value: "Newsreader", label: "Newsreader (Serif Premium)" },
+  { value: "Bricolage Grotesque", label: "Bricolage Grotesque (Moderno Expressivo)" },
+  { value: "Space Grotesk", label: "Space Grotesk (Futurista)" },
+  { value: "Lexend", label: "Lexend (Legibilidade)" },
+  { value: "Urbanist", label: "Urbanist (Moda Minimalista)" },
+  { value: "Quicksand", label: "Quicksand (Sans Amigável)" },
+  { value: "Jost", label: "Jost (Geométrico Futura)" },
+  { value: "Cabin", label: "Cabin (Sans Humanista)" },
+  { value: "Fira Sans", label: "Fira Sans (Geométrico Versátil)" },
+  { value: "Lato", label: "Lato (Sans Clássico)" },
+  { value: "Work Sans", label: "Work Sans (Sans Punchy)" },
+  { value: "Manrope", label: "Manrope (Limpo & Moderno)" },
+];
+
 export const Route = createFileRoute("/admin")({
   component: Admin,
 });
@@ -333,7 +386,31 @@ function Admin() {
               <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
                 Banner Promocional Superior
               </h3>
-              <div className="flex flex-col gap-1.5">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ToggleSwitch
+                  label="Exibir Barra Promocional (Laranja)"
+                  checked={data.promoBar.show !== false}
+                  onChange={(val) =>
+                    setData((prev) => ({
+                      ...prev,
+                      promoBar: { ...prev.promoBar, show: val },
+                    }))
+                  }
+                />
+                <ToggleSwitch
+                  label="Exibir Relógio Regressivo (Contador)"
+                  checked={data.promoBar.showTimer !== false}
+                  onChange={(val) =>
+                    setData((prev) => ({
+                      ...prev,
+                      promoBar: { ...prev.promoBar, showTimer: val },
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
                 <label className="text-xs font-semibold text-white/70">Texto da Promoção</label>
                 <input
                   type="text"
@@ -347,6 +424,73 @@ function Admin() {
                   className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                 />
               </div>
+
+              {data.promoBar.showTimer !== false && (
+                <div className="flex flex-col gap-2 mt-2">
+                  <label className="text-xs font-semibold text-white/70">Tempo Inicial do Relógio</label>
+                  <div className="grid grid-cols-3 gap-4 border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Horas</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={Math.floor((data.promoBar.timerDuration || 8130) / 3600)}
+                        onChange={(e) => {
+                          const h = Math.max(0, parseInt(e.target.value) || 0);
+                          const duration = data.promoBar.timerDuration || 8130;
+                          const m = Math.floor((duration % 3600) / 60);
+                          const s = duration % 60;
+                          setData((prev) => ({
+                            ...prev,
+                            promoBar: { ...prev.promoBar, timerDuration: h * 3600 + m * 60 + s }
+                          }));
+                        }}
+                        className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Minutos</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={Math.floor(((data.promoBar.timerDuration || 8130) % 3600) / 60)}
+                        onChange={(e) => {
+                          const m = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
+                          const duration = data.promoBar.timerDuration || 8130;
+                          const h = Math.floor(duration / 3600);
+                          const s = duration % 60;
+                          setData((prev) => ({
+                            ...prev,
+                            promoBar: { ...prev.promoBar, timerDuration: h * 3600 + m * 60 + s }
+                          }));
+                        }}
+                        className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Segundos</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={(data.promoBar.timerDuration || 8130) % 60}
+                        onChange={(e) => {
+                          const s = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
+                          const duration = data.promoBar.timerDuration || 8130;
+                          const h = Math.floor(duration / 3600);
+                          const m = Math.floor((duration % 3600) / 60);
+                          setData((prev) => ({
+                            ...prev,
+                            promoBar: { ...prev.promoBar, timerDuration: h * 3600 + m * 60 + s }
+                          }));
+                        }}
+                        className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -357,95 +501,181 @@ function Admin() {
                 Banner Principal (Hero)
               </h3>
               
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-white/70">Título Principal (Use \n para pular linha)</label>
-                <textarea
-                  value={data.hero.title}
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      hero: { ...prev.hero, title: e.target.value },
-                    }))
-                  }
-                  rows={3}
-                  className="w-full p-3 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-white/70">Subtítulo</label>
-                <textarea
-                  value={data.hero.subtitle}
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      hero: { ...prev.hero, subtitle: e.target.value },
-                    }))
-                  }
-                  rows={2}
-                  className="w-full p-3 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Texto do Botão Principal</label>
-                  <input
-                    type="text"
-                    value={data.hero.buttonText}
+                  <label className="text-xs font-semibold text-white/70">Título Principal (Use \n para pular linha)</label>
+                  <textarea
+                    value={data.hero.title}
                     onChange={(e) =>
                       setData((prev) => ({
                         ...prev,
-                        hero: { ...prev.hero, buttonText: e.target.value },
+                        hero: { ...prev.hero, title: e.target.value },
                       }))
                     }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    rows={3}
+                    className="w-full p-3 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Link do Botão Principal</label>
-                  <input
-                    type="text"
-                    value={data.hero.buttonLink}
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <label className="text-[10px] font-bold text-[#FF8A00] uppercase">Fonte do Título</label>
+                  <select
+                    value={data.hero.titleFont || "default"}
                     onChange={(e) =>
                       setData((prev) => ({
                         ...prev,
-                        hero: { ...prev.hero, buttonLink: e.target.value },
+                        hero: { ...prev.hero, titleFont: e.target.value },
                       }))
                     }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  >
+                    {GOOGLE_FONTS_LIST.map((f) => (
+                      <option key={f.value} value={f.value} className="bg-[#15181D] text-white">
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Texto do Botão Secundário</label>
-                  <input
-                    type="text"
-                    value={data.hero.secondaryButtonText}
+                  <label className="text-xs font-semibold text-white/70">Subtítulo</label>
+                  <textarea
+                    value={data.hero.subtitle}
                     onChange={(e) =>
                       setData((prev) => ({
                         ...prev,
-                        hero: { ...prev.hero, secondaryButtonText: e.target.value },
+                        hero: { ...prev.hero, subtitle: e.target.value },
                       }))
                     }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    rows={2}
+                    className="w-full p-3 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Link do Botão Secundário</label>
-                  <input
-                    type="text"
-                    value={data.hero.secondaryButtonLink}
+                <div className="flex flex-col gap-1.5 mt-1">
+                  <label className="text-[10px] font-bold text-[#FF8A00] uppercase">Fonte do Subtítulo</label>
+                  <select
+                    value={data.hero.subtitleFont || "default"}
                     onChange={(e) =>
                       setData((prev) => ({
                         ...prev,
-                        hero: { ...prev.hero, secondaryButtonLink: e.target.value },
+                        hero: { ...prev.hero, subtitleFont: e.target.value },
                       }))
                     }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  >
+                    {GOOGLE_FONTS_LIST.map((f) => (
+                      <option key={f.value} value={f.value} className="bg-[#15181D] text-white">
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="border border-[#282C32]/35 rounded-lg p-4 bg-[#15181D]/20 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Botão Principal</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Texto do Botão</label>
+                    <input
+                      type="text"
+                      value={data.hero.buttonText}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          hero: { ...prev.hero, buttonText: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link do Botão</label>
+                    <input
+                      type="text"
+                      value={data.hero.buttonLink}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          hero: { ...prev.hero, buttonLink: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold text-[#FF8A00] uppercase">Fonte do Botão Principal</label>
+                  <select
+                    value={data.hero.buttonFont || "default"}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        hero: { ...prev.hero, buttonFont: e.target.value },
+                      }))
+                    }
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  >
+                    {GOOGLE_FONTS_LIST.map((f) => (
+                      <option key={f.value} value={f.value} className="bg-[#15181D] text-white">
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="border border-[#282C32]/35 rounded-lg p-4 bg-[#15181D]/20 flex flex-col gap-4">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Botão Secundário</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Texto do Botão</label>
+                    <input
+                      type="text"
+                      value={data.hero.secondaryButtonText}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          hero: { ...prev.hero, secondaryButtonText: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link do Botão</label>
+                    <input
+                      type="text"
+                      value={data.hero.secondaryButtonLink}
+                      onChange={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          hero: { ...prev.hero, secondaryButtonLink: e.target.value },
+                        }))
+                      }
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold text-[#FF8A00] uppercase">Fonte do Botão Secundário</label>
+                  <select
+                    value={data.hero.secondaryButtonFont || "default"}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        hero: { ...prev.hero, secondaryButtonFont: e.target.value },
+                      }))
+                    }
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  >
+                    {GOOGLE_FONTS_LIST.map((f) => (
+                      <option key={f.value} value={f.value} className="bg-[#15181D] text-white">
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -461,6 +691,67 @@ function Admin() {
                   }))
                 }
               />
+
+              {/* Selos de Vantagens (Benefits Bar) */}
+              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4 mt-2">
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                  <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Selos de Vantagens (Abaixo do Hero)</h4>
+                  <ToggleSwitch
+                    label="Exibir Banner de Vantagens"
+                    checked={data.hero.showBenefits !== false}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        hero: { ...prev.hero, showBenefits: val },
+                      }))
+                    }
+                  />
+                </div>
+
+                {data.hero.showBenefits !== false && (
+                  <div className="flex flex-col gap-4">
+                    {(data.hero.benefits || []).map((benefit, idx) => (
+                      <div key={idx} className="border-l-2 border-brand/25 pl-4 py-1.5 flex flex-col gap-2.5">
+                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase font-mono">Selo {idx + 1}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-semibold text-white/60">Título</label>
+                            <input
+                              type="text"
+                              value={benefit.title}
+                              onChange={(e) => {
+                                const newBenefits = [...(data.hero.benefits || [])];
+                                newBenefits[idx] = { ...benefit, title: e.target.value };
+                                setData((prev) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, benefits: newBenefits },
+                                }));
+                              }}
+                              className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-semibold text-white/60">Subtítulo</label>
+                            <input
+                              type="text"
+                              value={benefit.subtitle}
+                              onChange={(e) => {
+                                const newBenefits = [...(data.hero.benefits || [])];
+                                newBenefits[idx] = { ...benefit, subtitle: e.target.value };
+                                setData((prev) => ({
+                                  ...prev,
+                                  hero: { ...prev.hero, benefits: newBenefits },
+                                }));
+                              }}
+                              className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
