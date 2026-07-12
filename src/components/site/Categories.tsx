@@ -23,6 +23,7 @@ export function Categories({ data }: { data?: CategoriesData }) {
     title: cat.title,
     description: cat.description,
     imageKey: idx === 0 ? "catMasc" : idx === 1 ? "catFem" : idx === 2 ? "catSolar" : "catPrem",
+    imageUrl: undefined as string | undefined,
   }));
 
   return (
