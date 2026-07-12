@@ -82,7 +82,7 @@ export function FlashBanner() {
   if (flashData.show === false) return null;
 
   return (
-    <section id="oferta" className="bg-white pb-14">
+    <section id="oferta" className="bg-background pb-14">
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
         <div className="flex flex-col items-center gap-6 rounded-lg border border-hairline/70 bg-gradient-to-r from-ink to-ink-2 p-6 shadow-sm lg:flex-row lg:justify-between lg:gap-8 lg:p-7">
           <div className="flex items-center gap-4 text-center lg:text-left">

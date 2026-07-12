@@ -303,7 +303,7 @@ function MasculinoPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-[#111111] font-sans selection:bg-[#FF8500] selection:text-white">
+    <div className="min-h-screen bg-background text-[#111111] font-sans selection:bg-[#FF8500] selection:text-white">
       {/* 1. Promotional Bar */}
       <PromoBar />
 
@@ -347,7 +347,7 @@ function MasculinoPage() {
       </section>
 
       {/* 4. Benefits Strip */}
-      <section className="bg-white border-b border-[#E0E0E0]">
+      <section className="bg-background border-b border-[#E0E0E0]">
         <div className="mx-auto max-w-[1240px] px-4 py-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-y-4 gap-x-2 text-left md:divide-x md:divide-[#E0E0E0]/60">
             <div className="flex items-center gap-2.5 px-1">
@@ -392,7 +392,7 @@ function MasculinoPage() {
       {/* 5. Main Area (Filters and Products Grid) */}
       <section className="mx-auto max-w-[1240px] px-4 py-8 sm:px-6">
         {/* Mobile Filter Trigger Button */}
-        <div className="md:hidden flex justify-between items-center gap-3 mb-6 bg-white p-3 rounded border border-[#E0E0E0]">
+        <div className="md:hidden flex justify-between items-center gap-3 mb-6 bg-background p-3 rounded border border-[#E0E0E0]">
           <span className="text-[11px] font-bold text-[#606060]">{filteredProducts.length} produtos encontrados</span>
           <button
             onClick={() => setMobileFiltersOpen(true)}
@@ -406,7 +406,7 @@ function MasculinoPage() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* 5.1. Sidebar Filters (Desktop only, drawer on mobile) */}
           <aside className="hidden md:block w-[220px] shrink-0">
-            <div className="bg-white border border-[#E0E0E0] rounded p-4 flex flex-col gap-5">
+            <div className="bg-background border border-[#E0E0E0] rounded p-4 flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#111111]">Filtros</h3>
                 <button 
@@ -716,14 +716,14 @@ function MasculinoPage() {
           {/* 5.3. Products Content Area */}
           <div className="flex-1">
             {/* 6. List toolbar controls */}
-            <div className="bg-white border border-[#E0E0E0] rounded p-3 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="bg-background border border-[#E0E0E0] rounded p-3 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <span className="text-[#606060] text-[11px] font-medium">Ordenar por:</span>
                   <select
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value)}
-                    className="h-8 bg-white border border-[#E0E0E0] rounded text-[11px] px-2 outline-none font-medium text-black focus:border-[#FF8500]"
+                    className="h-8 bg-background border border-[#E0E0E0] rounded text-[11px] px-2 outline-none font-medium text-black focus:border-[#FF8500]"
                   >
                     <option value="Mais Vendidos">Mais Vendidos</option>
                     <option value="Menor Preço">Menor Preço</option>
@@ -736,7 +736,7 @@ function MasculinoPage() {
                   <select
                     value={itemsPerPage}
                     onChange={(e) => setItemsPerPage(e.target.value)}
-                    className="h-8 bg-white border border-[#E0E0E0] rounded text-[11px] px-2 outline-none font-medium text-black focus:border-[#FF8500]"
+                    className="h-8 bg-background border border-[#E0E0E0] rounded text-[11px] px-2 outline-none font-medium text-black focus:border-[#FF8500]"
                   >
                     <option value="24 por página">24 por página</option>
                     <option value="12 por página">12 por página</option>
@@ -779,7 +779,7 @@ function MasculinoPage() {
 
             {/* 7. Grid of Products */}
             {filteredProducts.length === 0 ? (
-              <div className="bg-white border border-[#E0E0E0] rounded p-12 text-center">
+              <div className="bg-background border border-[#E0E0E0] rounded p-12 text-center">
                 <p className="text-sm font-semibold text-[#606060] mb-2">Nenhum produto atende aos filtros aplicados.</p>
                 <button 
                   onClick={handleClearFilters}
@@ -799,7 +799,7 @@ function MasculinoPage() {
                   return (
                     <div
                       key={product.id}
-                      className={`bg-white border border-[#E0E0E0]/80 rounded p-3 flex relative transition-all group ${
+                      className={`bg-background border border-[#E0E0E0]/80 rounded p-3 flex relative transition-all group ${
                         viewMode === "grid"
                           ? "flex-col hover:shadow-md"
                           : "flex-row gap-4 items-center hover:shadow-md"
@@ -813,13 +813,13 @@ function MasculinoPage() {
                       {/* Favorite Heart Button (Top Right) */}
                       <button
                         onClick={() => toggleFavorite(product.id)}
-                        className="absolute top-2.5 right-2.5 h-6 w-6 rounded-full bg-white/80 hover:bg-white shadow-sm flex items-center justify-center text-[#A0A0A0] hover:text-red-500 z-10 transition-colors cursor-pointer"
+                        className="absolute top-2.5 right-2.5 h-6 w-6 rounded-full bg-background/80 hover:bg-background shadow-sm flex items-center justify-center text-[#A0A0A0] hover:text-red-500 z-10 transition-colors cursor-pointer"
                       >
                         <Heart className={`h-4.5 w-4.5 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
                       </button>
 
                       {/* Product Image */}
-                      <div className={`flex items-center justify-center bg-white overflow-hidden shrink-0 ${
+                      <div className={`flex items-center justify-center bg-background overflow-hidden shrink-0 ${
                         viewMode === "grid" ? "h-40 w-full mb-3" : "h-28 w-28"
                       }`}>
                         <img

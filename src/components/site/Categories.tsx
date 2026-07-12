@@ -27,7 +27,7 @@ export function Categories({ data }: { data?: CategoriesData }) {
   }));
 
   return (
-    <section id="categorias" className="bg-[#fafafa] py-14">
+    <section id="categorias" className="bg-banner py-14">
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {list.map((cat, idx) => {
@@ -36,7 +36,7 @@ export function Categories({ data }: { data?: CategoriesData }) {
               <a
                 key={cat.title}
                 href="#mais-vendidos"
-                className="group relative flex h-40 overflow-hidden rounded-lg border border-border bg-[#f2f2f2] transition-transform hover:-translate-y-1"
+                className="group relative flex h-40 overflow-hidden rounded-lg border border-border bg-background/80 transition-transform hover:-translate-y-1"
               >
                 <div className="flex flex-1 flex-col justify-center p-5">
                   <h3 className="font-display text-lg font-extrabold tracking-tight text-ink">

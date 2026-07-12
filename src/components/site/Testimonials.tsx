@@ -85,7 +85,7 @@ export function Testimonials({ data: propData }: { data?: TestimonialsData }) {
   return (
     <>
       {showTestimonials && list.length > 0 && (
-        <section className="bg-white py-4">
+        <section className="bg-background py-4">
           <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
             <div className="relative mb-8 text-center">
               <p className="text-xs font-bold tracking-[0.2em] text-brand uppercase">{testimonialsData.subtitle}</p>
@@ -136,11 +136,11 @@ export function Testimonials({ data: propData }: { data?: TestimonialsData }) {
 
       {/* Brand logos with continuous rotating animation */}
       {brandsData.show !== false && brandsData.list && brandsData.list.length > 0 && (
-        <section className="bg-white py-12 border-t border-hairline/15 overflow-hidden relative w-full">
+        <section className="bg-banner py-12 border-t border-hairline/15 overflow-hidden relative w-full">
           <div className="flex w-full overflow-hidden select-none relative">
             {/* Gradient shadow overlays for visual blending */}
-            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[var(--banner)] via-[var(--banner)]/80 to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[var(--banner)] via-[var(--banner)]/80 to-transparent z-10 pointer-events-none" />
 
             <div className="flex shrink-0 items-center justify-around gap-16 min-w-full animate-marquee">
               {brandsData.list.map((brand, idx) => (

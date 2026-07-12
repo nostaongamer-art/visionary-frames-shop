@@ -28,7 +28,7 @@ function ProductCard({ product }: { product: any }) {
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-md">
-      <div className="relative bg-white p-3 border-b border-border/40">
+      <div className="relative bg-background p-3 border-b border-border/40">
         <span className="absolute left-3 top-3 z-10 rounded bg-ink px-2 py-1 text-[11px] font-bold text-white">
           {product.discount}
         </span>
@@ -110,7 +110,7 @@ export function BestSellers({ data }: { data?: BestSellersData }) {
   const products = data?.products || PRODUCTS;
 
   return (
-    <section id="mais-vendidos" className="bg-white py-14">
+    <section id="mais-vendidos" className="bg-background py-14">
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
         <div className="relative mb-8 text-center">
           <p className="text-xs font-bold tracking-[0.2em] text-brand">ESCOLHAS QUE ENCANTAM</p>

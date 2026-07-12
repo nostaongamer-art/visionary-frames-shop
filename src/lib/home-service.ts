@@ -301,7 +301,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     ink: "#08090A",
     ink2: "#111214",
     ink3: "#2A2A2A",
-    banner: "#0D0E10",
+    banner: "#FAFAFA",
     hairline: "#2E3033",
     background: "#FFFFFF",
     foreground: "#08090A",

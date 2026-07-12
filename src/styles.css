@@ -51,7 +51,7 @@
   --ink: oklch(0.16 0.006 260);        /* #08090A preto principal */
   --ink-2: oklch(0.2 0.006 260);       /* #111214 preto secundario */
   --ink-3: oklch(0.25 0.004 260);      /* #2A2A2A cinza escuro */
-  --banner: oklch(0.185 0.006 260);    /* #0D0E10 preto banners */
+  --banner: #FAFAFA;
   --hairline: oklch(0.3 0.004 260);
 
   --background: oklch(1 0 0);
