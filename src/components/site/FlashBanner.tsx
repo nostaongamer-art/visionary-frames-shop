@@ -24,6 +24,7 @@ export function FlashBanner() {
     showTimer: true,
     timerDuration: 2 * 3600 + 15 * 60 + 23,
   });
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
@@ -34,6 +35,7 @@ export function FlashBanner() {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.flashBanner) {
             setFlashData(parsed.flashBanner);
+            setIsLoaded(true);
           }
         }
       } catch (e) {
@@ -47,6 +49,7 @@ export function FlashBanner() {
         const data = await fetchHomePageContent();
         if (data && data.flashBanner) {
           setFlashData(data.flashBanner);
+          setIsLoaded(true);
         }
       } catch (e) {
         console.error("Failed to fetch flash banner content:", e);
@@ -62,6 +65,7 @@ export function FlashBanner() {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.flashBanner) {
             setFlashData(parsed.flashBanner);
+            setIsLoaded(true);
           }
         }
       } catch (e) {
@@ -73,7 +77,7 @@ export function FlashBanner() {
   }, []);
 
   const duration = flashData.timerDuration !== undefined ? flashData.timerDuration : (2 * 3600 + 15 * 60 + 23);
-  const { hours, minutes, seconds } = useCountdown(duration, "flash_countdown_target");
+  const { hours, minutes, seconds } = useCountdown(duration, "flash_countdown_target", isLoaded);
 
   if (flashData.show === false) return null;
 

@@ -15,6 +15,7 @@ function Unit({ value, label }: { value: string; label: string }) {
 export function PromoBar({ text: propText }: { text?: string }) {
   const [promoData, setPromoData] = useState(DEFAULT_HOME_PAGE_DATA.promoBar);
   const [open, setOpen] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
@@ -25,6 +26,7 @@ export function PromoBar({ text: propText }: { text?: string }) {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.promoBar) {
             setPromoData(parsed.promoBar);
+            setIsLoaded(true);
           }
         }
       } catch (e) {
@@ -38,6 +40,7 @@ export function PromoBar({ text: propText }: { text?: string }) {
         const data = await fetchHomePageContent();
         if (data && data.promoBar) {
           setPromoData(data.promoBar);
+          setIsLoaded(true);
         }
       } catch (e) {
         console.error("Failed to fetch promo bar content:", e);
@@ -54,6 +57,7 @@ export function PromoBar({ text: propText }: { text?: string }) {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.promoBar) {
             setPromoData(parsed.promoBar);
+            setIsLoaded(true);
           }
         }
       } catch (e) {
@@ -65,7 +69,7 @@ export function PromoBar({ text: propText }: { text?: string }) {
   }, []);
 
   const duration = promoData.timerDuration !== undefined ? promoData.timerDuration : (2 * 3600 + 15 * 60 + 30);
-  const { hours, minutes, seconds } = useCountdown(duration, "promo_countdown_target");
+  const { hours, minutes, seconds } = useCountdown(duration, "promo_countdown_target", isLoaded);
 
   // If the promo bar is explicitly disabled by admin, or closed by user, don't show it
   if (!open || promoData.show === false) return null;
