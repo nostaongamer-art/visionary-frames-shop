@@ -5,6 +5,7 @@ export function useCountdown(initialSeconds = 2 * 3600 + 15 * 60 + 30) {
   const [remaining, setRemaining] = useState(initialSeconds);
 
   useEffect(() => {
+    setRemaining(initialSeconds);
     const id = setInterval(() => {
       setRemaining((prev) => (prev <= 0 ? initialSeconds : prev - 1));
     }, 1000);
