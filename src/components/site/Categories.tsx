@@ -39,13 +39,13 @@ export function Categories({ data }: { data?: CategoriesData }) {
                 className="group relative flex h-40 overflow-hidden rounded-lg border border-border bg-background/80 transition-transform hover:-translate-y-1"
               >
                 <div className="flex flex-1 flex-col justify-center p-5">
-                  <h3 className="font-display text-lg font-extrabold tracking-tight text-ink">
+                  <h3 className="font-display text-lg font-extrabold tracking-tight text-foreground">
                     {cat.title}
                   </h3>
                   <p className="mt-1 max-w-[8rem] text-xs leading-snug text-muted-foreground">
                     {cat.description}
                   </p>
-                  <span className="mt-auto inline-flex h-7 w-7 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors group-hover:border-brand group-hover:text-brand">
+                  <span className="mt-auto inline-flex h-7 w-7 items-center justify-center rounded-full border border-foreground/20 text-foreground transition-colors group-hover:border-brand group-hover:text-brand">
                     <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </div>

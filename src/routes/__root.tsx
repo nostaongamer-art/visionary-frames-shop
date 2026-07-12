@@ -197,6 +197,8 @@ function CustomStylesInjector() {
       ${colors.hairline ? `--hairline: ${colors.hairline} !important;` : ""}
       ${colors.background ? `--background: ${colors.background} !important;` : ""}
       ${colors.foreground ? `--foreground: ${colors.foreground} !important;` : ""}
+      ${colors.logoAccent ? `--logo-accent: ${colors.logoAccent} !important;` : ""}
+      ${colors.logoText ? `--logo-text: ${colors.logoText} !important;` : ""}
     }
   `;
 

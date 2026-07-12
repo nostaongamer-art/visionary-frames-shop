@@ -135,7 +135,7 @@ export function Hero({ data }: { data?: HeroData }) {
                 <a
                   href={buttonLink}
                   style={getStyleForFont(buttonFont)}
-                  className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
+                  className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
                 >
                   {buttonText}
                   <ArrowRight className="h-4 w-4" />

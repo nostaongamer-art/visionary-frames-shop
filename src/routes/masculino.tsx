@@ -303,7 +303,7 @@ function MasculinoPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-[#111111] font-sans selection:bg-[#FF8500] selection:text-white">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-brand selection:text-white">
       {/* 1. Promotional Bar */}
       <PromoBar />
 
@@ -396,7 +396,7 @@ function MasculinoPage() {
           <span className="text-[11px] font-bold text-[#606060]">{filteredProducts.length} produtos encontrados</span>
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#FF8500] hover:bg-[#E97700] text-white text-[11px] font-bold rounded transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 bg-brand hover:bg-brand-2 text-white text-[11px] font-bold rounded transition-colors"
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             FILTRAR
@@ -408,7 +408,7 @@ function MasculinoPage() {
           <aside className="hidden md:block w-[220px] shrink-0">
             <div className="bg-background border border-[#E0E0E0] rounded p-4 flex flex-col gap-5">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#111111]">Filtros</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Filtros</h3>
                 <button 
                   onClick={handleClearFilters}
                   className="text-[10px] text-[#606060] hover:text-[#FF8500] font-bold underline cursor-pointer"
@@ -420,7 +420,7 @@ function MasculinoPage() {
 
               {/* Category Filter */}
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Categoria</h4>
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Categoria</h4>
                 <div className="flex flex-col gap-2">
                   {["Todos", "Armação de Grau", "Óculos de Sol", "Lentes Azuis"].map((cat) => (
                     <label key={cat} className="flex items-center gap-2 text-[11px] text-[#606060] cursor-pointer hover:text-black">
@@ -440,7 +440,7 @@ function MasculinoPage() {
 
               {/* Format Filter */}
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Formato</h4>
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Formato</h4>
                 <div className="flex flex-col gap-2">
                   {[
                     { label: "Aviador (32)", value: "Aviador" },
@@ -467,7 +467,7 @@ function MasculinoPage() {
 
               {/* Material Filter */}
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Material</h4>
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Material</h4>
                 <div className="flex flex-col gap-2">
                   {[
                     { label: "Acetato (68)", value: "Acetato" },
@@ -492,7 +492,7 @@ function MasculinoPage() {
 
               {/* Color Filter */}
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Cor</h4>
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Cor</h4>
                 <div className="flex flex-wrap gap-2.5">
                   {colorsList.map((color) => {
                     const isSelected = selectedColor === color.name;
@@ -523,7 +523,7 @@ function MasculinoPage() {
 
               {/* Price Filter */}
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2">Faixa de Preço</h4>
+                <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2">Faixa de Preço</h4>
                 <div className="flex justify-between text-[9px] text-[#606060] font-bold mb-2">
                   <span>R$ 69,90</span>
                   <span>R$ {priceMax.toFixed(2)}</span>
@@ -554,7 +554,7 @@ function MasculinoPage() {
               
               <button
                 onClick={handleCopyCoupon}
-                className="w-full h-8 bg-[#FF8500] hover:bg-[#E97700] text-white text-[10px] font-extrabold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="w-full h-8 bg-brand hover:bg-brand-2 text-white text-[10px] font-extrabold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 {couponCopied ? (
                   <>
@@ -576,7 +576,7 @@ function MasculinoPage() {
             <div className="fixed inset-0 bg-black/60 z-50 flex justify-end md:hidden">
               <div className="w-[280px] bg-white h-full p-5 overflow-y-auto flex flex-col gap-5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#111111]">Filtros</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Filtros</h3>
                   <button onClick={() => setMobileFiltersOpen(false)}>
                     <X className="h-5 w-5 text-black" />
                   </button>
@@ -585,7 +585,7 @@ function MasculinoPage() {
 
                 {/* Category Filter */}
                 <div>
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Categoria</h4>
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Categoria</h4>
                   <div className="flex flex-col gap-2">
                     {["Todos", "Armação de Grau", "Óculos de Sol", "Lentes Azuis"].map((cat) => (
                       <label key={cat} className="flex items-center gap-2 text-[11px] text-[#606060] cursor-pointer">
@@ -608,7 +608,7 @@ function MasculinoPage() {
 
                 {/* Format Filter */}
                 <div>
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Formato</h4>
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Formato</h4>
                   <div className="flex flex-col gap-2">
                     {[
                       { label: "Aviador (32)", value: "Aviador" },
@@ -635,7 +635,7 @@ function MasculinoPage() {
 
                 {/* Material Filter */}
                 <div>
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Material</h4>
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Material</h4>
                   <div className="flex flex-col gap-2">
                     {[
                       { label: "Acetato (68)", value: "Acetato" },
@@ -660,7 +660,7 @@ function MasculinoPage() {
 
                 {/* Color Filter */}
                 <div>
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2.5">Cor</h4>
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Cor</h4>
                   <div className="flex flex-wrap gap-2.5">
                     {colorsList.map((color) => {
                       const isSelected = selectedColor === color.name;
@@ -684,7 +684,7 @@ function MasculinoPage() {
 
                 {/* Price Filter */}
                 <div>
-                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-[#111111] mb-2">Faixa de Preço</h4>
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2">Faixa de Preço</h4>
                   <div className="flex justify-between text-[9px] text-[#606060] font-bold mb-2">
                     <span>R$ 69,90</span>
                     <span>R$ {priceMax.toFixed(2)}</span>
@@ -783,7 +783,7 @@ function MasculinoPage() {
                 <p className="text-sm font-semibold text-[#606060] mb-2">Nenhum produto atende aos filtros aplicados.</p>
                 <button 
                   onClick={handleClearFilters}
-                  className="px-4 py-2 bg-[#FF8500] text-white text-xs font-bold rounded hover:bg-[#E97700] transition-colors"
+                  className="px-4 py-2 bg-brand text-white text-xs font-bold rounded hover:bg-brand-2 transition-colors"
                 >
                   Limpar todos os filtros
                 </button>
@@ -833,7 +833,7 @@ function MasculinoPage() {
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           {/* Name */}
-                          <h3 className="text-xs font-semibold text-[#111111] leading-tight mb-1 group-hover:text-[#FF8500] transition-colors">
+                          <h3 className="text-xs font-semibold text-foreground leading-tight mb-1 group-hover:text-[#FF8500] transition-colors">
                             {product.name}
                           </h3>
 
@@ -861,7 +861,7 @@ function MasculinoPage() {
                         <div className="flex items-center gap-2 mt-auto">
                           <button
                             onClick={addItem}
-                            className="flex-1 h-8 bg-[#FF8500] hover:bg-[#E97700] text-white text-[10px] font-extrabold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            className="flex-1 h-8 bg-brand hover:bg-brand-2 text-white text-[10px] font-extrabold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                           >
                             <ShoppingCart className="h-3.5 w-3.5 shrink-0" />
                             ADICIONAR AO CARRINHO

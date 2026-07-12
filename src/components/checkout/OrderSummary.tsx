@@ -111,7 +111,7 @@ export function OrderSummary({ shippingType }: OrderSummaryProps) {
           />
           <button
             type="submit"
-            className="h-9 px-4 bg-transparent border border-brand hover:bg-brand text-white text-xs font-bold rounded-[4px] transition-colors"
+            className="h-9 px-4 bg-transparent border border-brand hover:bg-brand-2 text-white text-xs font-bold rounded-[4px] transition-colors"
           >
             Aplicar
           </button>

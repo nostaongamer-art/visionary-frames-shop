@@ -110,7 +110,7 @@ export function FlashBanner() {
 
           <a 
             href={flashData.buttonLink || "#mais-vendidos"}
-            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
+            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
           >
             {flashData.buttonText}
           </a>

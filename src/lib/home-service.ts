@@ -114,6 +114,8 @@ export interface HomePageData {
     hairline?: string;
     background?: string;
     foreground?: string;
+    logoAccent?: string;
+    logoText?: string;
   };
 }
 
@@ -305,6 +307,8 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     hairline: "#2E3033",
     background: "#FFFFFF",
     foreground: "#08090A",
+    logoAccent: "#FF8A00",
+    logoText: "#FFFFFF",
   },
 };
 
@@ -481,6 +485,8 @@ function mergeWithDefaults(saved: any): HomePageData {
       hairline: saved.colors?.hairline !== undefined ? saved.colors.hairline : DEFAULT_HOME_PAGE_DATA.colors!.hairline,
       background: saved.colors?.background !== undefined ? saved.colors.background : DEFAULT_HOME_PAGE_DATA.colors!.background,
       foreground: saved.colors?.foreground !== undefined ? saved.colors.foreground : DEFAULT_HOME_PAGE_DATA.colors!.foreground,
+      logoAccent: saved.colors?.logoAccent !== undefined ? saved.colors.logoAccent : DEFAULT_HOME_PAGE_DATA.colors!.logoAccent,
+      logoText: saved.colors?.logoText !== undefined ? saved.colors.logoText : DEFAULT_HOME_PAGE_DATA.colors!.logoText,
     },
   };
 }

@@ -43,7 +43,7 @@ function ProductCard({ product }: { product: any }) {
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <h3 className="text-sm font-bold text-ink">{product.name}</h3>
+        <h3 className="text-sm font-bold text-foreground">{product.name}</h3>
         <div className="mt-1.5 flex items-center gap-1.5">
           <Stars />
           <span className="text-xs text-muted-foreground">{product.reviews}</span>
@@ -58,7 +58,7 @@ function ProductCard({ product }: { product: any }) {
         <div className="mt-4 flex items-center gap-2">
           <button
             onClick={addItem}
-            className="inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-2.5 text-[11px] font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
+            className="inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-2.5 text-[11px] font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
             ADICIONAR AO CARRINHO
@@ -114,7 +114,7 @@ export function BestSellers({ data }: { data?: BestSellersData }) {
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
         <div className="relative mb-8 text-center">
           <p className="text-xs font-bold tracking-[0.2em] text-brand">ESCOLHAS QUE ENCANTAM</p>
-          <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">
+          <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-foreground">
             {title}
           </h2>
           <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">{subtitle}</p>

@@ -2071,10 +2071,12 @@ function Admin() {
                           ink: "#08090A",
                           ink2: "#111214",
                           ink3: "#2A2A2A",
-                          banner: "#0D0E10",
+                          banner: "#FAFAFA",
                           hairline: "#2E3033",
                           background: "#FFFFFF",
                           foreground: "#08090A",
+                          logoAccent: "#FF8A00",
+                          logoText: "#FFFFFF",
                         }
                       }));
                       toast.success("Cores restauradas para o padrão com sucesso!");
@@ -2146,6 +2148,74 @@ function Admin() {
                           }));
                         }}
                         placeholder="#FF9900"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Subcategoria 1.1: Logotipo Glasses */}
+              <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Cores do Logotipo "Glasses"</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  {/* Cor Dourada/Destaque ('Gl') */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.logoAccent || "#FF8A00"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, logoAccent: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Destaque do Logotipo ("Gl")</label>
+                      <input
+                        type="text"
+                        value={data.colors?.logoAccent || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, logoAccent: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FF8A00"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Cor Branca/Texto ('asses') */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.logoText || "#FFFFFF"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, logoText: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor do Texto do Logotipo ("asses")</label>
+                      <input
+                        type="text"
+                        value={data.colors?.logoText || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, logoText: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FFFFFF"
                         className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                       />
                     </div>

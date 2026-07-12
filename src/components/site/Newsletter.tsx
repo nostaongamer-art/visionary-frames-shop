@@ -81,7 +81,7 @@ export function Newsletter({ data }: { data?: NewsletterData }) {
             />
             <button
               type="submit"
-              className="cursor-pointer rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
+              className="cursor-pointer rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
             >
               {buttonText}
             </button>

@@ -37,6 +37,8 @@
   --color-ink-3: var(--ink-3);
   --color-banner: var(--banner);
   --color-hairline: var(--hairline);
+  --color-logo-accent: var(--logo-accent);
+  --color-logo-text: var(--logo-text);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Montserrat", "Inter", ui-sans-serif, sans-serif;
@@ -53,6 +55,8 @@
   --ink-3: oklch(0.25 0.004 260);      /* #2A2A2A cinza escuro */
   --banner: #FAFAFA;
   --hairline: oklch(0.3 0.004 260);
+  --logo-accent: #FF8A00;
+  --logo-text: #FFFFFF;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.16 0.006 260);

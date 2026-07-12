@@ -7,8 +7,8 @@ function Logo() {
   return (
     <Link to="/" className="flex flex-col leading-none outline-none">
       <span className="font-display text-2xl font-extrabold tracking-tight">
-        <span className="text-brand">Gl</span>
-        <span className="text-white">asses</span>
+        <span className="text-logo-accent">Gl</span>
+        <span className="text-logo-text">asses</span>
       </span>
       <span className="mt-0.5 text-[9px] font-semibold tracking-[0.2em] text-white/60">
         ÓCULOS COM ESTILO

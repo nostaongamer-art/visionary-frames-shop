@@ -72,8 +72,8 @@ export function Footer() {
           {footerData.showSobre !== false && (
             <div className="lg:col-span-1">
               <span className="font-display text-2xl font-extrabold tracking-tight">
-                <span className="text-brand">Gl</span>
-                <span className="text-white">asses</span>
+                <span className="text-logo-accent">Gl</span>
+                <span className="text-logo-text">asses</span>
               </span>
               <p className="mt-0.5 text-[9px] font-semibold tracking-[0.2em] text-white/60">
                 ÓCULOS COM ESTILO
@@ -200,7 +200,7 @@ export function Footer() {
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.9.2
+          © 2024 Glasses. Todos os direitos reservados. | v1.9.3
         </p>
       </div>
     </footer>
