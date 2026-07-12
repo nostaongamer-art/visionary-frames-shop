@@ -89,7 +89,7 @@ export function Testimonials({ data: propData }: { data?: TestimonialsData }) {
           <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
             <div className="relative mb-8 text-center">
               <p className="text-xs font-bold tracking-[0.2em] text-brand uppercase">{testimonialsData.subtitle}</p>
-              <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">
+              <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-foreground">
                 {testimonialsData.title}
               </h2>
               <div className="mt-4 flex justify-center sm:absolute sm:right-0 sm:top-1/2 sm:mt-0 sm:-translate-y-1/2">
@@ -120,7 +120,7 @@ export function Testimonials({ data: propData }: { data?: TestimonialsData }) {
                       className="h-16 w-16 shrink-0 rounded-md object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-ink">{t.name}</p>
+                      <p className="text-sm font-bold text-foreground">{t.name}</p>
                       <div className="mt-0.5">
                         <Stars />
                       </div>
@@ -146,7 +146,7 @@ export function Testimonials({ data: propData }: { data?: TestimonialsData }) {
               {brandsData.list.map((brand, idx) => (
                 <span
                   key={`${brand}-${idx}`}
-                  className="font-display text-xl font-bold tracking-widest text-ink/40 uppercase sm:text-2xl whitespace-nowrap hover:text-brand transition-colors cursor-default"
+                  className="font-display text-xl font-bold tracking-widest text-foreground/40 uppercase sm:text-2xl whitespace-nowrap hover:text-brand transition-colors cursor-default"
                 >
                   {brand}
                 </span>
@@ -157,7 +157,7 @@ export function Testimonials({ data: propData }: { data?: TestimonialsData }) {
               {brandsData.list.map((brand, idx) => (
                 <span
                   key={`${brand}-dup-${idx}`}
-                  className="font-display text-xl font-bold tracking-widest text-ink/40 uppercase sm:text-2xl whitespace-nowrap hover:text-brand transition-colors cursor-default"
+                  className="font-display text-xl font-bold tracking-widest text-foreground/40 uppercase sm:text-2xl whitespace-nowrap hover:text-brand transition-colors cursor-default"
                 >
                   {brand}
                 </span>

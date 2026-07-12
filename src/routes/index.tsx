@@ -24,7 +24,7 @@ function Index() {
 
   return (
     <CartProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background text-foreground">
         <PromoBar text={homeData.promoBar.text} />
         <Header />
         <main>

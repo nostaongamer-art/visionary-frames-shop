@@ -67,7 +67,7 @@ function ProductCard({ product }: { product: any }) {
             onClick={() => setLiked((l) => !l)}
             aria-label="Favoritar"
             aria-pressed={liked}
-            className="inline-flex h-[38px] w-[38px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-border text-ink transition-colors hover:border-brand hover:text-brand"
+            className="inline-flex h-[38px] w-[38px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-border text-foreground transition-colors hover:border-brand hover:text-brand"
           >
             <Heart className={`h-4 w-4 ${liked ? "fill-brand text-brand" : ""}`} />
           </button>
