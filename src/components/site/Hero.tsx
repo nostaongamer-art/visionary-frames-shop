@@ -49,7 +49,9 @@ export function Hero({ data }: { data?: HeroData }) {
   const buttonLink = data?.buttonLink || "#mais-vendidos";
   const secondaryButtonText = data?.secondaryButtonText || "VER COLEÇÃO";
   const secondaryButtonLink = data?.secondaryButtonLink || "#categorias";
-  const imageSrc = (data?.imageUrl && getDirectDriveUrl(data.imageUrl)) || heroMan;
+  const imageSrc = data?.imageUrl === undefined 
+    ? heroMan 
+    : (data.imageUrl ? getDirectDriveUrl(data.imageUrl) : "");
   
   const showBenefits = data?.showBenefits !== false;
   const benefitsList = data?.benefits || [
@@ -98,14 +100,16 @@ export function Hero({ data }: { data?: HeroData }) {
         <div className="relative min-h-[560px] overflow-hidden md:min-h-[600px]">
           {/* Background image on the right */}
           <div className="absolute inset-0 bg-ink z-0">
-            <img
-              src={imageSrc}
-              alt="Homem jovem usando óculos escuros pretos"
-              width={1200}
-              height={1200}
-              referrerPolicy="no-referrer"
-              className="h-full w-full object-cover object-right"
-            />
+            {imageSrc && (
+              <img
+                src={imageSrc}
+                alt="Homem jovem usando óculos escuros pretos"
+                width={1200}
+                height={1200}
+                referrerPolicy="no-referrer"
+                className="h-full w-full object-cover object-right"
+              />
+            )}
             {/* Gradient from left to right for text readability and side blending */}
             <div className="absolute inset-y-0 left-0 w-full md:w-[70%] bg-gradient-to-r from-ink via-ink/90 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/40 to-transparent" />
