@@ -17,15 +17,21 @@ export function FlushPreviewButton() {
 
   async function handleFlush() {
     setStatus("flushing");
+    // The /__hmr_flush endpoint only exists on the internal sandbox dev server.
+    // On the preview/published domain it 404s, so we fall back to a hard reload,
+    // which is what actually pulls the latest build into the browser.
     try {
-      const res = await fetch("/__hmr_flush", {
-        method: "POST",
-      });
-      setStatus(res.ok ? "done" : "error");
+      const res = await fetch("/__hmr_flush", { method: "POST" });
+      if (res.ok) {
+        setStatus("done");
+        setTimeout(() => window.location.reload(), 300);
+        return;
+      }
     } catch {
-      setStatus("error");
+      /* endpoint unavailable — fall back to reload below */
     }
-    setTimeout(() => setStatus("idle"), 1500);
+    setStatus("done");
+    setTimeout(() => window.location.reload(), 300);
   }
 
   return (

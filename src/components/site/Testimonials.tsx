@@ -25,6 +25,7 @@ export interface TestimonialsData {
     name: string;
     text: string;
     imageKey: string;
+    imageUrl?: string;
   }>;
 }
 
@@ -35,6 +36,7 @@ export function Testimonials({ data }: { data?: TestimonialsData }) {
     name: t.name,
     text: t.text,
     imageKey: `client${idx + 1}`,
+    imageUrl: undefined as string | undefined,
   }));
 
   return (
