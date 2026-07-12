@@ -25,6 +25,7 @@ export interface TestimonialsData {
     name: string;
     text: string;
     imageKey: string;
+    imageUrl?: string;
   }>;
 }
 
