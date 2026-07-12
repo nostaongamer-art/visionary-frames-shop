@@ -65,7 +65,7 @@ export function PromoBar({ text: propText }: { text?: string }) {
   }, []);
 
   const duration = promoData.timerDuration !== undefined ? promoData.timerDuration : (2 * 3600 + 15 * 60 + 30);
-  const { hours, minutes, seconds } = useCountdown(duration);
+  const { hours, minutes, seconds } = useCountdown(duration, "promo_countdown_target");
 
   // If the promo bar is explicitly disabled by admin, or closed by user, don't show it
   if (!open || promoData.show === false) return null;

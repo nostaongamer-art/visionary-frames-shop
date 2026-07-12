@@ -200,7 +200,7 @@ export function Footer() {
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.7.1
+          © 2024 Glasses. Todos os direitos reservados. | v1.8.0
         </p>
       </div>
     </footer>

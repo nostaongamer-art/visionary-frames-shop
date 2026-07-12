@@ -48,7 +48,17 @@ export interface HomePageData {
       imageUrl?: string;
     }>;
   };
+  flashBanner: {
+    show?: boolean;
+    title: string;
+    subtitle: string;
+    buttonText: string;
+    buttonLink: string;
+    showTimer?: boolean;
+    timerDuration?: number;
+  };
   testimonials: {
+    show?: boolean;
     title: string;
     subtitle: string;
     list: Array<{
@@ -57,6 +67,10 @@ export interface HomePageData {
       imageKey: string;
       imageUrl?: string;
     }>;
+  };
+  brands: {
+    show?: boolean;
+    list: string[];
   };
   newsletter: {
     title: string;
@@ -177,7 +191,17 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
       },
     ],
   },
+  flashBanner: {
+    show: true,
+    title: "15% OFF EM TODO O SITE!",
+    subtitle: "Aproveite agora e garanta o seu favorito.",
+    buttonText: "APROVEITAR AGORA",
+    buttonLink: "#mais-vendidos",
+    showTimer: true,
+    timerDuration: 2 * 3600 + 15 * 60 + 23, // 8123 seconds
+  },
   testimonials: {
+    show: true,
     title: "O Que Dizem Nossos Clientes",
     subtitle: "A opinião de quem já usa e aprova a qualidade da Glasses",
     list: [
@@ -200,6 +224,10 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
         imageUrl: "",
       },
     ],
+  },
+  brands: {
+    show: true,
+    list: ["Ray-Ban", "OAKLEY", "GUCCI", "PRADA", "Dior", "vogue"],
   },
   newsletter: {
     title: "Fique por dentro das novidades",
@@ -371,13 +399,29 @@ function mergeWithDefaults(saved: any): HomePageData {
         ...prod
       }))
     },
+    flashBanner: {
+      show: saved.flashBanner?.show !== undefined ? saved.flashBanner.show : true,
+      title: saved.flashBanner?.title !== undefined ? saved.flashBanner.title : DEFAULT_HOME_PAGE_DATA.flashBanner.title,
+      subtitle: saved.flashBanner?.subtitle !== undefined ? saved.flashBanner.subtitle : DEFAULT_HOME_PAGE_DATA.flashBanner.subtitle,
+      buttonText: saved.flashBanner?.buttonText !== undefined ? saved.flashBanner.buttonText : DEFAULT_HOME_PAGE_DATA.flashBanner.buttonText,
+      buttonLink: saved.flashBanner?.buttonLink !== undefined ? saved.flashBanner.buttonLink : DEFAULT_HOME_PAGE_DATA.flashBanner.buttonLink,
+      showTimer: saved.flashBanner?.showTimer !== undefined ? saved.flashBanner.showTimer : true,
+      timerDuration: saved.flashBanner?.timerDuration !== undefined ? saved.flashBanner.timerDuration : DEFAULT_HOME_PAGE_DATA.flashBanner.timerDuration,
+    },
     testimonials: {
+      show: saved.testimonials?.show !== undefined ? saved.testimonials.show : true,
       title: saved.testimonials?.title || DEFAULT_HOME_PAGE_DATA.testimonials.title,
       subtitle: saved.testimonials?.subtitle || DEFAULT_HOME_PAGE_DATA.testimonials.subtitle,
-      list: (saved.testimonials?.list || DEFAULT_HOME_PAGE_DATA.testimonials.list).map((t: any, idx: number) => ({
-        ...DEFAULT_HOME_PAGE_DATA.testimonials.list[idx],
-        ...t
-      }))
+      list: Array.isArray(saved.testimonials?.list) ? saved.testimonials.list.map((t: any, idx: number) => ({
+        name: t?.name !== undefined ? t.name : "",
+        text: t?.text !== undefined ? t.text : "",
+        imageKey: t?.imageKey !== undefined ? t.imageKey : `client${idx + 1}`,
+        imageUrl: t?.imageUrl !== undefined ? t.imageUrl : "",
+      })) : DEFAULT_HOME_PAGE_DATA.testimonials.list,
+    },
+    brands: {
+      show: saved.brands?.show !== undefined ? saved.brands.show : true,
+      list: Array.isArray(saved.brands?.list) ? saved.brands.list : DEFAULT_HOME_PAGE_DATA.brands.list,
     },
     newsletter: { ...DEFAULT_HOME_PAGE_DATA.newsletter, ...saved.newsletter },
     footer: {

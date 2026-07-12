@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { toast } from "sonner";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2 } from "lucide-react";
 
 const GOOGLE_FONTS_LIST = [
   { value: "default", label: "Padrão do Site (Outfit/Inter)" },
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type TabType = "promo" | "hero" | "categories" | "products" | "testimonials" | "newsletter" | "footer";
+type TabType = "promo" | "hero" | "categories" | "products" | "flash" | "testimonials" | "brands" | "newsletter" | "footer";
 
 function Admin() {
   const navigate = useNavigate();
@@ -72,6 +72,7 @@ function Admin() {
   
   // Admin form state
   const [data, setData] = useState<HomePageData>(DEFAULT_HOME_PAGE_DATA);
+  const [newBrandName, setNewBrandName] = useState("");
 
   useEffect(() => {
     async function checkAuthAndLoad() {
@@ -348,6 +349,15 @@ function Admin() {
             Mais Vendidos
           </button>
           <button
+            onClick={() => setActiveTab("flash")}
+            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
+              activeTab === "flash" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <Zap className="h-4 w-4 shrink-0" />
+            Oferta Relâmpago
+          </button>
+          <button
             onClick={() => setActiveTab("testimonials")}
             className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
               activeTab === "testimonials" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
@@ -355,6 +365,15 @@ function Admin() {
           >
             <Star className="h-4 w-4 shrink-0" />
             Depoimentos
+          </button>
+          <button
+            onClick={() => setActiveTab("brands")}
+            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
+              activeTab === "brands" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <Link className="h-4 w-4 shrink-0" />
+            Marcas Parceiras
           </button>
           <button
             onClick={() => setActiveTab("newsletter")}
@@ -973,97 +992,389 @@ function Admin() {
             </div>
           )}
 
+          {/* TAB: Oferta Relâmpago */}
+          {activeTab === "flash" && (
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Seção da Oferta Relâmpago
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ToggleSwitch
+                  label="Exibir Seção Oferta Relâmpago"
+                  checked={data.flashBanner?.show !== false}
+                  onChange={(val) =>
+                    setData((prev) => ({
+                      ...prev,
+                      flashBanner: { ...prev.flashBanner, show: val },
+                    }))
+                  }
+                />
+                <ToggleSwitch
+                  label="Exibir Relógio Regressivo"
+                  checked={data.flashBanner?.showTimer !== false}
+                  onChange={(val) =>
+                    setData((prev) => ({
+                      ...prev,
+                      flashBanner: { ...prev.flashBanner, showTimer: val },
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-xs font-semibold text-white/70">Título Principal</label>
+                <input
+                  type="text"
+                  value={data.flashBanner?.title || ""}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      flashBanner: { ...prev.flashBanner, title: e.target.value },
+                    }))
+                  }
+                  className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-white/70">Subtítulo</label>
+                <input
+                  type="text"
+                  value={data.flashBanner?.subtitle || ""}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      flashBanner: { ...prev.flashBanner, subtitle: e.target.value },
+                    }))
+                  }
+                  className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Texto do Botão</label>
+                  <input
+                    type="text"
+                    value={data.flashBanner?.buttonText || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        flashBanner: { ...prev.flashBanner, buttonText: e.target.value },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Link do Botão</label>
+                  <input
+                    type="text"
+                    value={data.flashBanner?.buttonLink || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        flashBanner: { ...prev.flashBanner, buttonLink: e.target.value },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {data.flashBanner?.showTimer !== false && (
+                <div className="flex flex-col gap-2 mt-2">
+                  <label className="text-xs font-semibold text-white/70">Tempo Inicial do Relógio</label>
+                  <div className="grid grid-cols-3 gap-4 border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Horas</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={Math.floor((data.flashBanner?.timerDuration || 8123) / 3600)}
+                        onChange={(e) => {
+                          const h = Math.max(0, parseInt(e.target.value) || 0);
+                          const duration = data.flashBanner?.timerDuration || 8123;
+                          const m = Math.floor((duration % 3600) / 60);
+                          const s = duration % 60;
+                          setData((prev) => ({
+                            ...prev,
+                            flashBanner: { ...prev.flashBanner, timerDuration: h * 3600 + m * 60 + s }
+                          }));
+                        }}
+                        className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Minutos</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={Math.floor(((data.flashBanner?.timerDuration || 8123) % 3600) / 60)}
+                        onChange={(e) => {
+                          const m = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
+                          const duration = data.flashBanner?.timerDuration || 8123;
+                          const h = Math.floor(duration / 3600);
+                          const s = duration % 60;
+                          setData((prev) => ({
+                            ...prev,
+                            flashBanner: { ...prev.flashBanner, timerDuration: h * 3600 + m * 60 + s }
+                          }));
+                        }}
+                        className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-white/60">Segundos</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={(data.flashBanner?.timerDuration || 8123) % 60}
+                        onChange={(e) => {
+                          const s = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
+                          const duration = data.flashBanner?.timerDuration || 8123;
+                          const h = Math.floor(duration / 3600);
+                          const m = Math.floor((duration % 3600) / 60);
+                          setData((prev) => ({
+                            ...prev,
+                            flashBanner: { ...prev.flashBanner, timerDuration: h * 3600 + m * 60 + s }
+                          }));
+                        }}
+                        className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* TAB 5: Depoimentos */}
           {activeTab === "testimonials" && (
             <div className="flex flex-col gap-5">
-              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
-                Seção de Depoimentos
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00] flex items-center justify-between">
+                <span>Seção de Depoimentos</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newList = [...(data.testimonials.list || [])];
+                    newList.push({
+                      name: "Novo Cliente",
+                      text: "Escreva o depoimento aqui...",
+                      imageKey: `client_custom_${Date.now()}`,
+                      imageUrl: "",
+                    });
+                    setData(prev => ({
+                      ...prev,
+                      testimonials: { ...prev.testimonials, list: newList }
+                    }));
+                  }}
+                  className="bg-[#FF8A00] hover:bg-[#E97800] text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Plus className="h-3.5 w-3.5" /> Adicionar Depoimento
+                </button>
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
-                  <input
-                    type="text"
-                    value={data.testimonials.title}
-                    onChange={(e) =>
-                      setData((prev) => ({
-                        ...prev,
-                        testimonials: { ...prev.testimonials, title: e.target.value },
-                      }))
-                    }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Subtítulo da Seção</label>
-                  <input
-                    type="text"
-                    value={data.testimonials.subtitle}
-                    onChange={(e) =>
-                      setData((prev) => ({
-                        ...prev,
-                        testimonials: { ...prev.testimonials, subtitle: e.target.value },
-                      }))
-                    }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
-                </div>
-              </div>
+              <ToggleSwitch
+                label="Exibir Seção de Depoimentos no Site"
+                checked={data.testimonials.show !== false}
+                onChange={(val) =>
+                  setData((prev) => ({
+                    ...prev,
+                    testimonials: { ...prev.testimonials, show: val },
+                  }))
+                }
+              />
 
-              <div className="flex flex-col gap-6">
-                {data.testimonials.list.map((t, idx) => (
-                  <div key={idx} className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-white/60">Nome do Cliente</label>
+              {data.testimonials.show !== false && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-white/70">Título da Seção</label>
                       <input
                         type="text"
-                        value={t.name}
-                        onChange={(e) => {
-                          const newList = [...data.testimonials.list];
-                          newList[idx] = { ...t, name: e.target.value };
+                        value={data.testimonials.title}
+                        onChange={(e) =>
                           setData((prev) => ({
                             ...prev,
-                            testimonials: { ...prev.testimonials, list: newList },
-                          }));
-                        }}
-                        className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                            testimonials: { ...prev.testimonials, title: e.target.value },
+                          }))
+                        }
+                        className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                       />
                     </div>
-                    
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-bold text-white/60">Depoimento</label>
-                      <textarea
-                        value={t.text}
-                        onChange={(e) => {
-                          const newList = [...data.testimonials.list];
-                          newList[idx] = { ...t, text: e.target.value };
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-white/70">Subtítulo da Seção</label>
+                      <input
+                        type="text"
+                        value={data.testimonials.subtitle}
+                        onChange={(e) =>
                           setData((prev) => ({
                             ...prev,
-                            testimonials: { ...prev.testimonials, list: newList },
-                          }));
-                        }}
-                        rows={2}
-                        className="p-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
+                            testimonials: { ...prev.testimonials, subtitle: e.target.value },
+                          }))
+                        }
+                        className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                       />
                     </div>
-
-                    <ImageInputWithPreview
-                      label={`Foto do Cliente - ${t.name}`}
-                      value={t.imageUrl || ""}
-                      recommendedSize="512 x 512 px"
-                      onChange={(val) => {
-                        const newList = [...data.testimonials.list];
-                        newList[idx] = { ...t, imageUrl: val };
-                        setData((prev) => ({
-                          ...prev,
-                          testimonials: { ...prev.testimonials, list: newList },
-                        }));
-                      }}
-                    />
                   </div>
-                ))}
-              </div>
+
+                  <div className="flex flex-col gap-6">
+                    {(data.testimonials.list || []).map((t, idx) => (
+                      <div key={idx} className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4 relative">
+                        <div className="absolute right-4 top-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newList = data.testimonials.list.filter((_, i) => i !== idx);
+                              setData(prev => ({
+                                ...prev,
+                                testimonials: { ...prev.testimonials, list: newList }
+                              }));
+                            }}
+                            className="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/10 cursor-pointer transition-colors flex items-center gap-1 text-xs font-bold"
+                          >
+                            <Trash2 className="h-4 w-4" /> Excluir Depoimento
+                          </button>
+                        </div>
+
+                        <div className="flex flex-col gap-1 max-w-[calc(100%-150px)]">
+                          <label className="text-[10px] font-bold text-white/60">Nome do Cliente</label>
+                          <input
+                            type="text"
+                            value={t.name}
+                            onChange={(e) => {
+                              const newList = [...data.testimonials.list];
+                              newList[idx] = { ...t, name: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                testimonials: { ...prev.testimonials, list: newList },
+                              }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Depoimento</label>
+                          <textarea
+                            value={t.text}
+                            onChange={(e) => {
+                              const newList = [...data.testimonials.list];
+                              newList[idx] = { ...t, text: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                testimonials: { ...prev.testimonials, list: newList },
+                              }));
+                            }}
+                            rows={2}
+                            className="p-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors resize-y"
+                          />
+                        </div>
+
+                        <ImageInputWithPreview
+                          label={`Foto do Cliente - ${t.name}`}
+                          value={t.imageUrl || ""}
+                          recommendedSize="512 w 512 px"
+                          onChange={(val) => {
+                            const newList = [...data.testimonials.list];
+                            newList[idx] = { ...t, imageUrl: val };
+                            setData((prev) => ({
+                              ...prev,
+                              testimonials: { ...prev.testimonials, list: newList },
+                            }));
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* TAB: Marcas Parceiras */}
+          {activeTab === "brands" && (
+            <div className="flex flex-col gap-5">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Seção de Marcas Parceiras (Carrossel Infinito)
+              </h3>
+
+              <ToggleSwitch
+                label="Exibir Marcas Parceiras no Site"
+                checked={data.brands?.show !== false}
+                onChange={(val) =>
+                  setData((prev) => ({
+                    ...prev,
+                    brands: { ...prev.brands, show: val },
+                  }))
+                }
+              />
+
+              {data.brands?.show !== false && (
+                <div className="flex flex-col gap-4">
+                  <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-3">
+                    <label className="text-xs font-semibold text-white/70">Adicionar Nova Marca</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Ex: RAY-BAN, OAKLEY, etc."
+                        value={newBrandName}
+                        onChange={(e) => setNewBrandName(e.target.value)}
+                        className="flex-1 h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!newBrandName.trim()) return;
+                          const newList = [...(data.brands?.list || [])];
+                          newList.push(newBrandName.trim());
+                          setData(prev => ({
+                            ...prev,
+                            brands: { ...prev.brands, list: newList }
+                          }));
+                          setNewBrandName("");
+                        }}
+                        className="bg-[#FF8A00] hover:bg-[#E97800] text-white font-bold px-4 rounded text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Plus className="h-4 w-4" /> Adicionar
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-white/70">Lista de Marcas Ativas ({data.brands?.list?.length || 0})</label>
+                    {(!data.brands?.list || data.brands.list.length === 0) ? (
+                      <p className="text-xs text-white/40 italic">Nenhuma marca cadastrada. O carrossel não será exibido.</p>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {data.brands.list.map((brand, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-[#15181D] border border-[#282C32]/45 rounded p-2 text-xs">
+                            <span className="font-semibold text-white/80 font-display truncate mr-2">{brand}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newList = data.brands.list.filter((_, i) => i !== idx);
+                                setData(prev => ({
+                                  ...prev,
+                                  brands: { ...prev.brands, list: newList }
+                                }));
+                              }}
+                              className="text-red-500 hover:text-red-400 p-1.5 rounded hover:bg-red-500/10 cursor-pointer transition-colors"
+                              title="Remover marca"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

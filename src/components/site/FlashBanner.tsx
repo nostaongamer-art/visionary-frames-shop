@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Zap } from "lucide-react";
 import { useCountdown } from "@/hooks/use-countdown";
+import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA } from "@/lib/home-service";
 
 function TimeBox({ value, label }: { value: string; label: string }) {
   return (
@@ -13,7 +15,67 @@ function TimeBox({ value, label }: { value: string; label: string }) {
 }
 
 export function FlashBanner() {
-  const { hours, minutes, seconds } = useCountdown();
+  const [flashData, setFlashData] = useState(DEFAULT_HOME_PAGE_DATA.flashBanner || {
+    show: true,
+    title: "15% OFF EM TODO O SITE!",
+    subtitle: "Aproveite agora e garanta o seu favorito.",
+    buttonText: "APROVEITAR AGORA",
+    buttonLink: "#mais-vendidos",
+    showTimer: true,
+    timerDuration: 2 * 3600 + 15 * 60 + 23,
+  });
+
+  useEffect(() => {
+    // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.flashBanner) {
+            setFlashData(parsed.flashBanner);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to read from localStorage in FlashBanner:", e);
+      }
+    }
+
+    // 2. Fetch do banco de dados para garantir que está atualizado
+    async function loadFlash() {
+      try {
+        const data = await fetchHomePageContent();
+        if (data && data.flashBanner) {
+          setFlashData(data.flashBanner);
+        }
+      } catch (e) {
+        console.error("Failed to fetch flash banner content:", e);
+      }
+    }
+    loadFlash();
+
+    // 3. Ouvir alterações feitas na área administrativa no mesmo navegador
+    const handleStorageChange = () => {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.flashBanner) {
+            setFlashData(parsed.flashBanner);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const duration = flashData.timerDuration !== undefined ? flashData.timerDuration : (2 * 3600 + 15 * 60 + 23);
+  const { hours, minutes, seconds } = useCountdown(duration, "flash_countdown_target");
+
+  if (flashData.show === false) return null;
 
   return (
     <section id="oferta" className="bg-white pb-14">
@@ -24,25 +86,30 @@ export function FlashBanner() {
               <Zap className="h-7 w-7" />
             </div>
             <div>
-              <p className="text-xs font-bold tracking-[0.15em] text-brand">OFERTA RELÂMPAGO</p>
+              <p className="text-xs font-bold tracking-[0.15em] text-brand font-mono">OFERTA RELÂMPAGO</p>
               <h2 className="font-display text-xl font-extrabold text-white sm:text-2xl">
-                15% OFF EM TODO O SITE!
+                {flashData.title}
               </h2>
-              <p className="text-xs text-white/60">Aproveite agora e garanta o seu favorito.</p>
+              <p className="text-xs text-white/60">{flashData.subtitle}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <TimeBox value={hours} label="HORAS" />
-            <span className="pb-4 font-display text-2xl font-bold text-white/50">:</span>
-            <TimeBox value={minutes} label="MINUTOS" />
-            <span className="pb-4 font-display text-2xl font-bold text-white/50">:</span>
-            <TimeBox value={seconds} label="SEGUNDOS" />
-          </div>
+          {flashData.showTimer !== false && (
+            <div className="flex items-center gap-2">
+              <TimeBox value={hours} label="HORAS" />
+              <span className="pb-4 font-display text-2xl font-bold text-white/50">:</span>
+              <TimeBox value={minutes} label="MINUTOS" />
+              <span className="pb-4 font-display text-2xl font-bold text-white/50">:</span>
+              <TimeBox value={seconds} label="SEGUNDOS" />
+            </div>
+          )}
 
-          <button className="inline-flex cursor-pointer items-center justify-center rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90">
-            APROVEITAR AGORA
-          </button>
+          <a 
+            href={flashData.buttonLink || "#mais-vendidos"}
+            className="inline-flex cursor-pointer items-center justify-center rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand/90"
+          >
+            {flashData.buttonText}
+          </a>
         </div>
       </div>
     </section>
