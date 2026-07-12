@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { toast } from "sonner";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2 } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette } from "lucide-react";
 
 const GOOGLE_FONTS_LIST = [
   { value: "default", label: "Padrão do Site (Outfit/Inter)" },
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type TabType = "promo" | "hero" | "categories" | "products" | "flash" | "testimonials" | "brands" | "newsletter" | "footer";
+type TabType = "promo" | "hero" | "categories" | "products" | "flash" | "testimonials" | "brands" | "newsletter" | "footer" | "colors";
 
 function Admin() {
   const navigate = useNavigate();
@@ -392,6 +392,15 @@ function Admin() {
           >
             <Layout className="h-4 w-4 shrink-0" />
             Rodapé (Footer)
+          </button>
+          <button
+            onClick={() => setActiveTab("colors")}
+            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
+              activeTab === "colors" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <Palette className="h-4 w-4 shrink-0" />
+            Paleta de Cores
           </button>
         </div>
 
@@ -2034,6 +2043,340 @@ function Admin() {
                       )}
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Paleta de Cores */}
+          {activeTab === "colors" && (
+            <div className="flex flex-col gap-6">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Gerenciador da Paleta de Cores do Site
+              </h3>
+              
+              <div className="bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg p-4 text-xs text-white/70 leading-relaxed">
+                <p>
+                  Personalize a identidade visual do seu e-commerce alterando as cores abaixo. As mudanças serão aplicadas instantaneamente em todos os botões, menus, rodapé, fundos de seção e textos do site.
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setData((prev) => ({
+                        ...prev,
+                        colors: {
+                          brand: "#FF8A00",
+                          brandHover: "#FF9900",
+                          ink: "#08090A",
+                          ink2: "#111214",
+                          ink3: "#2A2A2A",
+                          banner: "#0D0E10",
+                          hairline: "#2E3033",
+                          background: "#FFFFFF",
+                          foreground: "#08090A",
+                        }
+                      }));
+                      toast.success("Cores restauradas para o padrão com sucesso!");
+                    }}
+                    className="bg-white/10 hover:bg-white/15 text-white px-2.5 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors"
+                  >
+                    Restaurar Padrão do Site
+                  </button>
+                </div>
+              </div>
+
+              {/* Categoria 1: Marca */}
+              <div className="flex flex-col gap-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1. Cores de Identidade da Marca</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
+                  {/* Cor Laranja Principal */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.brand || "#FF8A00"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, brand: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Marca)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.brand || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, brand: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FF8A00"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Cor Laranja Hover */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.brandHover || "#FF9900"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, brandHover: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Hover/Foco)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.brandHover || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, brandHover: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FF9900"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Categoria 2: Fundo e Banners */}
+              <div className="flex flex-col gap-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">2. Cores de Fundo (Tema Escuro/Claro)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  
+                  {/* ink - Fundo Geral */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.ink || "#08090A"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, ink: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo Geral Escuro</label>
+                      <input
+                        type="text"
+                        value={data.colors?.ink || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, ink: e.target.value }
+                          }));
+                        }}
+                        placeholder="#08090A"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* ink2 - Cards e Menus */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.ink2 || "#111214"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, ink2: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo de Cards/Caixas</label>
+                      <input
+                        type="text"
+                        value={data.colors?.ink2 || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, ink2: e.target.value }
+                          }));
+                        }}
+                        placeholder="#111214"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* ink3 - Cinza Escuro Auxiliar */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.ink3 || "#2A2A2A"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, ink3: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo Auxiliar (Cinza)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.ink3 || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, ink3: e.target.value }
+                          }));
+                        }}
+                        placeholder="#2A2A2A"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* banner - Banners Promocionais */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.banner || "#0D0E10"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, banner: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo de Seções/Banners</label>
+                      <input
+                        type="text"
+                        value={data.colors?.banner || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, banner: e.target.value }
+                          }));
+                        }}
+                        placeholder="#0D0E10"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* background - Fundo Claro (Seções Brancas) */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.background || "#FFFFFF"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, background: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo Claro do Site</label>
+                      <input
+                        type="text"
+                        value={data.colors?.background || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, background: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FFFFFF"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Categoria 3: Texto e Divisores */}
+              <div className="flex flex-col gap-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">3. Textos e Linhas Divisórias</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
+                  {/* foreground - Texto Principal */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.foreground || "#08090A"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, foreground: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor do Texto Principal</label>
+                      <input
+                        type="text"
+                        value={data.colors?.foreground || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, foreground: e.target.value }
+                          }));
+                        }}
+                        placeholder="#08090A"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* hairline - Bordas e Contornos */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.hairline || "#2E3033"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, hairline: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Bordas e Linhas (Hairline)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.hairline || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, hairline: e.target.value }
+                          }));
+                        }}
+                        placeholder="#2E3033"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>

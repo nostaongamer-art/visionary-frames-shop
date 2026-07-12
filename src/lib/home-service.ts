@@ -104,6 +104,17 @@ export interface HomePageData {
     paymentsTitle: string;
     payments: Array<{ label: string; imageUrl?: string; show?: boolean }>;
   };
+  colors?: {
+    brand?: string;
+    brandHover?: string;
+    ink?: string;
+    ink2?: string;
+    ink3?: string;
+    banner?: string;
+    hairline?: string;
+    background?: string;
+    foreground?: string;
+  };
 }
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
@@ -284,6 +295,17 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
       { label: "Pix", imageUrl: "", show: true },
     ],
   },
+  colors: {
+    brand: "#FF8A00",
+    brandHover: "#FF9900",
+    ink: "#08090A",
+    ink2: "#111214",
+    ink3: "#2A2A2A",
+    banner: "#0D0E10",
+    hairline: "#2E3033",
+    background: "#FFFFFF",
+    foreground: "#08090A",
+  },
 };
 
 /**
@@ -448,6 +470,17 @@ function mergeWithDefaults(saved: any): HomePageData {
       atendimentoLines: mergeAtendimento(savedFooter.atendimentoLines, defaultFooter.atendimentoLines),
       paymentsTitle: savedFooter.paymentsTitle !== undefined ? savedFooter.paymentsTitle : defaultFooter.paymentsTitle,
       payments: mergePayments(savedFooter.payments, defaultFooter.payments),
+    },
+    colors: {
+      brand: saved.colors?.brand !== undefined ? saved.colors.brand : DEFAULT_HOME_PAGE_DATA.colors!.brand,
+      brandHover: saved.colors?.brandHover !== undefined ? saved.colors.brandHover : DEFAULT_HOME_PAGE_DATA.colors!.brandHover,
+      ink: saved.colors?.ink !== undefined ? saved.colors.ink : DEFAULT_HOME_PAGE_DATA.colors!.ink,
+      ink2: saved.colors?.ink2 !== undefined ? saved.colors.ink2 : DEFAULT_HOME_PAGE_DATA.colors!.ink2,
+      ink3: saved.colors?.ink3 !== undefined ? saved.colors.ink3 : DEFAULT_HOME_PAGE_DATA.colors!.ink3,
+      banner: saved.colors?.banner !== undefined ? saved.colors.banner : DEFAULT_HOME_PAGE_DATA.colors!.banner,
+      hairline: saved.colors?.hairline !== undefined ? saved.colors.hairline : DEFAULT_HOME_PAGE_DATA.colors!.hairline,
+      background: saved.colors?.background !== undefined ? saved.colors.background : DEFAULT_HOME_PAGE_DATA.colors!.background,
+      foreground: saved.colors?.foreground !== undefined ? saved.colors.foreground : DEFAULT_HOME_PAGE_DATA.colors!.foreground,
     },
   };
 }

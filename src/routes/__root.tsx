@@ -7,7 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
+import { fetchHomePageContent } from "../lib/home-service";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -132,11 +133,82 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function CustomStylesInjector() {
+  const [colors, setColors] = useState<any>(null);
+
+  useEffect(() => {
+    // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.colors) {
+            setColors(parsed.colors);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to read from localStorage:", e);
+      }
+    }
+
+    // 2. Fetch do banco de dados para garantir que está atualizado
+    async function loadColors() {
+      try {
+        const data = await fetchHomePageContent();
+        if (data && data.colors) {
+          setColors(data.colors);
+        }
+      } catch (e) {
+        console.error("Failed to fetch colors:", e);
+      }
+    }
+    loadColors();
+
+    // 3. Ouvir alterações feitas na área administrativa no mesmo navegador
+    const handleStorageChange = () => {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.colors) {
+            setColors(parsed.colors);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  if (!colors) return null;
+
+  // Generate CSS custom variables override stylesheet
+  const css = `
+    :root {
+      ${colors.brand ? `--brand: ${colors.brand} !important;` : ""}
+      ${colors.brandHover ? `--brand-2: ${colors.brandHover} !important;` : ""}
+      ${colors.ink ? `--ink: ${colors.ink} !important;` : ""}
+      ${colors.ink2 ? `--ink-2: ${colors.ink2} !important;` : ""}
+      ${colors.ink3 ? `--ink-3: ${colors.ink3} !important;` : ""}
+      ${colors.banner ? `--banner: ${colors.banner} !important;` : ""}
+      ${colors.hairline ? `--hairline: ${colors.hairline} !important;` : ""}
+      ${colors.background ? `--background: ${colors.background} !important;` : ""}
+      ${colors.foreground ? `--foreground: ${colors.foreground} !important;` : ""}
+    }
+  `;
+
+  return <style dangerouslySetInnerHTML={{ __html: css }} />;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <CustomStylesInjector />
       {/* Dev-only helper to flush the HMR gate without spending credits. */}
       <FlushPreviewButton />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
