@@ -1,12 +1,20 @@
 import { ArrowRight } from "lucide-react";
 import { CATEGORIES } from "@/lib/shop-data";
 import { getDirectDriveUrl } from "@/lib/home-service";
+import { Link } from "@tanstack/react-router";
 
 const CAT_IMAGE_MAP: Record<string, string> = {
   catMasc: CATEGORIES[0]?.image || "",
   catFem: CATEGORIES[1]?.image || "",
   catSolar: CATEGORIES[2]?.image || "",
   catPrem: CATEGORIES[3]?.image || "",
+};
+
+const ROUTE_MAP: Record<string, string> = {
+  MASCULINO: "/masculino",
+  FEMININO: "/feminino",
+  SOLAR: "/solar",
+  PREMIUM: "/premium",
 };
 
 export interface CategoriesData {
@@ -32,10 +40,11 @@ export function Categories({ data }: { data?: CategoriesData }) {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {list.map((cat, idx) => {
             const imageSrc = (cat.imageUrl && getDirectDriveUrl(cat.imageUrl)) || CAT_IMAGE_MAP[cat.imageKey] || CATEGORIES[idx]?.image;
+            const targetRoute = ROUTE_MAP[cat.title.toUpperCase()] || "/colecoes";
             return (
-              <a
+              <Link
                 key={cat.title}
-                href="#mais-vendidos"
+                to={targetRoute}
                 className="group relative flex h-40 overflow-hidden rounded-lg border border-border bg-background/80 transition-transform hover:-translate-y-1"
               >
                 <div className="flex flex-1 flex-col justify-center p-5">
@@ -59,7 +68,7 @@ export function Categories({ data }: { data?: CategoriesData }) {
                     className="h-full w-full object-cover"
                   />
                 </div>
-              </a>
+              </Link>
             );
           })}
         </div>

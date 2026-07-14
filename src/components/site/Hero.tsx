@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ArrowRight, Truck, ShieldCheck, Users, CreditCard } from "lucide-react";
 import heroMan from "@/assets/hero-man.jpg";
 import { getDirectDriveUrl } from "@/lib/home-service";
+import { Link } from "@tanstack/react-router";
 
 const ICONS = [Truck, ShieldCheck, Users, CreditCard];
 
@@ -48,7 +49,7 @@ export function Hero({ data }: { data?: HeroData }) {
   const buttonText = data?.buttonText || "COMPRAR AGORA";
   const buttonLink = data?.buttonLink || "#mais-vendidos";
   const secondaryButtonText = data?.secondaryButtonText || "VER COLEÇÃO";
-  const secondaryButtonLink = data?.secondaryButtonLink || "#categorias";
+  const secondaryButtonLink = data?.secondaryButtonLink || "/colecoes";
   const imageSrc = data?.imageUrl === undefined 
     ? heroMan 
     : (data.imageUrl ? getDirectDriveUrl(data.imageUrl) : "");
@@ -132,21 +133,42 @@ export function Hero({ data }: { data?: HeroData }) {
                 {subtitle}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href={buttonLink}
-                  style={getStyleForFont(buttonFont)}
-                  className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
-                >
-                  {buttonText}
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-                <a
-                  href={secondaryButtonLink}
-                  style={getStyleForFont(secondaryButtonFont)}
-                  className="inline-flex cursor-pointer items-center justify-center rounded-md border border-white/40 bg-transparent px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:border-brand hover:text-brand"
-                >
-                  {secondaryButtonText}
-                </a>
+                {buttonLink.startsWith("/") ? (
+                  <Link
+                    to={buttonLink}
+                    style={getStyleForFont(buttonFont)}
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
+                  >
+                    {buttonText}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <a
+                    href={buttonLink}
+                    style={getStyleForFont(buttonFont)}
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-brand px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
+                  >
+                    {buttonText}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                )}
+                {secondaryButtonLink.startsWith("/") ? (
+                  <Link
+                    to={secondaryButtonLink}
+                    style={getStyleForFont(secondaryButtonFont)}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-md border border-white/40 bg-transparent px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:border-brand hover:text-brand"
+                  >
+                    {secondaryButtonText}
+                  </Link>
+                ) : (
+                  <a
+                    href={secondaryButtonLink}
+                    style={getStyleForFont(secondaryButtonFont)}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-md border border-white/40 bg-transparent px-6 py-3 text-sm font-bold tracking-wide text-white transition-colors hover:border-brand hover:text-brand"
+                  >
+                    {secondaryButtonText}
+                  </a>
+                )}
               </div>
             </div>
           </div>

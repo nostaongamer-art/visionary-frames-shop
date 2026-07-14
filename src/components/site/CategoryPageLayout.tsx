@@ -233,7 +233,19 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
               </div>
               
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-1.5 font-display">
-                {headerData.title}
+                {(() => {
+                  const title = headerData.title;
+                  if (!title) return "";
+                  const words = title.split(" ");
+                  if (words.length <= 1) return title;
+                  const lastWord = words.pop();
+                  return (
+                    <>
+                      {words.join(" ")}{" "}
+                      <span className="text-brand">{lastWord}</span>
+                    </>
+                  );
+                })()}
               </h1>
               
               <p className="text-xs text-white/70 max-w-sm">

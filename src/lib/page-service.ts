@@ -66,7 +66,7 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     oldPrice: "R$ 249,90",
     price: "R$ 199,90",
     priceVal: 199.9,
-    installment: "12x de R$ 19,90",
+    installment: "12x de R$ 16,66",
     category: "Armação de Grau",
     format: "Quadrado",
     material: "Acetato",
@@ -82,7 +82,7 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     oldPrice: "R$ 299,90",
     price: "R$ 254,90",
     priceVal: 254.9,
-    installment: "12x de R$ 25,49",
+    installment: "12x de R$ 21,24",
     category: "Óculos de Sol",
     format: "Wayfarer",
     material: "Acetato",
@@ -98,7 +98,7 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     oldPrice: "R$ 199,90",
     price: "R$ 149,90",
     priceVal: 149.9,
-    installment: "12x de R$ 14,90",
+    installment: "12x de R$ 12,49",
     category: "Armação de Grau",
     format: "Retangular",
     material: "Acetato",
@@ -114,7 +114,7 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     oldPrice: "R$ 329,90",
     price: "R$ 269,90",
     priceVal: 269.9,
-    installment: "12x de R$ 26,99",
+    installment: "12x de R$ 22,49",
     category: "Óculos de Sol",
     format: "Retangular",
     material: "TR90",
@@ -130,7 +130,7 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     oldPrice: "R$ 279,90",
     price: "R$ 251,90",
     priceVal: 251.9,
-    installment: "12x de R$ 25,19",
+    installment: "12x de R$ 20,99",
     category: "Armação de Grau",
     format: "Aviador",
     material: "Titânio",
@@ -146,7 +146,7 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     oldPrice: "R$ 229,90",
     price: "R$ 179,90",
     priceVal: 179.9,
-    installment: "12x de R$ 17,90",
+    installment: "12x de R$ 14,99",
     category: "Óculos de Sol",
     format: "Aviador",
     material: "Metal",
@@ -154,6 +154,54 @@ export const MOCK_BASE_PRODUCTS: PageProduct[] = [
     rating: 5,
     sales: 140
   },
+  {
+    id: 7,
+    name: "Armação Square Style",
+    discount: "-15%",
+    reviews: "(87)",
+    oldPrice: "R$ 260,90",
+    price: "R$ 220,90",
+    priceVal: 220.9,
+    installment: "12x de R$ 18,40",
+    category: "Armação de Grau",
+    format: "Quadrado",
+    material: "Acetato",
+    color: "marrom",
+    rating: 5,
+    sales: 95
+  },
+  {
+    id: 8,
+    name: "Óculos Esportivo Pro",
+    discount: "-20%",
+    reviews: "(71)",
+    oldPrice: "R$ 299,90",
+    price: "R$ 239,90",
+    priceVal: 239.9,
+    installment: "12x de R$ 19,99",
+    category: "Óculos de Sol",
+    format: "Esportivo",
+    material: "TR90",
+    color: "preto",
+    rating: 5,
+    sales: 110
+  },
+  {
+    id: 9,
+    name: "Óculos Solar Redondo",
+    discount: "-17%",
+    reviews: "(93)",
+    oldPrice: "R$ 239,90",
+    price: "R$ 199,90",
+    priceVal: 199.9,
+    installment: "12x de R$ 16,66",
+    category: "Óculos de Sol",
+    format: "Redondo",
+    material: "Metal",
+    color: "azul",
+    rating: 5,
+    sales: 105
+  }
 ];
 
 export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
@@ -175,6 +223,8 @@ export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
       { ...MOCK_BASE_PRODUCTS[3], id: 4, name: "Coleção Solar Polarizado" },
       { ...MOCK_BASE_PRODUCTS[4], id: 5, name: "Coleção Titanium Flex" },
       { ...MOCK_BASE_PRODUCTS[5], id: 6, name: "Coleção Solar Aviador" },
+      { ...MOCK_BASE_PRODUCTS[6], id: 7, name: "Coleção Armação Square Style" },
+      { ...MOCK_BASE_PRODUCTS[7], id: 8, name: "Coleção Óculos Esportivo Pro" },
     ],
   },
   masculino: {
@@ -195,6 +245,9 @@ export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
       { ...MOCK_BASE_PRODUCTS[3], id: 4 },
       { ...MOCK_BASE_PRODUCTS[4], id: 5 },
       { ...MOCK_BASE_PRODUCTS[5], id: 6 },
+      { ...MOCK_BASE_PRODUCTS[6], id: 7 },
+      { ...MOCK_BASE_PRODUCTS[7], id: 8 },
+      { ...MOCK_BASE_PRODUCTS[8], id: 9 },
     ],
   },
   feminino: {
@@ -210,11 +263,13 @@ export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
     },
     products: [
       { ...MOCK_BASE_PRODUCTS[0], id: 1, name: "Armação Feminina Cateye", format: "Gatinho", color: "marrom" },
-      { ...MOCK_BASE_PRODUCTS[1], id: 2, name: "Óculos Solar Feminino Chic", color: "vermelho" },
+      { ...MOCK_BASE_PRODUCTS[1], id: 2, name: "Óculos Solar Feminino Chic", color: "preto" },
       { ...MOCK_BASE_PRODUCTS[2], id: 3, name: "Armação Acetato Elegance", color: "transparente" },
       { ...MOCK_BASE_PRODUCTS[3], id: 4, name: "Óculos Solar Diva Gold", material: "Metal", color: "dourado" },
       { ...MOCK_BASE_PRODUCTS[4], id: 5, name: "Armação Round Slim", format: "Redondo", color: "cinza" },
       { ...MOCK_BASE_PRODUCTS[5], id: 6, name: "Óculos Solar Oversized", format: "Quadrado", color: "preto" },
+      { ...MOCK_BASE_PRODUCTS[6], id: 7, name: "Armação Feminina Square", format: "Quadrado", color: "marrom" },
+      { ...MOCK_BASE_PRODUCTS[8], id: 8, name: "Óculos Solar Diva Blue", format: "Redondo", color: "azul" },
     ],
   },
   solar: {
@@ -232,9 +287,11 @@ export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
       { ...MOCK_BASE_PRODUCTS[1], id: 1 },
       { ...MOCK_BASE_PRODUCTS[3], id: 2 },
       { ...MOCK_BASE_PRODUCTS[5], id: 3 },
-      { ...MOCK_BASE_PRODUCTS[1], id: 4, name: "Solar Wayfarer Gold", color: "dourado" },
-      { ...MOCK_BASE_PRODUCTS[3], id: 5, name: "Solar Polarizado Sport", material: "TR90" },
-      { ...MOCK_BASE_PRODUCTS[5], id: 6, name: "Solar Aviador Retro", material: "Metal" },
+      { ...MOCK_BASE_PRODUCTS[7], id: 4 },
+      { ...MOCK_BASE_PRODUCTS[8], id: 5 },
+      { ...MOCK_BASE_PRODUCTS[1], id: 6, name: "Solar Wayfarer Gold", color: "dourado" },
+      { ...MOCK_BASE_PRODUCTS[3], id: 7, name: "Solar Polarizado Sport", material: "TR90" },
+      { ...MOCK_BASE_PRODUCTS[5], id: 8, name: "Solar Aviador Retro", material: "Metal" },
     ],
   },
   premium: {
@@ -253,6 +310,8 @@ export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
       { ...MOCK_BASE_PRODUCTS[0], id: 2, name: "Acetato Italiano Classic", material: "Acetato" },
       { ...MOCK_BASE_PRODUCTS[1], id: 3, name: "Solar Premium Hexagonal", format: "Hexagonal" },
       { ...MOCK_BASE_PRODUCTS[4], id: 4, name: "Titanium Flex Square", format: "Quadrado" },
+      { ...MOCK_BASE_PRODUCTS[2], id: 5, name: "Acetato Tortoise Premium", material: "Acetato" },
+      { ...MOCK_BASE_PRODUCTS[6], id: 6, name: "Premium Square Acetate", material: "Acetato" },
     ],
   },
   promocoes: {
@@ -267,9 +326,12 @@ export const DEFAULT_PAGES_DATA: Record<string, CategoryPageData> = {
       list: [...DEFAULT_BENEFITS],
     },
     products: [
-      { ...MOCK_BASE_PRODUCTS[0], id: 1, discount: "-40%", price: "R$ 149,90", priceVal: 149.9 },
-      { ...MOCK_BASE_PRODUCTS[2], id: 2, discount: "-50%", price: "R$ 99,90", priceVal: 99.9 },
-      { ...MOCK_BASE_PRODUCTS[5], id: 3, discount: "-30%", price: "R$ 159,90", priceVal: 159.9 },
+      { ...MOCK_BASE_PRODUCTS[0], id: 1, discount: "-40%", price: "R$ 149,90", oldPrice: "R$ 249,90", priceVal: 149.9 },
+      { ...MOCK_BASE_PRODUCTS[2], id: 2, discount: "-50%", price: "R$ 99,90", oldPrice: "R$ 199,90", priceVal: 99.9 },
+      { ...MOCK_BASE_PRODUCTS[5], id: 3, discount: "-30%", price: "R$ 134,95", oldPrice: "R$ 179,90", priceVal: 134.95 },
+      { ...MOCK_BASE_PRODUCTS[1], id: 4, discount: "-25%", price: "R$ 191,15", oldPrice: "R$ 254,90", priceVal: 191.15 },
+      { ...MOCK_BASE_PRODUCTS[3], id: 5, discount: "-35%", price: "R$ 175,40", oldPrice: "R$ 269,90", priceVal: 175.4 },
+      { ...MOCK_BASE_PRODUCTS[7], id: 6, discount: "-20%", price: "R$ 191,90", oldPrice: "R$ 239,90", priceVal: 191.9 },
     ],
   },
 };
@@ -298,11 +360,18 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
       .eq("id", pageId)
       .single();
 
-    if (error || !data) {
+    if (error || !data || !data.content) {
+      // Cria a linha no Supabase com o defaultData se não existir para coligar perfeitamente
+      savePageContent(pageId, defaultData).catch(err => console.error("Auto-upsert failed:", err));
       return localFallback;
     }
 
     const saved = data.content as any;
+    const dbProducts = Array.isArray(saved.products) ? saved.products : [];
+    
+    // Se o banco estiver vazio de produtos, força o fallback para os produtos default daquela seção
+    const finalProducts = dbProducts.length > 0 ? dbProducts : defaultData.products;
+
     const merged = {
       header: {
         ...defaultData.header,
@@ -319,7 +388,7 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
           };
         }) : defaultData.benefits.list,
       },
-      products: Array.isArray(saved.products) ? saved.products.map((p: any) => ({
+      products: finalProducts.map((p: any) => ({
         id: typeof p.id === "number" ? p.id : Math.random(),
         name: p.name || "",
         discount: p.discount || "",
@@ -335,7 +404,7 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
         color: p.color || "preto",
         rating: typeof p.rating === "number" ? p.rating : 5,
         sales: typeof p.sales === "number" ? p.sales : 100,
-      })) : defaultData.products,
+      })),
       colors: saved.colors || defaultData.colors,
     };
 
