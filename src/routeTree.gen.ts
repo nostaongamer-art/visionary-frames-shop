@@ -9,16 +9,36 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SolarRouteImport } from './routes/solar'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PromocoesRouteImport } from './routes/promocoes'
+import { Route as PremiumRouteImport } from './routes/premium'
 import { Route as MasculinoRouteImport } from './routes/masculino'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FemininoRouteImport } from './routes/feminino'
+import { Route as ColecoesRouteImport } from './routes/colecoes'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SolarRoute = SolarRouteImport.update({
+  id: '/solar',
+  path: '/solar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromocoesRoute = PromocoesRouteImport.update({
+  id: '/promocoes',
+  path: '/promocoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PremiumRoute = PremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MasculinoRoute = MasculinoRouteImport.update({
@@ -29,6 +49,16 @@ const MasculinoRoute = MasculinoRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FemininoRoute = FemininoRouteImport.update({
+  id: '/feminino',
+  path: '/feminino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ColecoesRoute = ColecoesRouteImport.update({
+  id: '/colecoes',
+  path: '/colecoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -51,26 +81,41 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/checkout': typeof CheckoutRoute
+  '/colecoes': typeof ColecoesRoute
+  '/feminino': typeof FemininoRoute
   '/login': typeof LoginRoute
   '/masculino': typeof MasculinoRoute
+  '/premium': typeof PremiumRoute
+  '/promocoes': typeof PromocoesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/solar': typeof SolarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/checkout': typeof CheckoutRoute
+  '/colecoes': typeof ColecoesRoute
+  '/feminino': typeof FemininoRoute
   '/login': typeof LoginRoute
   '/masculino': typeof MasculinoRoute
+  '/premium': typeof PremiumRoute
+  '/promocoes': typeof PromocoesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/solar': typeof SolarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/checkout': typeof CheckoutRoute
+  '/colecoes': typeof ColecoesRoute
+  '/feminino': typeof FemininoRoute
   '/login': typeof LoginRoute
   '/masculino': typeof MasculinoRoute
+  '/premium': typeof PremiumRoute
+  '/promocoes': typeof PromocoesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/solar': typeof SolarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,37 +123,84 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/checkout'
+    | '/colecoes'
+    | '/feminino'
     | '/login'
     | '/masculino'
+    | '/premium'
+    | '/promocoes'
     | '/sitemap.xml'
+    | '/solar'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/checkout' | '/login' | '/masculino' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/admin'
+    | '/checkout'
+    | '/colecoes'
+    | '/feminino'
+    | '/login'
+    | '/masculino'
+    | '/premium'
+    | '/promocoes'
+    | '/sitemap.xml'
+    | '/solar'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/checkout'
+    | '/colecoes'
+    | '/feminino'
     | '/login'
     | '/masculino'
+    | '/premium'
+    | '/promocoes'
     | '/sitemap.xml'
+    | '/solar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   CheckoutRoute: typeof CheckoutRoute
+  ColecoesRoute: typeof ColecoesRoute
+  FemininoRoute: typeof FemininoRoute
   LoginRoute: typeof LoginRoute
   MasculinoRoute: typeof MasculinoRoute
+  PremiumRoute: typeof PremiumRoute
+  PromocoesRoute: typeof PromocoesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SolarRoute: typeof SolarRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/solar': {
+      id: '/solar'
+      path: '/solar'
+      fullPath: '/solar'
+      preLoaderRoute: typeof SolarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promocoes': {
+      id: '/promocoes'
+      path: '/promocoes'
+      fullPath: '/promocoes'
+      preLoaderRoute: typeof PromocoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/premium': {
+      id: '/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof PremiumRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/masculino': {
@@ -123,6 +215,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feminino': {
+      id: '/feminino'
+      path: '/feminino'
+      fullPath: '/feminino'
+      preLoaderRoute: typeof FemininoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/colecoes': {
+      id: '/colecoes'
+      path: '/colecoes'
+      fullPath: '/colecoes'
+      preLoaderRoute: typeof ColecoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -153,9 +259,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   CheckoutRoute: CheckoutRoute,
+  ColecoesRoute: ColecoesRoute,
+  FemininoRoute: FemininoRoute,
   LoginRoute: LoginRoute,
   MasculinoRoute: MasculinoRoute,
+  PremiumRoute: PremiumRoute,
+  PromocoesRoute: PromocoesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SolarRoute: SolarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
