@@ -25,12 +25,12 @@ export function Header() {
 
   const navItems = [
     { label: "INÍCIO", href: "/", active: currentPath === "/" },
-    { label: "COLEÇÕES", href: "/#categorias", active: false },
+    { label: "COLEÇÕES", href: "/colecoes", active: currentPath === "/colecoes" },
     { label: "MASCULINO", href: "/masculino", active: currentPath === "/masculino" },
-    { label: "FEMININO", href: "/#categorias", active: false },
-    { label: "SOLAR", href: "/#categorias", active: false },
-    { label: "PREMIUM", href: "/#categorias", active: false },
-    { label: "PROMOÇÕES", href: "/#oferta", active: false },
+    { label: "FEMININO", href: "/feminino", active: currentPath === "/feminino" },
+    { label: "SOLAR", href: "/solar", active: currentPath === "/solar" },
+    { label: "PREMIUM", href: "/premium", active: currentPath === "/premium" },
+    { label: "PROMOÇÕES", href: "/promocoes", active: currentPath === "/promocoes" },
   ];
 
   return (

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
+import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
 import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette } from "lucide-react";
 
@@ -62,21 +63,38 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type TabType = "promo" | "hero" | "categories" | "products" | "flash" | "testimonials" | "brands" | "newsletter" | "footer" | "colors";
+type TabType = 
+  | "promo" | "hero" | "categories" | "products" | "flash" | "testimonials" | "brands" | "newsletter" | "footer" | "colors"
+  | "cat-banner" | "cat-benefits" | "cat-products" | "cat-colors";
 
 function Admin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("home");
   const [activeTab, setActiveTab] = useState<TabType>("promo");
   
-  // Admin form state
+  // Admin form states
   const [data, setData] = useState<HomePageData>(DEFAULT_HOME_PAGE_DATA);
+  const [categoryData, setCategoryData] = useState<CategoryPageData | null>(null);
   const [newBrandName, setNewBrandName] = useState("");
 
+  // Product CRUD states for catalogue sections (2-7)
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [prodName, setProdName] = useState("");
+  const [prodPrice, setProdPrice] = useState("");
+  const [prodOldPrice, setProdOldPrice] = useState("");
+  const [prodDiscount, setProdDiscount] = useState("");
+  const [prodCategory, setProdCategory] = useState("Armação de Grau");
+  const [prodFormat, setProdFormat] = useState("Quadrado");
+  const [prodMaterial, setProdMaterial] = useState("Acetato");
+  const [prodColor, setProdColor] = useState("preto");
+  const [prodImageUrl, setProdImageUrl] = useState("");
+
   useEffect(() => {
-    async function checkAuthAndLoad() {
-      // Check auth status (Supabase real session OR local storage mock bypass)
+    async function checkAuth() {
       const bypass = localStorage.getItem("admin_auth_bypass");
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -85,31 +103,45 @@ function Admin() {
         navigate({ to: "/login" });
         return;
       }
+    }
+    checkAuth();
+  }, [navigate]);
 
-      // Load home page content
-      const content = await fetchHomePageContent();
-      setData(content);
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      if (activeSection === "home") {
+        const content = await fetchHomePageContent();
+        setData(content);
+      } else {
+        const content = await fetchPageContent(activeSection);
+        setCategoryData(content);
+      }
       setLoading(false);
     }
-
-    checkAuthAndLoad();
-  }, [navigate]);
+    loadData();
+  }, [activeSection]);
 
   const handleSave = async () => {
     setSaving(true);
-    const result = await saveHomePageContent(data);
+    let result;
+    if (activeSection === "home") {
+      result = await saveHomePageContent(data);
+    } else if (categoryData) {
+      result = await savePageContent(activeSection, categoryData);
+    }
     setSaving(false);
 
-    if (result.success) {
+    if (result && result.success) {
       if (result.isLocalOnly) {
         toast.warning(
-          `Salvo temporariamente no navegador! Sincronização falhou: ${result.error || "Sem permissão"}. Certifique-se de que a tabela home_page_content e as permissões RLS foram criadas no Supabase.`
+          `Salvo temporariamente no navegador! Sincronização falhou: ${result.error || "Sem permissão"}.`
         );
       } else {
-        toast.success("Alterações salvas com sucesso no Supabase e na nuvem!");
+        toast.success("Alterações salvas com sucesso!");
       }
     } else {
-      toast.error(`Erro ao salvar: ${result.error || "Erro desconhecido"}`);
+      toast.error(`Erro ao salvar: ${result?.error || "Erro desconhecido"}`);
     }
   };
 
@@ -121,8 +153,15 @@ function Admin() {
   };
 
   const resetToDefault = () => {
-    if (window.confirm("Deseja realmente restaurar todos os textos e imagens para o padrão inicial?")) {
-      setData(DEFAULT_HOME_PAGE_DATA);
+    if (window.confirm("Deseja realmente restaurar todos os campos desta página para o padrão inicial?")) {
+      if (activeSection === "home") {
+        setData(DEFAULT_HOME_PAGE_DATA);
+      } else {
+        const defaultData = DEFAULT_PAGES_DATA[activeSection];
+        if (defaultData) {
+          setCategoryData(defaultData);
+        }
+      }
       toast.success("Campos restaurados para o padrão. Clique em 'Salvar' para gravar no banco.");
     }
   };
@@ -308,100 +347,182 @@ function Admin() {
       {/* Main Admin UI */}
       <main className="max-w-[1200px] w-full mx-auto px-4 mt-8 grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Navigation Sidebar / Tabs list */}
-        <div className="flex flex-col gap-2 bg-[#101217] border border-[#282C32]/45 rounded-lg p-3 h-fit">
-          <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mb-2">
-            Seções da Página Inicial
+        <div className="flex flex-col gap-3 bg-[#101217] border border-[#282C32]/45 rounded-lg p-3 h-fit text-left">
+          <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mb-1">
+            Páginas do Site
           </h4>
-          <button
-            onClick={() => setActiveTab("promo")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "promo" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Info className="h-4 w-4 shrink-0" />
-            Banner Promocional
-          </button>
-          <button
-            onClick={() => setActiveTab("hero")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "hero" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <LayoutGrid className="h-4 w-4 shrink-0" />
-            Banner Principal (Hero)
-          </button>
-          <button
-            onClick={() => setActiveTab("categories")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "categories" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Image className="h-4 w-4 shrink-0" />
-            Categorias
-          </button>
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "products" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Edit className="h-4 w-4 shrink-0" />
-            Mais Vendidos
-          </button>
-          <button
-            onClick={() => setActiveTab("flash")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "flash" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Zap className="h-4 w-4 shrink-0" />
-            Oferta Relâmpago
-          </button>
-          <button
-            onClick={() => setActiveTab("testimonials")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "testimonials" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Star className="h-4 w-4 shrink-0" />
-            Depoimentos
-          </button>
-          <button
-            onClick={() => setActiveTab("brands")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "brands" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Link className="h-4 w-4 shrink-0" />
-            Marcas Parceiras
-          </button>
-          <button
-            onClick={() => setActiveTab("newsletter")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "newsletter" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Mail className="h-4 w-4 shrink-0" />
-            Newsletter
-          </button>
-          <button
-            onClick={() => setActiveTab("footer")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "footer" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Layout className="h-4 w-4 shrink-0" />
-            Rodapé (Footer)
-          </button>
-          <button
-            onClick={() => setActiveTab("colors")}
-            className={`w-full text-left px-3 py-2 rounded text-sm font-semibold flex items-center gap-2.5 transition-colors cursor-pointer ${
-              activeTab === "colors" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-            }`}
-          >
-            <Palette className="h-4 w-4 shrink-0" />
-            Paleta de Cores
-          </button>
+          {[
+            { id: "home", label: "Seção 1: Página Inicial" },
+            { id: "colecoes", label: "Seção 2: Coleções" },
+            { id: "masculino", label: "Seção 3: Masculino" },
+            { id: "feminino", label: "Seção 4: Feminino" },
+            { id: "solar", label: "Seção 5: Solar" },
+            { id: "premium", label: "Seção 6: Premium" },
+            { id: "promocoes", label: "Seção 7: Promoções" },
+          ].map((sec) => {
+            const isExpanded = activeSection === sec.id;
+            return (
+              <div key={sec.id} className="flex flex-col gap-1 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection(sec.id);
+                    if (sec.id === "home") {
+                      setActiveTab("promo");
+                    } else {
+                      setActiveTab("cat-banner");
+                    }
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                    activeSection === sec.id ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+                  }`}
+                >
+                  <span>{sec.label}</span>
+                  <span className="text-[9px] opacity-70">
+                    {isExpanded ? "▲" : "▼"}
+                  </span>
+                </button>
+                
+                {isExpanded && (
+                  <div className="flex flex-col gap-1 pl-2.5 mt-1.5 border-l border-[#FF8A00]/40 ml-2.5">
+                    {sec.id === "home" ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("promo")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "promo" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Banner Promocional
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("hero")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "hero" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Banner Principal (Hero)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("categories")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "categories" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Categorias
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("products")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "products" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Mais Vendidos
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("flash")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "flash" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Oferta Relâmpago
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("testimonials")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "testimonials" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Depoimentos
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("brands")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "brands" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Marcas Parceiras
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("newsletter")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "newsletter" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Newsletter
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("footer")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "footer" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Rodapé (Footer)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("colors")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "colors" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Paleta de Cores
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("cat-banner")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "cat-banner" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Banner Superior
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("cat-benefits")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "cat-benefits" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Barra de Benefícios
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("cat-products")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "cat-products" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Produtos (CRUD)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("cat-colors")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "cat-colors" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Paleta de Cores
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Content Form Editor */}
@@ -2449,6 +2570,640 @@ function Admin() {
 
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB: Catalogue Banner */}
+          {activeSection !== "home" && activeTab === "cat-banner" && categoryData && (
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Banner Superior - {categoryData.header.title}
+              </h3>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <ToggleSwitch
+                  label="Exibir Banner Superior nesta Página"
+                  checked={categoryData.header.show !== false}
+                  onChange={(val) =>
+                    setCategoryData((prev: any) => ({
+                      ...prev,
+                      header: { ...prev.header, show: val },
+                    }))
+                  }
+                />
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Título da Página</label>
+                  <input
+                    type="text"
+                    value={categoryData.header.title}
+                    onChange={(e) =>
+                      setCategoryData((prev: any) => ({
+                        ...prev,
+                        header: { ...prev.header, title: e.target.value },
+                      }))
+                    }
+                    className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Subtítulo / Descrição</label>
+                  <textarea
+                    value={categoryData.header.subtitle}
+                    onChange={(e) =>
+                      setCategoryData((prev: any) => ({
+                        ...prev,
+                        header: { ...prev.header, subtitle: e.target.value },
+                      }))
+                    }
+                    className="w-full h-20 p-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00] resize-none"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">URL da Imagem do Banner (Drive)</label>
+                  <input
+                    type="text"
+                    value={categoryData.header.imageUrl || ""}
+                    onChange={(e) =>
+                      setCategoryData((prev: any) => ({
+                        ...prev,
+                        header: { ...prev.header, imageUrl: e.target.value },
+                      }))
+                    }
+                    placeholder="Cole a URL ou link de compartilhamento do Google Drive"
+                    className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Catalogue Benefits */}
+          {activeSection !== "home" && activeTab === "cat-benefits" && categoryData && (
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Barra de Benefícios - {categoryData.header.title}
+              </h3>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <ToggleSwitch
+                  label="Exibir Barra de Benefícios"
+                  checked={categoryData.benefits.show !== false}
+                  onChange={(val) =>
+                    setCategoryData((prev: any) => ({
+                      ...prev,
+                      benefits: { ...prev.benefits, show: val },
+                    }))
+                  }
+                />
+
+                <div className="flex flex-col gap-4 mt-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">Edição dos Itens de Benefícios</h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    {categoryData.benefits.list.map((b, idx) => (
+                      <div key={idx} className="bg-[#15181D]/80 border border-[#282C32]/45 p-4 rounded-lg flex flex-col gap-3">
+                        <span className="text-[10px] font-black text-[#FF8A00] tracking-wider uppercase">Item {idx + 1} - Ícone: {b.iconKey}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] text-white/50 font-bold">Título</label>
+                            <input
+                              type="text"
+                              value={b.title}
+                              onChange={(e) => {
+                                const newList = [...categoryData.benefits.list];
+                                newList[idx] = { ...b, title: e.target.value };
+                                setCategoryData((prev: any) => ({ ...prev, benefits: { ...prev.benefits, list: newList } }));
+                              }}
+                              className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] text-white/50 font-bold">Subtítulo</label>
+                            <input
+                              type="text"
+                              value={b.subtitle}
+                              onChange={(e) => {
+                                const newList = [...categoryData.benefits.list];
+                                newList[idx] = { ...b, subtitle: e.target.value };
+                                setCategoryData((prev: any) => ({ ...prev, benefits: { ...prev.benefits, list: newList } }));
+                              }}
+                              className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Catalogue Products CRUD */}
+          {activeSection !== "home" && activeTab === "cat-products" && categoryData && (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <h3 className="text-base font-bold text-[#FF8A00]">
+                  Gerenciador de Produtos - {categoryData.header.title}
+                </h3>
+                {!isEditingProduct && !isAddingProduct && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingProduct(true);
+                      setProdName("");
+                      setProdPrice("199.90");
+                      setProdOldPrice("R$ 249,90");
+                      setProdDiscount("-20%");
+                      setProdCategory("Armação de Grau");
+                      setProdFormat("Quadrado");
+                      setProdMaterial("Acetato");
+                      setProdColor("preto");
+                      setProdImageUrl("");
+                    }}
+                    className="bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4" /> Novo Produto
+                  </button>
+                )}
+              </div>
+
+              {/* Inline CRUD Add / Edit Form */}
+              {(isAddingProduct || isEditingProduct) ? (
+                <div className="bg-[#15181D] border border-[#282C32]/60 rounded-lg p-5 flex flex-col gap-4">
+                  <h4 className="text-sm font-bold text-[#FF8A00]">
+                    {isAddingProduct ? "Adicionar Novo Óculos" : "Editar Produto"}
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Nome do Modelo</label>
+                      <input
+                        type="text"
+                        value={prodName}
+                        onChange={(e) => setProdName(e.target.value)}
+                        placeholder="Ex: Óculos Aviador Retro Gold"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Categoria</label>
+                      <select
+                        value={prodCategory}
+                        onChange={(e) => setProdCategory(e.target.value)}
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      >
+                        <option value="Armação de Grau">Armação de Grau</option>
+                        <option value="Óculos de Sol">Óculos de Sol</option>
+                        <option value="Lentes Azuis">Lentes Azuis</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Preço de Venda (Apenas números, ex: 189.90)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={prodPrice}
+                        onChange={(e) => setProdPrice(e.target.value)}
+                        placeholder="189.90"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Preço Original Riscado (Ex: R$ 249,90)</label>
+                      <input
+                        type="text"
+                        value={prodOldPrice}
+                        onChange={(e) => setProdOldPrice(e.target.value)}
+                        placeholder="R$ 249,90"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Selo de Desconto (Ex: -15% ou em branco)</label>
+                      <input
+                        type="text"
+                        value={prodDiscount}
+                        onChange={(e) => setProdDiscount(e.target.value)}
+                        placeholder="-15%"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Formato da Armação</label>
+                      <select
+                        value={prodFormat}
+                        onChange={(e) => setProdFormat(e.target.value)}
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      >
+                        <option value="Quadrado">Quadrado</option>
+                        <option value="Redondo">Redondo</option>
+                        <option value="Retangular">Retangular</option>
+                        <option value="Aviador">Aviador</option>
+                        <option value="Wayfarer">Wayfarer</option>
+                        <option value="Esportivo">Esportivo</option>
+                        <option value="Gatinho">Gatinho</option>
+                        <option value="Hexagonal">Hexagonal</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Material</label>
+                      <select
+                        value={prodMaterial}
+                        onChange={(e) => setProdMaterial(e.target.value)}
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      >
+                        <option value="Acetato">Acetato</option>
+                        <option value="Metal">Metal</option>
+                        <option value="TR90">TR90</option>
+                        <option value="Titânio">Titânio</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Cor</label>
+                      <select
+                        value={prodColor}
+                        onChange={(e) => setProdColor(e.target.value)}
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      >
+                        <option value="preto">Preto</option>
+                        <option value="marrom">Marrom</option>
+                        <option value="azul">Azul</option>
+                        <option value="cinza">Cinza</option>
+                        <option value="verde">Verde</option>
+                        <option value="vermelho">Vermelho</option>
+                        <option value="dourado">Dourado</option>
+                        <option value="transparente">Transparente</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1 md:col-span-2">
+                      <label className="text-xs font-semibold text-white/70">URL da Imagem do Produto (Drive)</label>
+                      <input
+                        type="text"
+                        value={prodImageUrl}
+                        onChange={(e) => setProdImageUrl(e.target.value)}
+                        placeholder="URL de compartilhamento do Google Drive"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 justify-end mt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddingProduct(false);
+                        setIsEditingProduct(false);
+                        setEditingProductId(null);
+                      }}
+                      className="bg-white/10 hover:bg-white/15 text-white text-xs font-bold px-4 py-2 rounded transition-colors cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!prodName) {
+                          toast.error("Por favor, preencha o nome do modelo!");
+                          return;
+                        }
+                        const numPrice = parseFloat(prodPrice);
+                        if (isNaN(numPrice)) {
+                          toast.error("Por favor, preencha um preço válido!");
+                          return;
+                        }
+
+                        const installmentVal = (numPrice / 12).toFixed(2).replace(".", ",");
+                        const autoInstallment = `12x de R$ ${installmentVal}`;
+
+                        const productPayload: PageProduct = {
+                          id: isEditingProduct && editingProductId !== null ? editingProductId : Date.now(),
+                          name: prodName,
+                          discount: prodDiscount,
+                          reviews: isEditingProduct && editingProductId !== null ? (categoryData.products.find(p => p.id === editingProductId)?.reviews || "(0)") : `(${Math.floor(Math.random() * 150) + 15})`,
+                          oldPrice: prodOldPrice || `R$ ${(numPrice * 1.25).toFixed(2).replace(".", ",")}`,
+                          price: `R$ ${numPrice.toFixed(2).replace(".", ",")}`,
+                          priceVal: numPrice,
+                          installment: autoInstallment,
+                          imageUrl: prodImageUrl,
+                          category: prodCategory,
+                          format: prodFormat,
+                          material: prodMaterial,
+                          color: prodColor,
+                          rating: 5,
+                          sales: isEditingProduct && editingProductId !== null ? (categoryData.products.find(p => p.id === editingProductId)?.sales || 10) : Math.floor(Math.random() * 200) + 10,
+                        };
+
+                        if (isAddingProduct) {
+                          setCategoryData((prev: any) => ({
+                            ...prev,
+                            products: [...prev.products, productPayload],
+                          }));
+                          toast.success("Produto adicionado. Salve para confirmar!");
+                        } else {
+                          setCategoryData((prev: any) => ({
+                            ...prev,
+                            products: prev.products.map((p: any) => p.id === editingProductId ? productPayload : p),
+                          }));
+                          toast.success("Produto atualizado. Salve para confirmar!");
+                        }
+
+                        setIsAddingProduct(false);
+                        setIsEditingProduct(false);
+                        setEditingProductId(null);
+                      }}
+                      className="bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold px-4 py-2 rounded transition-colors cursor-pointer"
+                    >
+                      {isAddingProduct ? "Adicionar Produto" : "Salvar Edição"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-[#282C32]/45 text-white/50 font-bold uppercase tracking-wider">
+                        <th className="p-3">Modelo</th>
+                        <th className="p-3">Categoria</th>
+                        <th className="p-3">Format/Mat/Cor</th>
+                        <th className="p-3">Preço</th>
+                        <th className="p-3 text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categoryData.products.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="p-8 text-center text-white/40 italic">
+                            Nenhum óculos cadastrado nesta página. Clique em "Novo Produto" para adicionar.
+                          </td>
+                        </tr>
+                      ) : (
+                        categoryData.products.map((prod) => (
+                          <tr key={prod.id} className="border-b border-[#282C32]/20 last:border-0 hover:bg-white/5 transition-colors">
+                            <td className="p-3 font-semibold text-white">{prod.name}</td>
+                            <td className="p-3 text-white/70">{prod.category}</td>
+                            <td className="p-3 text-white/60">
+                              {prod.format} | {prod.material} | {prod.color}
+                            </td>
+                            <td className="p-3 font-bold text-[#FF8A00]">{prod.price}</td>
+                            <td className="p-3 text-right flex items-center justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsEditingProduct(true);
+                                  setEditingProductId(prod.id);
+                                  setProdName(prod.name);
+                                  setProdPrice(prod.priceVal.toString());
+                                  setProdOldPrice(prod.oldPrice);
+                                  setProdDiscount(prod.discount);
+                                  setProdCategory(prod.category);
+                                  setProdFormat(prod.format);
+                                  setProdMaterial(prod.material);
+                                  setProdColor(prod.color);
+                                  setProdImageUrl(prod.imageUrl || "");
+                                }}
+                                className="text-white/60 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors"
+                              >
+                                Editar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (window.confirm(`Deseja realmente remover o óculos "${prod.name}" desta página?`)) {
+                                    setCategoryData((prev: any) => ({
+                                      ...prev,
+                                      products: prev.products.filter((p: any) => p.id !== prod.id),
+                                    }));
+                                    toast.success("Produto removido. Salve para confirmar!");
+                                  }
+                                }}
+                                className="text-red-400 hover:text-red-500 bg-red-500/10 hover:bg-red-500/15 p-1.5 rounded cursor-pointer transition-colors"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: Catalogue Page Color Overrides */}
+          {activeSection !== "home" && activeTab === "cat-colors" && categoryData && (
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <h3 className="text-base font-bold text-[#FF8A00]">
+                  Paleta de Cores Personalizada - {categoryData.header.title}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategoryData((prev: any) => ({
+                      ...prev,
+                      colors: { ...(data.colors || DEFAULT_HOME_PAGE_DATA.colors) }
+                    }));
+                    toast.success("Cores da Página Inicial copiadas para esta seção!");
+                  }}
+                  className="bg-white/10 hover:bg-white/15 text-white text-[10px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
+                >
+                  Copiar Cores da Página Inicial
+                </button>
+              </div>
+
+              <div className="bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg p-4 text-xs text-white/70 leading-relaxed">
+                <p>
+                  Defina uma identidade visual única para esta página específica. Se você não configurar cores personalizadas aqui, a página usará automaticamente a paleta global configurada na Seção 1 (Página Inicial).
+                </p>
+                {categoryData.colors && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategoryData((prev: any) => {
+                        const copy = { ...prev };
+                        delete copy.colors;
+                        return copy;
+                      });
+                      toast.success("Cores limpas! Esta página voltará a herdar as cores da home.");
+                    }}
+                    className="mt-2.5 bg-red-500/10 hover:bg-red-500/15 text-red-400 px-2 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors"
+                  >
+                    Limpar Cores e Herdar da Home
+                  </button>
+                )}
+              </div>
+
+              {!categoryData.colors ? (
+                <div className="text-center py-6 bg-[#15181D]/15 border border-[#282C32]/35 border-dashed rounded-lg">
+                  <p className="text-xs text-white/50 mb-3">Esta página está herdando as cores da Página Inicial.</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategoryData((prev: any) => ({
+                        ...prev,
+                        colors: { ...(data.colors || DEFAULT_HOME_PAGE_DATA.colors) }
+                      }));
+                      toast.success("Paleta de cores personalizada ativada!");
+                    }}
+                    className="bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold px-4 py-2 rounded transition-colors cursor-pointer"
+                  >
+                    Ativar Cores Personalizadas para esta Página
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  {/* Categoria 1: Identidade */}
+                  <div className="flex flex-col gap-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1. Cores de Identidade da Marca</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Cor Laranja Principal */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.brand || "#FF8A00"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, brand: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Marca)</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.brand || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, brand: e.target.value } }))}
+                            placeholder="#FF8A00"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Cor Laranja Hover */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.brandHover || "#FF9900"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, brandHover: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Hover/Foco)</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.brandHover || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, brandHover: e.target.value } }))}
+                            placeholder="#FF9900"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Categoria 2: Fundo */}
+                  <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">2. Cores de Fundo (Tema Escuro/Claro)</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Fundo Geral Escuro */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.ink || "#08090A"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, ink: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo Geral Escuro</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.ink || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, ink: e.target.value } }))}
+                            placeholder="#08090A"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Fundo Claro do Site */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.background || "#FFFFFF"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, background: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo Claro do Site</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.background || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, background: e.target.value } }))}
+                            placeholder="#FFFFFF"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Categoria 3: Textos */}
+                  <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">3. Textos e Linhas Divisórias</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Cor do Texto Principal */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.foreground || "#08090A"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, foreground: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor do Texto Principal</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.foreground || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, foreground: e.target.value } }))}
+                            placeholder="#08090A"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Bordas e Linhas */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.hairline || "#2E3033"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, hairline: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Bordas e Linhas (Hairline)</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.hairline || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, hairline: e.target.value } }))}
+                            placeholder="#2E3033"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
