@@ -117,6 +117,41 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   const showBanner = headerData.show !== false;
   const bannerImage = headerData.imageUrl ? getDirectDriveUrl(headerData.imageUrl) : DEFAULT_BANNER_MAP[pageId];
 
+  const bannerHeightSetting = (headerData as any).bannerHeight || "giant";
+
+  const heightClass = (() => {
+    switch (bannerHeightSetting) {
+      case "small": return "h-[180px]";
+      case "medium": return "h-[300px]";
+      case "large": return "h-[400px]";
+      case "giant":
+      default:
+        return "h-[220px] sm:h-[350px] md:h-[600px]";
+    }
+  })();
+
+  const titleSizeClass = (() => {
+    switch (bannerHeightSetting) {
+      case "small": return "text-2xl sm:text-3xl";
+      case "medium": return "text-2xl sm:text-4xl";
+      case "large": return "text-2xl sm:text-4xl md:text-5xl";
+      case "giant":
+      default:
+        return "text-2xl sm:text-4xl md:text-5xl lg:text-6xl";
+    }
+  })();
+
+  const subtitleSizeClass = (() => {
+    switch (bannerHeightSetting) {
+      case "small": return "text-xs";
+      case "medium": return "text-xs sm:text-sm";
+      case "large": return "text-xs sm:text-sm md:text-base";
+      case "giant":
+      default:
+        return "text-xs sm:text-sm md:text-base";
+    }
+  })();
+
   const benefitsData = pageData.benefits || { show: true, list: [] };
   const showBenefits = benefitsData.show !== false;
   const benefitsList = benefitsData.list || [];
@@ -224,7 +259,7 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
 
       {/* 3. Category Banner */}
       {showBanner && (
-        <section className="relative h-[220px] sm:h-[350px] md:h-[600px] bg-[#090B0E] overflow-hidden">
+        <section className={`relative ${heightClass} bg-[#090B0E] overflow-hidden`}>
           <div className="mx-auto max-w-[1240px] px-4 sm:px-6 h-full flex items-center relative z-10">
             <div className="max-w-md md:max-w-2xl text-left py-6 flex flex-col justify-center h-full">
               <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium text-white/60 mb-2 md:mb-3">
@@ -233,7 +268,7 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                 <span className="text-white">{BREADCRUMB_LABEL}</span>
               </div>
               
-              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-2 md:mb-3.5 font-display">
+              <h1 className={`${titleSizeClass} font-extrabold tracking-tight text-white mb-2 md:mb-3.5 font-display`}>
                 {(() => {
                   const title = headerData.title;
                   if (!title) return "";
@@ -249,7 +284,7 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                 })()}
               </h1>
               
-              <p className="text-xs sm:text-sm md:text-base text-white/70 max-w-sm md:max-w-xl">
+              <p className={`${subtitleSizeClass} text-white/70 max-w-sm md:max-w-xl`}>
                 {headerData.subtitle}
               </p>
             </div>

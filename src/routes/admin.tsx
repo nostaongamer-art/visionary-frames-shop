@@ -2621,6 +2621,25 @@ function Admin() {
                   />
                 </div>
 
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Altura do Banner no Site</label>
+                  <select
+                    value={categoryData.header.bannerHeight || "giant"}
+                    onChange={(e) =>
+                      setCategoryData((prev: any) => ({
+                        ...prev,
+                        header: { ...prev.header, bannerHeight: e.target.value },
+                      }))
+                    }
+                    className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                  >
+                    <option value="small">Pequena (180px - Padrão antigo)</option>
+                    <option value="medium">Média (300px)</option>
+                    <option value="large">Grande (400px)</option>
+                    <option value="giant">Gigante (600px - Nova altura)</option>
+                  </select>
+                </div>
+
                 <ImageInputWithPreview
                   label="URL da Imagem do Banner (Drive)"
                   value={categoryData.header.imageUrl || ""}
