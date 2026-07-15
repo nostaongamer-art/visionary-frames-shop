@@ -2640,6 +2640,34 @@ function Admin() {
                   </select>
                 </div>
 
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-white/70">Ajuste Vertical da Imagem (Subir / Descer)</label>
+                    <span className="text-[10px] text-[#FF8A00] font-bold">
+                      {categoryData.header.imagePositionY !== undefined ? categoryData.header.imagePositionY : 50}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={categoryData.header.imagePositionY !== undefined ? categoryData.header.imagePositionY : 50}
+                    onChange={(e) =>
+                      setCategoryData((prev: any) => ({
+                        ...prev,
+                        header: { ...prev.header, imagePositionY: parseInt(e.target.value) },
+                      }))
+                    }
+                    className="w-full accent-[#FF8A00] h-1 bg-[#1C1F26] rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[9px] text-white/40">
+                    <span>Subir (Topo - 0%)</span>
+                    <span>Centro (50%)</span>
+                    <span>Descer (Base - 100%)</span>
+                  </div>
+                </div>
+
                 <ImageInputWithPreview
                   label="URL da Imagem do Banner (Drive)"
                   value={categoryData.header.imageUrl || ""}

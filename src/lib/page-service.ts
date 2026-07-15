@@ -25,6 +25,7 @@ export interface CategoryPageData {
     subtitle: string;
     imageUrl?: string;
     bannerHeight?: "small" | "medium" | "large" | "giant";
+    imagePositionY?: number;
   };
   benefits: {
     show?: boolean;
@@ -379,6 +380,7 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
         ...defaultData.header,
         ...saved.header,
         bannerHeight: saved.header?.bannerHeight || defaultData.header?.bannerHeight || "giant",
+        imagePositionY: saved.header?.imagePositionY !== undefined ? saved.header.imagePositionY : (defaultData.header?.imagePositionY !== undefined ? defaultData.header.imagePositionY : 50),
       },
       benefits: {
         show: saved.benefits?.show !== undefined ? saved.benefits.show : defaultData.benefits.show,

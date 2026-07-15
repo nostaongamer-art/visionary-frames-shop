@@ -295,7 +295,8 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
               <img
                 src={bannerImage}
                 alt={headerData.title}
-                className="h-full w-full object-cover object-center"
+                style={{ objectPosition: `center ${(headerData as any).imagePositionY !== undefined ? (headerData as any).imagePositionY : 50}%` }}
+                className="h-full w-full object-cover"
                 referrerPolicy="no-referrer"
               />
             )}
