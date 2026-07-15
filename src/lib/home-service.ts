@@ -361,7 +361,7 @@ function mergeWithDefaults(saved: any): HomePageData {
 
   // Safe helper for atendimento lines
   const mergeAtendimento = (savedLines: any[], defaultLines: any[]) => {
-    if (!Array.isArray(savedLines)) return defaultLinks;
+    if (!Array.isArray(savedLines)) return defaultLines;
     return defaultLines.map((defaultLine, idx) => {
       const savedLine = savedLines[idx];
       if (typeof savedLine === "string") {
