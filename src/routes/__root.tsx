@@ -15,6 +15,7 @@ import { fetchPageContent } from "../lib/page-service";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { FlushPreviewButton } from "../components/site/FlushPreviewButton";
+import { CartProvider } from "@/hooks/use-cart";
 
 function NotFoundComponent() {
   return (
@@ -246,11 +247,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CustomStylesInjector />
-      {/* Dev-only helper to flush the HMR gate without spending credits. */}
-      <FlushPreviewButton />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <CartProvider>
+        <CustomStylesInjector />
+        {/* Dev-only helper to flush the HMR gate without spending credits. */}
+        <FlushPreviewButton />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </CartProvider>
     </QueryClientProvider>
   );
 }

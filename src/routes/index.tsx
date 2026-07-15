@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CartProvider } from "@/hooks/use-cart";
 import { PromoBar } from "@/components/site/PromoBar";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
@@ -23,20 +22,18 @@ function Index() {
   const homeData = Route.useLoaderData();
 
   return (
-    <CartProvider>
-      <div className="min-h-screen bg-background text-foreground">
-        <PromoBar text={homeData.promoBar.text} />
-        <Header />
-        <main>
-          <Hero data={homeData.hero} />
-          <Categories data={homeData.categories} />
-          <BestSellers data={homeData.bestSellers} />
-          <FlashBanner />
-          <Testimonials data={homeData.testimonials} />
-          <Newsletter data={homeData.newsletter} />
-        </main>
-        <Footer />
-      </div>
-    </CartProvider>
+    <div className="min-h-screen bg-background text-foreground">
+      <PromoBar text={homeData.promoBar.text} />
+      <Header />
+      <main>
+        <Hero data={homeData.hero} />
+        <Categories data={homeData.categories} />
+        <BestSellers data={homeData.bestSellers} />
+        <FlashBanner />
+        <Testimonials data={homeData.testimonials} />
+        <Newsletter data={homeData.newsletter} />
+      </main>
+      <Footer />
+    </div>
   );
 }

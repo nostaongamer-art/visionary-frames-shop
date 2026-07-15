@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CartProvider } from "@/hooks/use-cart";
 import { PromotionalBar } from "@/components/checkout/PromotionalBar";
 import { CheckoutHeader } from "@/components/checkout/CheckoutHeader";
 import { CheckoutStepper } from "@/components/checkout/CheckoutStepper";
@@ -18,16 +17,8 @@ import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
-  component: CheckoutRoute,
+  component: CheckoutPage,
 });
-
-function CheckoutRoute() {
-  return (
-    <CartProvider>
-      <CheckoutPage />
-    </CartProvider>
-  );
-}
 
 function CheckoutPage() {
   // Form States
