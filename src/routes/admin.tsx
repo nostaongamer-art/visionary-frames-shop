@@ -2630,7 +2630,7 @@ function Admin() {
                       header: { ...prev.header, imageUrl: val },
                     }))
                   }
-                  recommendedSize="1920 X 400 PX"
+                  recommendedSize="1920 X 600 PX"
                 />
               </div>
             </div>
