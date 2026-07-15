@@ -2621,21 +2621,17 @@ function Admin() {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">URL da Imagem do Banner (Drive)</label>
-                  <input
-                    type="text"
-                    value={categoryData.header.imageUrl || ""}
-                    onChange={(e) =>
-                      setCategoryData((prev: any) => ({
-                        ...prev,
-                        header: { ...prev.header, imageUrl: e.target.value },
-                      }))
-                    }
-                    placeholder="Cole a URL ou link de compartilhamento do Google Drive"
-                    className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
-                  />
-                </div>
+                <ImageInputWithPreview
+                  label="URL da Imagem do Banner (Drive)"
+                  value={categoryData.header.imageUrl || ""}
+                  onChange={(val) =>
+                    setCategoryData((prev: any) => ({
+                      ...prev,
+                      header: { ...prev.header, imageUrl: val },
+                    }))
+                  }
+                  recommendedSize="1920 X 400 PX"
+                />
               </div>
             </div>
           )}
@@ -2729,6 +2725,19 @@ function Admin() {
                   </button>
                 )}
               </div>
+
+              {!isEditingProduct && !isAddingProduct && (
+                <ToggleSwitch
+                  label="Exibir Grade de Produtos nesta Página"
+                  checked={categoryData.productsShow !== false}
+                  onChange={(val) =>
+                    setCategoryData((prev: any) => ({
+                      ...prev,
+                      productsShow: val,
+                    }))
+                  }
+                />
+              )}
 
               {/* Inline CRUD Add / Edit Form */}
               {(isAddingProduct || isEditingProduct) ? (
@@ -2847,13 +2856,11 @@ function Admin() {
                     </div>
 
                     <div className="flex flex-col gap-1 md:col-span-2">
-                      <label className="text-xs font-semibold text-white/70">URL da Imagem do Produto (Drive)</label>
-                      <input
-                        type="text"
+                      <ImageInputWithPreview
+                        label="URL da Imagem do Produto (Drive)"
                         value={prodImageUrl}
-                        onChange={(e) => setProdImageUrl(e.target.value)}
-                        placeholder="URL de compartilhamento do Google Drive"
-                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                        onChange={setProdImageUrl}
+                        recommendedSize="600 X 600 PX"
                       />
                     </div>
                   </div>
@@ -3109,12 +3116,58 @@ function Admin() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Subcategoria 1.1: Logotipo Glasses */}
+                    <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Cores do Logotipo "Glasses"</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Cor Dourada/Destaque ('Gl') */}
+                        <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                          <input
+                            type="color"
+                            value={categoryData.colors.logoAccent || "#FF8A00"}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoAccent: e.target.value } }))}
+                            className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Destaque do Logotipo ("Gl")</label>
+                            <input
+                              type="text"
+                              value={categoryData.colors.logoAccent || ""}
+                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoAccent: e.target.value } }))}
+                              placeholder="#FF8A00"
+                              className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Cor Branca/Texto ('asses') */}
+                        <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                          <input
+                            type="color"
+                            value={categoryData.colors.logoText || "#FFFFFF"}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoText: e.target.value } }))}
+                            className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor do Texto do Logotipo ("asses")</label>
+                            <input
+                              type="text"
+                              value={categoryData.colors.logoText || ""}
+                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoText: e.target.value } }))}
+                              placeholder="#FFFFFF"
+                              className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Categoria 2: Fundo */}
                   <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">2. Cores de Fundo (Tema Escuro/Claro)</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {/* Fundo Geral Escuro */}
                       <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
                         <input
@@ -3135,6 +3188,46 @@ function Admin() {
                         </div>
                       </div>
 
+                      {/* ink2 - Fundo de Cartão / Foco */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.ink2 || "#111214"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, ink2: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo de Cartão/Foco</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.ink2 || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, ink2: e.target.value } }))}
+                            placeholder="#111214"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* ink3 - Fundo de Campo de Texto */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.ink3 || "#1C1F26"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, ink3: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo Campo Texto</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.ink3 || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, ink3: e.target.value } }))}
+                            placeholder="#1C1F26"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
                       {/* Fundo Claro do Site */}
                       <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
                         <input
@@ -3150,6 +3243,26 @@ function Admin() {
                             value={categoryData.colors.background || ""}
                             onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, background: e.target.value } }))}
                             placeholder="#FFFFFF"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Fundo de Banner/Faixas (banner) */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.banner || "#FAFAFA"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, banner: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Fundo de Banner/Faixas</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.banner || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, banner: e.target.value } }))}
+                            placeholder="#FAFAFA"
                             className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
                         </div>

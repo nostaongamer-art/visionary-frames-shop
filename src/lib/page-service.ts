@@ -33,6 +33,7 @@ export interface CategoryPageData {
       iconKey: string;
     }>;
   };
+  productsShow?: boolean;
   products: PageProduct[];
   colors?: {
     brand?: string;
@@ -405,6 +406,7 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
         rating: typeof p.rating === "number" ? p.rating : 5,
         sales: typeof p.sales === "number" ? p.sales : 100,
       })),
+      productsShow: saved.productsShow !== undefined ? saved.productsShow : true,
       colors: saved.colors || defaultData.colors,
     };
 
