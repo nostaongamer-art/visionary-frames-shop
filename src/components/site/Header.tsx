@@ -61,39 +61,13 @@ function Logo() {
   }
 
   return (
-    <Link to="/" className="flex flex-col items-center leading-none outline-none group py-0.5">
-      <svg viewBox="0 0 100 100" className="w-8 h-8 mb-1 transition-transform group-hover:scale-105">
-        <defs>
-          <linearGradient id="logo-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--logo-accent, #FF8A00)" />
-            <stop offset="100%" stopColor="var(--logo-text, #FFFFFF)" opacity="0.8" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M 73 30 A 32 32 0 1 0 73 70"
-          fill="none"
-          stroke="url(#logo-gold-grad)"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 73 30 L 53 30"
-          fill="none"
-          stroke="url(#logo-gold-grad)"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 50 50 L 73 50"
-          fill="none"
-          stroke="url(#logo-gold-grad)"
-          strokeWidth="8"
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="font-display text-xl font-extrabold tracking-tight">
+    <Link to="/" className="flex flex-col leading-none outline-none">
+      <span className="font-display text-2xl font-extrabold tracking-tight">
         <span className="text-logo-accent">Gl</span>
         <span className="text-logo-text">asses</span>
+      </span>
+      <span className="mt-0.5 text-[9px] font-semibold tracking-[0.2em] text-white/60">
+        ÓCULOS COM ESTILO
       </span>
     </Link>
   );
