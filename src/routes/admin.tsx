@@ -2308,77 +2308,9 @@ function Admin() {
                 </div>
               </div>
 
-              {/* Categoria 1: Marca */}
+              {/* Categoria 1: Logotipo Glasses */}
               <div className="flex flex-col gap-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1. Cores de Identidade da Marca</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
-                  {/* Cor Laranja Principal */}
-                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
-                    <input
-                      type="color"
-                      value={data.colors?.brand || "#FF8A00"}
-                      onChange={(e) => {
-                        setData((prev) => ({
-                          ...prev,
-                          colors: { ...prev.colors, brand: e.target.value }
-                        }));
-                      }}
-                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Marca)</label>
-                      <input
-                        type="text"
-                        value={data.colors?.brand || ""}
-                        onChange={(e) => {
-                          setData((prev) => ({
-                            ...prev,
-                            colors: { ...prev.colors, brand: e.target.value }
-                          }));
-                        }}
-                        placeholder="#FF8A00"
-                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Cor Laranja Hover */}
-                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
-                    <input
-                      type="color"
-                      value={data.colors?.brandHover || "#FF9900"}
-                      onChange={(e) => {
-                        setData((prev) => ({
-                          ...prev,
-                          colors: { ...prev.colors, brandHover: e.target.value }
-                        }));
-                      }}
-                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Hover/Foco)</label>
-                      <input
-                        type="text"
-                        value={data.colors?.brandHover || ""}
-                        onChange={(e) => {
-                          setData((prev) => ({
-                            ...prev,
-                            colors: { ...prev.colors, brandHover: e.target.value }
-                          }));
-                        }}
-                        placeholder="#FF9900"
-                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                      />
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Subcategoria 1.1: Logotipo Glasses */}
-              <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Logotipo do Site ("Glasses")</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1. Logotipo do Site ("Glasses")</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                   {/* URL da Imagem do Logotipo */}
@@ -2485,6 +2417,74 @@ function Admin() {
                           }));
                         }}
                         placeholder="#FFFFFF"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Subcategoria 1.1: Cores de Identidade da Marca */}
+              <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Cores de Identidade da Marca</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
+                  {/* Cor Laranja Principal */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.brand || "#FF8A00"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, brand: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Marca)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.brand || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, brand: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FF8A00"
+                        className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Cor Laranja Hover */}
+                  <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                    <input
+                      type="color"
+                      value={data.colors?.brandHover || "#FF9900"}
+                      onChange={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, brandHover: e.target.value }
+                        }));
+                      }}
+                      className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Principal (Hover/Foco)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.brandHover || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, brandHover: e.target.value }
+                          }));
+                        }}
+                        placeholder="#FF9900"
                         className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                       />
                     </div>
@@ -3402,9 +3402,90 @@ function Admin() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
-                  {/* Categoria 1: Identidade */}
+                  {/* Categoria 1: Logotipo Glasses */}
                   <div className="flex flex-col gap-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1. Cores de Identidade da Marca</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1. Logotipo do Site ("Glasses")</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                      {/* URL da Imagem do Logotipo */}
+                      <div className="md:col-span-2">
+                        <ImageInputWithPreview
+                          label="URL da Imagem do Logotipo Personalizado (Drive/PNG/JPG/SVG) - Deixe vazio para usar texto"
+                          value={categoryData.colors.logoUrl || ""}
+                          onChange={(val) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoUrl: val } }))}
+                          recommendedSize="ALTURA MÁXIMA SUGERIDA: 50PX"
+                        />
+                      </div>
+
+                      {/* Dimensões do Logotipo */}
+                      <div className="flex gap-4 md:col-span-2 bg-[#15181D]/30 border border-[#282C32]/45 p-3 rounded-lg">
+                        <div className="flex-1">
+                          <label className="text-[10px] font-bold text-white/80 block mb-1">Largura da Logo no Site (px)</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.logoWidth || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoWidth: e.target.value } }))}
+                            placeholder="Ex: 120"
+                            className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-[10px] font-bold text-white/80 block mb-1">Altura da Logo no Site (px)</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.logoHeight || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoHeight: e.target.value } }))}
+                            placeholder="Ex: 40"
+                            className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Cor Dourada/Destaque ('Gl') */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.logoAccent || "#FF8A00"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoAccent: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Destaque do Logotipo ("Gl")</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.logoAccent || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoAccent: e.target.value } }))}
+                            placeholder="#FF8A00"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Cor Branca/Texto ('asses') */}
+                      <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
+                        <input
+                          type="color"
+                          value={categoryData.colors.logoText || "#FFFFFF"}
+                          onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoText: e.target.value } }))}
+                          className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor do Texto do Logotipo ("asses")</label>
+                          <input
+                            type="text"
+                            value={categoryData.colors.logoText || ""}
+                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoText: e.target.value } }))}
+                            placeholder="#FFFFFF"
+                            className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subcategoria 1.1: Cores de Identidade da Marca */}
+                  <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Cores de Identidade da Marca</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Cor Laranja Principal */}
                       <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
@@ -3443,87 +3524,6 @@ function Admin() {
                             placeholder="#FF9900"
                             className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Subcategoria 1.1: Logotipo Glasses */}
-                    <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Logotipo do Site ("Glasses")</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {/* URL da Imagem do Logotipo */}
-                        <div className="md:col-span-2">
-                          <ImageInputWithPreview
-                            label="URL da Imagem do Logotipo Personalizado (Drive/PNG/JPG/SVG) - Deixe vazio para usar texto"
-                            value={categoryData.colors.logoUrl || ""}
-                            onChange={(val) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoUrl: val } }))}
-                            recommendedSize="ALTURA MÁXIMA SUGERIDA: 50PX"
-                          />
-                        </div>
-
-                        {/* Dimensões do Logotipo */}
-                        <div className="flex gap-4 md:col-span-2 bg-[#15181D]/30 border border-[#282C32]/45 p-3 rounded-lg">
-                          <div className="flex-1">
-                            <label className="text-[10px] font-bold text-white/80 block mb-1">Largura da Logo no Site (px)</label>
-                            <input
-                              type="text"
-                              value={categoryData.colors.logoWidth || ""}
-                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoWidth: e.target.value } }))}
-                              placeholder="Ex: 120"
-                              className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <label className="text-[10px] font-bold text-white/80 block mb-1">Altura da Logo no Site (px)</label>
-                            <input
-                              type="text"
-                              value={categoryData.colors.logoHeight || ""}
-                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoHeight: e.target.value } }))}
-                              placeholder="Ex: 40"
-                              className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Cor Dourada/Destaque ('Gl') */}
-                        <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
-                          <input
-                            type="color"
-                            value={categoryData.colors.logoAccent || "#FF8A00"}
-                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoAccent: e.target.value } }))}
-                            className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor Destaque do Logotipo ("Gl")</label>
-                            <input
-                              type="text"
-                              value={categoryData.colors.logoAccent || ""}
-                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoAccent: e.target.value } }))}
-                              placeholder="#FF8A00"
-                              className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Cor Branca/Texto ('asses') */}
-                        <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
-                          <input
-                            type="color"
-                            value={categoryData.colors.logoText || "#FFFFFF"}
-                            onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoText: e.target.value } }))}
-                            className="h-10 w-12 rounded cursor-pointer border-none bg-transparent shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <label className="text-[10px] font-bold text-white/80 block mb-0.5">Cor do Texto do Logotipo ("asses")</label>
-                            <input
-                              type="text"
-                              value={categoryData.colors.logoText || ""}
-                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoText: e.target.value } }))}
-                              placeholder="#FFFFFF"
-                              className="w-full h-8 px-2 bg-[#1C1F26] border border-[#282C32]/35 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                            />
-                          </div>
                         </div>
                       </div>
                     </div>
