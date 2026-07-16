@@ -73,12 +73,17 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   
   // Controls
   const [sortOption, setSortOption] = useState("Mais Vendidos");
-  const [itemsPerPage, setItemsPerPage] = useState("24 por página");
+  const ITEMS_PER_PAGE = 15;
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [favorites, setFavorites] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [couponCopied, setCouponCopied] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Reset page to 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedFormats, selectedMaterials, selectedColor, priceMax, pageId]);
 
   useEffect(() => {
     async function loadData() {
@@ -235,6 +240,12 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
     if (sortOption === "Maior Preço") return b.priceVal - a.priceVal;
     return b.sales - a.sales;
   });
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const displayedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const handleFormatChange = (format: string) => {
     if (selectedFormats.includes(format)) {
@@ -531,6 +542,114 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                       </div>
                     </div>
                   )}
+
+                  {/* Format Filter */}
+                  {uniqueFormats.length > 0 && (
+                    <>
+                      <hr className="border-border/40" />
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Formato</h4>
+                        <div className="flex flex-col gap-2">
+                          {uniqueFormats.map((format) => (
+                            <label key={format} className="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={selectedFormats.includes(format)}
+                                onChange={() => handleFormatChange(format)}
+                                className="rounded border-border text-brand focus:ring-brand h-3.5 w-3.5"
+                              />
+                              <span>{format}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Material Filter */}
+                  {uniqueMaterials.length > 0 && (
+                    <>
+                      <hr className="border-border/40" />
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Material</h4>
+                        <div className="flex flex-col gap-2">
+                          {uniqueMaterials.map((material) => (
+                            <label key={material} className="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={selectedMaterials.includes(material)}
+                                onChange={() => handleMaterialChange(material)}
+                                className="rounded border-border text-brand focus:ring-brand h-3.5 w-3.5"
+                              />
+                              <span>{material}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Color Filter */}
+                  {uniqueColors.length > 0 && (
+                    <>
+                      <hr className="border-border/40" />
+                      <div>
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2.5">Cor</h4>
+                        <div className="flex flex-wrap gap-2.5">
+                          {uniqueColors.map((colorName) => {
+                            const isSelected = selectedColor === colorName;
+                            const hex = colorHexMap[colorName] || "#CCCCCC";
+                            return (
+                              <button
+                                key={colorName}
+                                onClick={() => setSelectedColor(isSelected ? null : colorName)}
+                                style={{ backgroundColor: hex }}
+                                className={`h-5 w-5 rounded-full border cursor-pointer transition-all ${
+                                  isSelected 
+                                    ? "border-brand ring-1 ring-brand scale-110" 
+                                    : "border-border hover:scale-105"
+                                }`}
+                                title={colorName}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Price Filter */}
+                  <>
+                    <hr className="border-border/40" />
+                    <div>
+                      <h4 className="text-[10px] font-extrabold uppercase tracking-wide text-foreground mb-2">Faixa de Preço</h4>
+                      <div className="flex justify-between text-[9px] text-muted-foreground font-bold mb-2">
+                        <span>R$ 69,90</span>
+                        <span>R$ {priceMax.toFixed(2)}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="69.90"
+                        max="999.90"
+                        step="10"
+                        value={priceMax}
+                        onChange={(e) => setPriceMax(parseFloat(e.target.value))}
+                        className="w-full accent-brand h-1 bg-border rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+                  </>
+
+                  {/* Mobile Clear Filters Button */}
+                  <hr className="border-border/40" />
+                  <button 
+                    onClick={() => {
+                      handleClearFilters();
+                      setMobileFiltersOpen(false);
+                    }}
+                    className="w-full py-2 bg-white/5 hover:bg-white/10 border border-border text-xs font-bold rounded text-foreground transition-colors cursor-pointer"
+                  >
+                    Limpar todos os filtros
+                  </button>
                 </div>
               </div>
             )}
@@ -549,18 +668,6 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                       <option value="Mais Vendidos">Mais Vendidos</option>
                       <option value="Menor Preço">Menor Preço</option>
                       <option value="Maior Preço">Maior Preço</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-[11px] font-medium">Mostrar:</span>
-                    <select
-                      value={itemsPerPage}
-                      onChange={(e) => setItemsPerPage(e.target.value)}
-                      className="h-8 bg-background border border-border text-[11px] px-2 outline-none font-medium text-foreground focus:border-brand"
-                    >
-                      <option value="24 por página">24 por página</option>
-                      <option value="12 por página">12 por página</option>
-                      <option value="36 por página">36 por página</option>
                     </select>
                   </div>
                 </div>
@@ -611,7 +718,7 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                     ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
                     : "flex flex-col gap-3"
                 }>
-                  {filteredProducts.map((product, idx) => {
+                  {displayedProducts.map((product, idx) => {
                     const isFavorite = favorites.includes(product.id);
                     const img = product.imageUrl ? getDirectDriveUrl(product.imageUrl) : MOCK_IMAGES[idx % 4];
                     return (
@@ -681,6 +788,42 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                       </div>
                     );
                   })}
+                </div>
+              )}
+
+              {/* Client Site Products Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex justify-center items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="h-8 px-3 bg-background border border-border hover:border-brand text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-foreground"
+                  >
+                    Anterior
+                  </button>
+                  {Array.from({ length: totalPages }, (_, idx) => {
+                    const pageNum = idx + 1;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`h-8 w-8 text-xs font-bold rounded transition-colors cursor-pointer ${
+                          currentPage === pageNum
+                            ? "bg-[#FF8A00] text-white"
+                            : "bg-background border border-border hover:border-brand text-foreground"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="h-8 px-3 bg-background border border-border hover:border-brand text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-foreground"
+                  >
+                    Próxima
+                  </button>
                 </div>
               )}
             </div>

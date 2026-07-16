@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search } from "lucide-react";
 
 const GOOGLE_FONTS_LIST = [
   { value: "default", label: "Padrão do Site (Outfit/Inter)" },
@@ -92,6 +92,8 @@ function Admin() {
   const [prodMaterial, setProdMaterial] = useState("Acetato");
   const [prodColor, setProdColor] = useState("preto");
   const [prodImageUrl, setProdImageUrl] = useState("");
+  const [adminProductSearch, setAdminProductSearch] = useState("");
+  const [adminProductPage, setAdminProductPage] = useState(1);
 
   useEffect(() => {
     async function checkAuth() {
@@ -110,6 +112,8 @@ function Admin() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
+      setAdminProductSearch("");
+      setAdminProductPage(1);
       if (activeSection === "home") {
         const content = await fetchHomePageContent();
         setData(content);
@@ -120,7 +124,7 @@ function Admin() {
       setLoading(false);
     }
     loadData();
-  }, [activeSection]);
+  }, [activeSection, activeTab]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -298,6 +302,26 @@ function Admin() {
       </div>
     );
   }
+
+  // Admin catalogue products calculations
+  const filteredAdminProducts = categoryData?.products
+    ? categoryData.products.filter((prod) => {
+        const search = adminProductSearch.trim().toLowerCase();
+        if (!search) return true;
+        return (
+          prod.name.toLowerCase().includes(search) ||
+          prod.category.toLowerCase().includes(search)
+        );
+      })
+    : [];
+
+  const ADMIN_ITEMS_PER_PAGE = 15;
+  const totalAdminPages = Math.ceil(filteredAdminProducts.length / ADMIN_ITEMS_PER_PAGE);
+  const activeAdminPage = Math.min(adminProductPage, Math.max(1, totalAdminPages));
+  const paginatedAdminProducts = filteredAdminProducts.slice(
+    (activeAdminPage - 1) * ADMIN_ITEMS_PER_PAGE,
+    activeAdminPage * ADMIN_ITEMS_PER_PAGE
+  );
 
   return (
     <div className="min-h-screen bg-[#080A0D] text-white font-sans antialiased pb-12 select-none">
@@ -2786,6 +2810,29 @@ function Admin() {
                 />
               )}
 
+              {!isEditingProduct && !isAddingProduct && (
+                <div className="flex flex-col md:flex-row gap-3 items-center justify-between bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg p-3">
+                  <div className="relative w-full md:max-w-md">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="h-4 w-4 text-white/40" />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Buscar por modelo ou categoria..."
+                      value={adminProductSearch}
+                      onChange={(e) => {
+                        setAdminProductSearch(e.target.value);
+                        setAdminProductPage(1);
+                      }}
+                      className="w-full h-10 pl-9 pr-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00] placeholder:text-white/30"
+                    />
+                  </div>
+                  <div className="text-xs text-white/50 font-medium">
+                    Exibindo {filteredAdminProducts.length} de {categoryData.products.length} produtos cadastrados
+                  </div>
+                </div>
+              )}
+
               {/* Inline CRUD Add / Edit Form */}
               {(isAddingProduct || isEditingProduct) ? (
                 <div className="bg-[#15181D] border border-[#282C32]/60 rounded-lg p-5 flex flex-col gap-4">
@@ -2983,7 +3030,8 @@ function Admin() {
                   </div>
                 </div>
               ) : (
-                <div className="overflow-x-auto bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg">
+                <>
+                  <div className="overflow-x-auto bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="border-b border-[#282C32]/45 text-white/50 font-bold uppercase tracking-wider">
@@ -2995,14 +3043,14 @@ function Admin() {
                       </tr>
                     </thead>
                     <tbody>
-                      {categoryData.products.length === 0 ? (
+                      {filteredAdminProducts.length === 0 ? (
                         <tr>
                           <td colSpan={5} className="p-8 text-center text-white/40 italic">
-                            Nenhum óculos cadastrado nesta página. Clique em "Novo Produto" para adicionar.
+                            Nenhum óculos encontrado com os filtros atuais.
                           </td>
                         </tr>
                       ) : (
-                        categoryData.products.map((prod) => (
+                        paginatedAdminProducts.map((prod) => (
                           <tr key={prod.id} className="border-b border-[#282C32]/20 last:border-0 hover:bg-white/5 transition-colors">
                             <td className="p-3 font-semibold text-white">{prod.name}</td>
                             <td className="p-3 text-white/70">{prod.category}</td>
@@ -3052,6 +3100,46 @@ function Admin() {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Admin Products Pagination */}
+                {totalAdminPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-4 bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg p-3">
+                    <button
+                      type="button"
+                      onClick={() => setAdminProductPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={activeAdminPage === 1}
+                      className="h-8 px-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand text-xs font-semibold rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      Anterior
+                    </button>
+                    {Array.from({ length: totalAdminPages }, (_, idx) => {
+                      const pageNum = idx + 1;
+                      return (
+                        <button
+                          key={pageNum}
+                          type="button"
+                          onClick={() => setAdminProductPage(pageNum)}
+                          className={`h-8 w-8 text-xs font-bold rounded transition-all cursor-pointer ${
+                            activeAdminPage === pageNum
+                              ? "bg-[#FF8A00] text-white"
+                              : "bg-white/5 hover:bg-white/10 border border-white/10 text-white/80"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() => setAdminProductPage((prev) => Math.min(prev + 1, totalAdminPages))}
+                      disabled={activeAdminPage === totalAdminPages}
+                      className="h-8 px-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand text-xs font-semibold rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      Próxima
+                    </button>
+                  </div>
+                )}
+                </>
               )}
             </div>
           )}
