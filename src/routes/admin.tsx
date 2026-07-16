@@ -94,6 +94,10 @@ function Admin() {
   const [prodImageUrl, setProdImageUrl] = useState("");
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductPage, setAdminProductPage] = useState(1);
+  const [addedCategories, setAddedCategories] = useState<string[]>([]);
+  const [addedFormats, setAddedFormats] = useState<string[]>([]);
+  const [addedMaterials, setAddedMaterials] = useState<string[]>([]);
+  const [addedColors, setAddedColors] = useState<string[]>([]);
 
   useEffect(() => {
     async function checkAuth() {
@@ -114,6 +118,10 @@ function Admin() {
       setLoading(true);
       setAdminProductSearch("");
       setAdminProductPage(1);
+      setAddedCategories([]);
+      setAddedFormats([]);
+      setAddedMaterials([]);
+      setAddedColors([]);
       if (activeSection === "home") {
         const content = await fetchHomePageContent();
         setData(content);
@@ -325,6 +333,53 @@ function Admin() {
     (activeAdminPage - 1) * ADMIN_ITEMS_PER_PAGE,
     activeAdminPage * ADMIN_ITEMS_PER_PAGE
   );
+
+  // Categoria Options
+  const categoryOptions = Array.from(new Set([
+    "Armação de Grau",
+    "Óculos de Sol",
+    "Lentes Azuis",
+    ...(categoryData?.products?.map(p => p.category) || []),
+    ...addedCategories
+  ].filter(Boolean)));
+
+  // Formato Options
+  const formatOptions = Array.from(new Set([
+    "Quadrado",
+    "Redondo",
+    "Retangular",
+    "Aviador",
+    "Wayfarer",
+    "Esportivo",
+    "Gatinho",
+    "Hexagonal",
+    ...(categoryData?.products?.map(p => p.format) || []),
+    ...addedFormats
+  ].filter(Boolean)));
+
+  // Material Options
+  const materialOptions = Array.from(new Set([
+    "Acetato",
+    "Metal",
+    "TR90",
+    "Titânio",
+    ...(categoryData?.products?.map(p => p.material) || []),
+    ...addedMaterials
+  ].filter(Boolean)));
+
+  // Cor Options
+  const colorOptions = Array.from(new Set([
+    "preto",
+    "marrom",
+    "azul",
+    "cinza",
+    "verde",
+    "vermelho",
+    "dourado",
+    "transparente",
+    ...(categoryData?.products?.map(p => p.color) || []),
+    ...addedColors
+  ].filter(Boolean)));
 
   return (
     <div className="min-h-screen bg-[#080A0D] text-white font-sans antialiased pb-12 select-none">
@@ -2856,15 +2911,31 @@ function Admin() {
                     </div>
                     
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs font-semibold text-white/70">Categoria</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-white/70">Categoria</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const val = prompt("Digite o nome da nova Categoria:");
+                            if (val && val.trim()) {
+                              const clean = val.trim();
+                              setAddedCategories((prev) => [...prev, clean]);
+                              setProdCategory(clean);
+                            }
+                          }}
+                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                        >
+                          + Adicionar personalizada
+                        </button>
+                      </div>
                       <select
                         value={prodCategory}
                         onChange={(e) => setProdCategory(e.target.value)}
                         className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                       >
-                        <option value="Armação de Grau">Armação de Grau</option>
-                        <option value="Óculos de Sol">Óculos de Sol</option>
-                        <option value="Lentes Azuis">Lentes Azuis</option>
+                        {categoryOptions.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
                       </select>
                     </div>
 
@@ -2903,52 +2974,89 @@ function Admin() {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs font-semibold text-white/70">Formato da Armação</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-white/70">Formato da Armação</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const val = prompt("Digite o nome do novo Formato:");
+                            if (val && val.trim()) {
+                              const clean = val.trim();
+                              setAddedFormats((prev) => [...prev, clean]);
+                              setProdFormat(clean);
+                            }
+                          }}
+                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                        >
+                          + Adicionar personalizado
+                        </button>
+                      </div>
                       <select
                         value={prodFormat}
                         onChange={(e) => setProdFormat(e.target.value)}
                         className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                       >
-                        <option value="Quadrado">Quadrado</option>
-                        <option value="Redondo">Redondo</option>
-                        <option value="Retangular">Retangular</option>
-                        <option value="Aviador">Aviador</option>
-                        <option value="Wayfarer">Wayfarer</option>
-                        <option value="Esportivo">Esportivo</option>
-                        <option value="Gatinho">Gatinho</option>
-                        <option value="Hexagonal">Hexagonal</option>
+                        {formatOptions.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
                       </select>
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs font-semibold text-white/70">Material</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-white/70">Material</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const val = prompt("Digite o nome do novo Material:");
+                            if (val && val.trim()) {
+                              const clean = val.trim();
+                              setAddedMaterials((prev) => [...prev, clean]);
+                              setProdMaterial(clean);
+                            }
+                          }}
+                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                        >
+                          + Adicionar personalizado
+                        </button>
+                      </div>
                       <select
                         value={prodMaterial}
                         onChange={(e) => setProdMaterial(e.target.value)}
                         className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                       >
-                        <option value="Acetato">Acetato</option>
-                        <option value="Metal">Metal</option>
-                        <option value="TR90">TR90</option>
-                        <option value="Titânio">Titânio</option>
+                        {materialOptions.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
                       </select>
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs font-semibold text-white/70">Cor</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-white/70">Cor</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const val = prompt("Digite o nome da nova Cor:");
+                            if (val && val.trim()) {
+                              const clean = val.trim();
+                              setAddedColors((prev) => [...prev, clean]);
+                              setProdColor(clean);
+                            }
+                          }}
+                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                        >
+                          + Adicionar personalizada
+                        </button>
+                      </div>
                       <select
                         value={prodColor}
                         onChange={(e) => setProdColor(e.target.value)}
                         className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                       >
-                        <option value="preto">Preto</option>
-                        <option value="marrom">Marrom</option>
-                        <option value="azul">Azul</option>
-                        <option value="cinza">Cinza</option>
-                        <option value="verde">Verde</option>
-                        <option value="vermelho">Vermelho</option>
-                        <option value="dourado">Dourado</option>
-                        <option value="transparente">Transparente</option>
+                        {colorOptions.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
                       </select>
                     </div>
 
