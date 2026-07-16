@@ -2378,8 +2378,23 @@ function Admin() {
 
               {/* Subcategoria 1.1: Logotipo Glasses */}
               <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Cores do Logotipo "Glasses"</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Logotipo do Site ("Glasses")</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  {/* URL da Imagem do Logotipo */}
+                  <div className="md:col-span-2">
+                    <ImageInputWithPreview
+                      label="URL da Imagem do Logotipo Personalizado (Drive/PNG/JPG/SVG) - Deixe vazio para usar texto"
+                      value={data.colors?.logoUrl || ""}
+                      onChange={(val) => {
+                        setData((prev) => ({
+                          ...prev,
+                          colors: { ...prev.colors, logoUrl: val }
+                        }));
+                      }}
+                      recommendedSize="ALTURA MÁXIMA SUGERIDA: 50PX"
+                    />
+                  </div>
 
                   {/* Cor Dourada/Destaque ('Gl') */}
                   <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
@@ -3400,8 +3415,19 @@ function Admin() {
 
                     {/* Subcategoria 1.1: Logotipo Glasses */}
                     <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Cores do Logotipo "Glasses"</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#FF8A00]/80">1.1 Logotipo do Site ("Glasses")</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        {/* URL da Imagem do Logotipo */}
+                        <div className="md:col-span-2">
+                          <ImageInputWithPreview
+                            label="URL da Imagem do Logotipo Personalizado (Drive/PNG/JPG/SVG) - Deixe vazio para usar texto"
+                            value={categoryData.colors.logoUrl || ""}
+                            onChange={(val) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoUrl: val } }))}
+                            recommendedSize="ALTURA MÁXIMA SUGERIDA: 50PX"
+                          />
+                        </div>
+
                         {/* Cor Dourada/Destaque ('Gl') */}
                         <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
                           <input

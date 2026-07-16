@@ -1,9 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { Link, useLocation } from "@tanstack/react-router";
+import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 
 function Logo() {
+  const [logoUrl, setLogoUrl] = useState<string>("");
+
+  useEffect(() => {
+    function readLogo() {
+      if (typeof window !== "undefined") {
+        try {
+          const cached = localStorage.getItem("glasses_home_page_content");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed?.colors?.logoUrl) {
+              setLogoUrl(parsed.colors.logoUrl);
+              return;
+            }
+          }
+          setLogoUrl("");
+        } catch (e) {
+          console.error("Error reading logoUrl from localStorage:", e);
+        }
+      }
+    }
+    readLogo();
+
+    async function loadFromDb() {
+      try {
+        const data = await fetchHomePageContent();
+        if (data?.colors?.logoUrl) {
+          setLogoUrl(data.colors.logoUrl);
+        }
+      } catch (e) {
+        console.error("Error loading logoUrl from db:", e);
+      }
+    }
+    loadFromDb();
+
+    const handleStorage = () => {
+      readLogo();
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const directLogoUrl = logoUrl ? getDirectDriveUrl(logoUrl) : "";
+
+  if (directLogoUrl) {
+    return (
+      <Link to="/" className="flex items-center outline-none py-1">
+        <img
+          src={directLogoUrl}
+          alt="Glasses Logo"
+          className="h-10 md:h-12 w-auto object-contain max-w-[200px]"
+        />
+      </Link>
+    );
+  }
+
   return (
     <Link to="/" className="flex flex-col items-center leading-none outline-none group py-0.5">
       <svg viewBox="0 0 100 100" className="w-8 h-8 mb-1 transition-transform group-hover:scale-105">
