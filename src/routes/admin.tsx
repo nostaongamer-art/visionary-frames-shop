@@ -310,7 +310,10 @@ function Admin() {
         if (!search) return true;
         return (
           prod.name.toLowerCase().includes(search) ||
-          prod.category.toLowerCase().includes(search)
+          prod.category.toLowerCase().includes(search) ||
+          (prod.format || "").toLowerCase().includes(search) ||
+          (prod.material || "").toLowerCase().includes(search) ||
+          (prod.color || "").toLowerCase().includes(search)
         );
       })
     : [];
