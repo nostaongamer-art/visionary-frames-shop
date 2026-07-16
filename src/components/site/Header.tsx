@@ -6,6 +6,8 @@ import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 
 function Logo() {
   const [logoUrl, setLogoUrl] = useState<string>("");
+  const [logoWidth, setLogoWidth] = useState<string | number>("");
+  const [logoHeight, setLogoHeight] = useState<string | number>("");
 
   useEffect(() => {
     function readLogo() {
@@ -16,10 +18,14 @@ function Logo() {
             const parsed = JSON.parse(cached);
             if (parsed?.colors?.logoUrl) {
               setLogoUrl(parsed.colors.logoUrl);
+              setLogoWidth(parsed.colors.logoWidth || "");
+              setLogoHeight(parsed.colors.logoHeight || "");
               return;
             }
           }
           setLogoUrl("");
+          setLogoWidth("");
+          setLogoHeight("");
         } catch (e) {
           console.error("Error reading logoUrl from localStorage:", e);
         }
@@ -32,6 +38,8 @@ function Logo() {
         const data = await fetchHomePageContent();
         if (data?.colors?.logoUrl) {
           setLogoUrl(data.colors.logoUrl);
+          setLogoWidth(data.colors.logoWidth || "");
+          setLogoHeight(data.colors.logoHeight || "");
         }
       } catch (e) {
         console.error("Error loading logoUrl from db:", e);
@@ -49,12 +57,15 @@ function Logo() {
   const directLogoUrl = logoUrl ? getDirectDriveUrl(logoUrl) : "";
 
   if (directLogoUrl) {
+    const widthStyle = logoWidth ? `${logoWidth}px` : "auto";
+    const heightStyle = logoHeight ? `${logoHeight}px` : "auto";
     return (
       <Link to="/" className="flex items-center outline-none py-1">
         <img
           src={directLogoUrl}
           alt="Glasses Logo"
-          className="h-10 md:h-12 w-auto object-contain max-w-[200px]"
+          style={{ width: widthStyle, height: heightStyle }}
+          className="object-contain max-w-[350px] max-h-[70px]"
         />
       </Link>
     );

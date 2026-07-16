@@ -2396,6 +2396,40 @@ function Admin() {
                     />
                   </div>
 
+                  {/* Dimensões do Logotipo */}
+                  <div className="flex gap-4 md:col-span-2 bg-[#15181D]/30 border border-[#282C32]/45 p-3 rounded-lg">
+                    <div className="flex-1">
+                      <label className="text-[10px] font-bold text-white/80 block mb-1">Largura da Logo no Site (px)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.logoWidth || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, logoWidth: e.target.value }
+                          }));
+                        }}
+                        placeholder="Ex: 120"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-[10px] font-bold text-white/80 block mb-1">Altura da Logo no Site (px)</label>
+                      <input
+                        type="text"
+                        value={data.colors?.logoHeight || ""}
+                        onChange={(e) => {
+                          setData((prev) => ({
+                            ...prev,
+                            colors: { ...prev.colors, logoHeight: e.target.value }
+                          }));
+                        }}
+                        placeholder="Ex: 40"
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+                  </div>
+
                   {/* Cor Dourada/Destaque ('Gl') */}
                   <div className="flex items-center gap-3 bg-[#15181D] border border-[#282C32]/45 p-3 rounded-lg">
                     <input
@@ -3426,6 +3460,30 @@ function Admin() {
                             onChange={(val) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoUrl: val } }))}
                             recommendedSize="ALTURA MÁXIMA SUGERIDA: 50PX"
                           />
+                        </div>
+
+                        {/* Dimensões do Logotipo */}
+                        <div className="flex gap-4 md:col-span-2 bg-[#15181D]/30 border border-[#282C32]/45 p-3 rounded-lg">
+                          <div className="flex-1">
+                            <label className="text-[10px] font-bold text-white/80 block mb-1">Largura da Logo no Site (px)</label>
+                            <input
+                              type="text"
+                              value={categoryData.colors.logoWidth || ""}
+                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoWidth: e.target.value } }))}
+                              placeholder="Ex: 120"
+                              className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <label className="text-[10px] font-bold text-white/80 block mb-1">Altura da Logo no Site (px)</label>
+                            <input
+                              type="text"
+                              value={categoryData.colors.logoHeight || ""}
+                              onChange={(e) => setCategoryData((prev: any) => ({ ...prev, colors: { ...prev.colors, logoHeight: e.target.value } }))}
+                              placeholder="Ex: 40"
+                              className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/35 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                            />
+                          </div>
                         </div>
 
                         {/* Cor Dourada/Destaque ('Gl') */}

@@ -117,6 +117,8 @@ export interface HomePageData {
     logoAccent?: string;
     logoText?: string;
     logoUrl?: string;
+    logoWidth?: string | number;
+    logoHeight?: string | number;
   };
 }
 
@@ -311,6 +313,8 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     logoAccent: "#FF8A00",
     logoText: "#FFFFFF",
     logoUrl: "",
+    logoWidth: "",
+    logoHeight: "",
   },
 };
 
@@ -490,6 +494,8 @@ function mergeWithDefaults(saved: any): HomePageData {
       logoAccent: saved.colors?.logoAccent !== undefined ? saved.colors.logoAccent : DEFAULT_HOME_PAGE_DATA.colors!.logoAccent,
       logoText: saved.colors?.logoText !== undefined ? saved.colors.logoText : DEFAULT_HOME_PAGE_DATA.colors!.logoText,
       logoUrl: saved.colors?.logoUrl !== undefined ? saved.colors.logoUrl : DEFAULT_HOME_PAGE_DATA.colors!.logoUrl,
+      logoWidth: saved.colors?.logoWidth !== undefined ? saved.colors.logoWidth : DEFAULT_HOME_PAGE_DATA.colors!.logoWidth,
+      logoHeight: saved.colors?.logoHeight !== undefined ? saved.colors.logoHeight : DEFAULT_HOME_PAGE_DATA.colors!.logoHeight,
     },
   };
 }
