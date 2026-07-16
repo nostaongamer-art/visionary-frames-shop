@@ -116,8 +116,6 @@ function Admin() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      setAdminProductSearch("");
-      setAdminProductPage(1);
       setAddedCategories([]);
       setAddedFormats([]);
       setAddedMaterials([]);
@@ -132,7 +130,25 @@ function Admin() {
       setLoading(false);
     }
     loadData();
-  }, [activeSection, activeTab]);
+  }, [activeSection]);
+
+  // Reset search and pagination when changing tab
+  useEffect(() => {
+    setAdminProductSearch("");
+    setAdminProductPage(1);
+  }, [activeTab]);
+
+  // Autosave categoryData to localStorage whenever it changes in admin panel
+  useEffect(() => {
+    if (categoryData && activeSection !== "home") {
+      try {
+        localStorage.setItem(`glasses_page_content_${activeSection}`, JSON.stringify(categoryData));
+        window.dispatchEvent(new Event("storage"));
+      } catch (e) {
+        console.error("Failed to autosave categoryData to localStorage:", e);
+      }
+    }
+  }, [categoryData, activeSection]);
 
   const handleSave = async () => {
     setSaving(true);
