@@ -92,6 +92,7 @@ function Admin() {
   const [prodMaterial, setProdMaterial] = useState("Acetato");
   const [prodColor, setProdColor] = useState("preto");
   const [prodImageUrl, setProdImageUrl] = useState("");
+  const [prodInstallments, setProdInstallments] = useState(12);
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductPage, setAdminProductPage] = useState(1);
   const [addedCategories, setAddedCategories] = useState<string[]>([]);
@@ -2863,6 +2864,7 @@ function Admin() {
                       setProdMaterial("Acetato");
                       setProdColor("preto");
                       setProdImageUrl("");
+                      setProdInstallments(12);
                     }}
                     className="bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
@@ -2990,6 +2992,19 @@ function Admin() {
                     </div>
 
                     <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Parcelas Sem Juros</label>
+                      <select
+                        value={prodInstallments}
+                        onChange={(e) => setProdInstallments(parseInt(e.target.value) || 12)}
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 24].map((num) => (
+                          <option key={num} value={num}>{num}x sem juros</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-white/70">Formato da Armação</label>
                         <button
@@ -3111,8 +3126,8 @@ function Admin() {
                           return;
                         }
 
-                        const installmentVal = (numPrice / 12).toFixed(2).replace(".", ",");
-                        const autoInstallment = `12x de R$ ${installmentVal}`;
+                        const installmentVal = (numPrice / prodInstallments).toFixed(2).replace(".", ",");
+                        const autoInstallment = `${prodInstallments}x de R$ ${installmentVal}`;
 
                         const productPayload: PageProduct = {
                           id: isEditingProduct && editingProductId !== null ? editingProductId : Date.now(),
@@ -3200,6 +3215,10 @@ function Admin() {
                                   setProdMaterial(prod.material);
                                   setProdColor(prod.color);
                                   setProdImageUrl(prod.imageUrl || "");
+                                  
+                                  const instMatch = prod.installment ? prod.installment.match(/^(\d+)x/) : null;
+                                  const currentInst = instMatch ? parseInt(instMatch[1]) : 12;
+                                  setProdInstallments(currentInst);
                                 }}
                                 className="text-white/60 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded text-[10px] font-semibold cursor-pointer transition-colors"
                               >
