@@ -179,7 +179,15 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   const uniqueCategories = ["Todos", ...Array.from(new Set(productsList.map(p => p.category)))];
   const uniqueFormats = Array.from(new Set(productsList.map(p => p.format)));
   const uniqueMaterials = Array.from(new Set(productsList.map(p => p.material)));
-  const uniqueColors = Array.from(new Set(productsList.map(p => p.color)));
+  
+  // As 8 cores padrão definidas no painel admin que sempre devem aparecer nos filtros
+  const defaultColorsList = ["preto", "marrom", "azul", "cinza", "verde", "vermelho", "dourado", "transparente"];
+  
+  // Mescla as cores padrão com as cores personalizadas cadastradas nos produtos daquela página
+  const uniqueColors = Array.from(new Set([
+    ...defaultColorsList,
+    ...productsList.map(p => (p.color || "").trim().toLowerCase()).filter(Boolean)
+  ]));
 
   const getColorStyle = (colorName: string): { background: string; border?: string } => {
     if (!colorName) return { background: "#CCCCCC" };
@@ -300,8 +308,12 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
     if (selectedMaterials.length > 0 && !selectedMaterials.includes(product.material)) {
       return false;
     }
-    if (selectedColor && product.color !== selectedColor) {
-      return false;
+    if (selectedColor) {
+      const pColor = (product.color || "").trim().toLowerCase();
+      const sColor = selectedColor.trim().toLowerCase();
+      if (pColor !== sColor) {
+        return false;
+      }
     }
     if (product.priceVal > priceMax) {
       return false;
