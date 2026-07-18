@@ -274,7 +274,8 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   };
 
   const handleCopyCoupon = () => {
-    navigator.clipboard.writeText("PRIMEIRACOMPRA");
+    const code = pageData?.couponCard?.couponCode || "PRIMEIRACOMPRA";
+    navigator.clipboard.writeText(code);
     setCouponCopied(true);
     setTimeout(() => setCouponCopied(false), 2000);
   };
@@ -570,30 +571,36 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
               </div>
 
               {/* Coupon Card */}
-              <div className="mt-6 bg-[#080A0D] text-white border border-white/5 rounded p-5 flex flex-col items-center text-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-brand/5 rounded-full filter blur-xl" />
-                <span className="text-3xl font-extrabold tracking-tight text-brand font-display">10% OFF</span>
-                <span className="text-[9px] font-black tracking-widest text-white/95 mt-1">NA SUA PRIMEIRA COMPRA</span>
-                <p className="text-[9px] text-white/50 mt-3 mb-4 leading-relaxed">
-                  Use o cupom: <strong className="text-white">PRIMEIRACOMPRA</strong>
-                </p>
-                <button
-                  onClick={handleCopyCoupon}
-                  className="w-full h-8 bg-brand hover:bg-brand-2 text-white text-[10px] font-extrabold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  {couponCopied ? (
-                    <>
-                      <Check className="h-3 w-3 shrink-0" />
-                      CUPOM COPIADO
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3 shrink-0" />
-                      COPIAR CUPOM
-                    </>
-                  )}
-                </button>
-              </div>
+              {pageData.couponCard?.show !== false && (
+                <div className="mt-6 bg-[#080A0D] text-white border border-white/5 rounded p-5 flex flex-col items-center text-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-brand/5 rounded-full filter blur-xl" />
+                  <span className="text-3xl font-extrabold tracking-tight text-brand font-display">
+                    {pageData.couponCard?.discountText || "10% OFF"}
+                  </span>
+                  <span className="text-[9px] font-black tracking-widest text-white/95 mt-1">
+                    {pageData.couponCard?.subtitle || "NA SUA PRIMEIRA COMPRA"}
+                  </span>
+                  <p className="text-[9px] text-white/50 mt-3 mb-4 leading-relaxed">
+                    Use o cupom: <strong className="text-white">{pageData.couponCard?.couponCode || "PRIMEIRACOMPRA"}</strong>
+                  </p>
+                  <button
+                    onClick={handleCopyCoupon}
+                    className="w-full h-8 bg-brand hover:bg-brand-2 text-white text-[10px] font-extrabold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    {couponCopied ? (
+                      <>
+                        <Check className="h-3 w-3 shrink-0" />
+                        COPIADO!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3 shrink-0" />
+                        {pageData.couponCard?.buttonText || "COPIAR CUPOM"}
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </aside>
 
             {/* Mobile Filter Drawer */}

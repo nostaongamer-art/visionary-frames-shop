@@ -54,6 +54,13 @@ export interface CategoryPageData {
   customFormats?: string[];
   customMaterials?: string[];
   customColors?: string[];
+  couponCard?: {
+    show: boolean;
+    discountText: string;
+    subtitle: string;
+    couponCode: string;
+    buttonText: string;
+  };
 }
 
 export const DEFAULT_BENEFITS = [
@@ -420,6 +427,19 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
       customFormats: saved.customFormats || defaultData.customFormats,
       customMaterials: saved.customMaterials || defaultData.customMaterials,
       customColors: saved.customColors || defaultData.customColors,
+      couponCard: saved.couponCard ? {
+        show: saved.couponCard.show !== undefined ? saved.couponCard.show : true,
+        discountText: saved.couponCard.discountText || "10% OFF",
+        subtitle: saved.couponCard.subtitle || "NA SUA PRIMEIRA COMPRA",
+        couponCode: saved.couponCard.couponCode || "PRIMEIRACOMPRA",
+        buttonText: saved.couponCard.buttonText || "COPIAR CUPOM",
+      } : {
+        show: true,
+        discountText: "10% OFF",
+        subtitle: "NA SUA PRIMEIRA COMPRA",
+        couponCode: "PRIMEIRACOMPRA",
+        buttonText: "COPIAR CUPOM",
+      },
     };
 
     // Salvar localmente

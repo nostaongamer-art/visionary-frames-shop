@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket } from "lucide-react";
 
 const GOOGLE_FONTS_LIST = [
   { value: "default", label: "Padrão do Site (Outfit/Inter)" },
@@ -2890,6 +2890,137 @@ function Admin() {
                     }))
                   }
                 />
+              )}
+
+              {!isEditingProduct && !isAddingProduct && (
+                <div className="bg-[#15181D]/45 border border-[#282C32]/45 rounded-lg p-4 flex flex-col gap-4">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                    <div className="flex items-center gap-2">
+                      <Ticket className="h-4 w-4 text-[#FF8A00]" />
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                        Cupom de Desconto Lateral
+                      </h4>
+                    </div>
+                    <ToggleSwitch
+                      label="Exibir Cupom"
+                      checked={categoryData.couponCard?.show !== false}
+                      onChange={(val) => {
+                        setCategoryData((prev: any) => ({
+                          ...prev,
+                          couponCard: {
+                            ...(prev.couponCard || {
+                              discountText: "10% OFF",
+                              subtitle: "NA SUA PRIMEIRA COMPRA",
+                              couponCode: "PRIMEIRACOMPRA",
+                              buttonText: "COPIAR CUPOM"
+                            }),
+                            show: val
+                          }
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  {categoryData.couponCard?.show !== false && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/50 uppercase">Texto Desconto</label>
+                        <input
+                          type="text"
+                          value={categoryData.couponCard?.discountText ?? "10% OFF"}
+                          onChange={(e) => {
+                            setCategoryData((prev: any) => ({
+                              ...prev,
+                              couponCard: {
+                                ...(prev.couponCard || {
+                                  show: true,
+                                  subtitle: "NA SUA PRIMEIRA COMPRA",
+                                  couponCode: "PRIMEIRACOMPRA",
+                                  buttonText: "COPIAR CUPOM"
+                                }),
+                                discountText: e.target.value
+                              }
+                            }));
+                          }}
+                          placeholder="Ex: 10% OFF"
+                          className="h-9 px-3 bg-[#13151A] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/50 uppercase">Subtítulo</label>
+                        <input
+                          type="text"
+                          value={categoryData.couponCard?.subtitle ?? "NA SUA PRIMEIRA COMPRA"}
+                          onChange={(e) => {
+                            setCategoryData((prev: any) => ({
+                              ...prev,
+                              couponCard: {
+                                ...(prev.couponCard || {
+                                  show: true,
+                                  discountText: "10% OFF",
+                                  couponCode: "PRIMEIRACOMPRA",
+                                  buttonText: "COPIAR CUPOM"
+                                }),
+                                subtitle: e.target.value
+                              }
+                            }));
+                          }}
+                          placeholder="Ex: NA SUA PRIMEIRA COMPRA"
+                          className="h-9 px-3 bg-[#13151A] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/50 uppercase">Código do Cupom</label>
+                        <input
+                          type="text"
+                          value={categoryData.couponCard?.couponCode ?? "PRIMEIRACOMPRA"}
+                          onChange={(e) => {
+                            setCategoryData((prev: any) => ({
+                              ...prev,
+                              couponCard: {
+                                ...(prev.couponCard || {
+                                  show: true,
+                                  discountText: "10% OFF",
+                                  subtitle: "NA SUA PRIMEIRA COMPRA",
+                                  buttonText: "COPIAR CUPOM"
+                                }),
+                                couponCode: e.target.value
+                              }
+                            }));
+                          }}
+                          placeholder="Ex: PRIMEIRACOMPRA"
+                          className="h-9 px-3 bg-[#13151A] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/50 uppercase">Texto do Botão</label>
+                        <input
+                          type="text"
+                          value={categoryData.couponCard?.buttonText ?? "COPIAR CUPOM"}
+                          onChange={(e) => {
+                            setCategoryData((prev: any) => ({
+                              ...prev,
+                              couponCard: {
+                                ...(prev.couponCard || {
+                                  show: true,
+                                  discountText: "10% OFF",
+                                  subtitle: "NA SUA PRIMEIRA COMPRA",
+                                  couponCode: "PRIMEIRACOMPRA"
+                                }),
+                                buttonText: e.target.value
+                              }
+                            }));
+                          }}
+                          placeholder="Ex: COPIAR CUPOM"
+                          className="h-9 px-3 bg-[#13151A] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
               {!isEditingProduct && !isAddingProduct && (
