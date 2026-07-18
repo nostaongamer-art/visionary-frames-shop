@@ -181,15 +181,87 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   const uniqueMaterials = Array.from(new Set(productsList.map(p => p.material)));
   const uniqueColors = Array.from(new Set(productsList.map(p => p.color)));
 
-  const colorHexMap: Record<string, string> = {
-    preto: "#000000",
-    marrom: "#8B4513",
-    azul: "#0000FF",
-    cinza: "#808080",
-    verde: "#008000",
-    vermelho: "#FF0000",
-    dourado: "#FFD700",
-    transparente: "#E5E5E5",
+  const getColorStyle = (colorName: string): { background: string; border?: string } => {
+    if (!colorName) return { background: "#CCCCCC" };
+    
+    // Normalize and remove accents
+    const name = colorName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+    if (name.includes("preto") || name.includes("preta") || name.includes("black")) {
+      return { background: "#000000" };
+    }
+    if (name.includes("marrom") || name.includes("brown") || name.includes("tartaruga") || name.includes("tortoise")) {
+      if (name.includes("tartaruga") || name.includes("tortoise")) {
+        return { background: "radial-gradient(circle, #5c3014 20%, #8c5225 50%, #1c0e07 90%)" };
+      }
+      return { background: "#8B4513" };
+    }
+    if (name.includes("azul") || name.includes("blue")) {
+      return { background: "#1E40AF" };
+    }
+    if (name.includes("cinza") || name.includes("gray") || name.includes("grey") || name.includes("grafite") || name.includes("graphite")) {
+      return { background: "#808080" };
+    }
+    if (name.includes("verde") || name.includes("green")) {
+      return { background: "#15803D" };
+    }
+    if (name.includes("vermelho") || name.includes("vermelha") || name.includes("red") || name.includes("vinho") || name.includes("burgundy") || name.includes("bordo")) {
+      if (name.includes("vinho") || name.includes("burgundy") || name.includes("bordo")) {
+        return { background: "#800020" };
+      }
+      return { background: "#B91C1C" };
+    }
+    if (name.includes("dourado") || name.includes("dourada") || name.includes("gold") || name.includes("ouro")) {
+      return { background: "linear-gradient(135deg, #FFE07D 0%, #D97706 100%)" };
+    }
+    if (name.includes("transparente") || name.includes("transparent") || name.includes("cristal") || name.includes("clear") || name.includes("sem cor")) {
+      return { 
+        background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(200,200,200,0.2) 100%)",
+        border: "1px dashed rgba(255,255,255,0.4)" 
+      };
+    }
+    if (name.includes("amarelo") || name.includes("amarela") || name.includes("yellow")) {
+      return { background: "#FBBF24" };
+    }
+    if (name.includes("rosa") || name.includes("pink") || name.includes("rose") || name.includes("rose gold")) {
+      if (name.includes("rose") || name.includes("rosé")) {
+        return { background: "#B76E79" };
+      }
+      return { background: "#EC4899" };
+    }
+    if (name.includes("roxo") || name.includes("roxa") || name.includes("purple") || name.includes("violeta") || name.includes("lilas")) {
+      return { background: "#8B5CF6" };
+    }
+    if (name.includes("laranja") || name.includes("orange")) {
+      return { background: "#F97316" };
+    }
+    if (name.includes("branco") || name.includes("white")) {
+      return { background: "#FFFFFF", border: "1px solid #CCCCCC" };
+    }
+    if (name.includes("prata") || name.includes("silver") || name.includes("prateado") || name.includes("prateada")) {
+      return { background: "linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%)" };
+    }
+    if (name.includes("mesclado") || name.includes("multicor") || name.includes("colorido") || name.includes("colorida") || name.includes("rainbow")) {
+      return { background: "linear-gradient(to right, #EF4444, #F59E0B, #10B981, #3B82F6, #8B5CF6)" };
+    }
+    if (name.includes("bege") || name.includes("beige") || name.includes("creme") || name.includes("cream")) {
+      return { background: "#F5F5DC" };
+    }
+    if (name.includes("caramelo") || name.includes("caramel")) {
+      return { background: "#C68E17" };
+    }
+    if (name.includes("bronze")) {
+      return { background: "#CD7F32" };
+    }
+    if (name.includes("cobre") || name.includes("copper")) {
+      return { background: "#B87333" };
+    }
+
+    return { background: name };
   };
 
   const handleCopyCoupon = () => {
@@ -441,16 +513,19 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                       <div className="flex flex-wrap gap-2.5">
                         {uniqueColors.map((colorName) => {
                           const isSelected = selectedColor === colorName;
-                          const hex = colorHexMap[colorName] || "#CCCCCC";
+                          const styleInfo = getColorStyle(colorName);
                           return (
                             <button
                               key={colorName}
                               onClick={() => setSelectedColor(isSelected ? null : colorName)}
-                              style={{ backgroundColor: hex }}
-                              className={`h-5 w-5 rounded-full border cursor-pointer transition-all ${
+                              style={{ 
+                                background: styleInfo.background,
+                                border: styleInfo.border || (isSelected ? "2px solid var(--brand, #FF8A00)" : "1px solid rgba(255,255,255,0.2)")
+                              }}
+                              className={`h-5 w-5 rounded-full cursor-pointer transition-all ${
                                 isSelected 
-                                  ? "border-brand ring-1 ring-brand scale-110" 
-                                  : "border-border hover:scale-105"
+                                  ? "ring-1 ring-brand scale-110" 
+                                  : "hover:scale-105"
                               }`}
                               title={colorName}
                             />
@@ -598,16 +673,19 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
                         <div className="flex flex-wrap gap-2.5">
                           {uniqueColors.map((colorName) => {
                             const isSelected = selectedColor === colorName;
-                            const hex = colorHexMap[colorName] || "#CCCCCC";
+                            const styleInfo = getColorStyle(colorName);
                             return (
                               <button
                                 key={colorName}
                                 onClick={() => setSelectedColor(isSelected ? null : colorName)}
-                                style={{ backgroundColor: hex }}
-                                className={`h-5 w-5 rounded-full border cursor-pointer transition-all ${
+                                style={{ 
+                                  background: styleInfo.background,
+                                  border: styleInfo.border || (isSelected ? "2px solid var(--brand, #FF8A00)" : "1px solid rgba(255,255,255,0.2)")
+                                }}
+                                className={`h-5 w-5 rounded-full cursor-pointer transition-all ${
                                   isSelected 
-                                    ? "border-brand ring-1 ring-brand scale-110" 
-                                    : "border-border hover:scale-105"
+                                    ? "ring-1 ring-brand scale-110" 
+                                    : "hover:scale-105"
                                 }`}
                                 title={colorName}
                               />
