@@ -114,10 +114,6 @@ function Admin() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      setAddedCategories([]);
-      setAddedFormats([]);
-      setAddedMaterials([]);
-      setAddedColors([]);
       if (activeSection === "home") {
         const content = await fetchHomePageContent();
         setData(content);
