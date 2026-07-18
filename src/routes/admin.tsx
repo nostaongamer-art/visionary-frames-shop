@@ -2940,17 +2940,21 @@ function Admin() {
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               const val = prompt("Digite o nome da nova Categoria:");
                               if (val && val.trim()) {
                                 const clean = val.trim();
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customCategories || defaultCategories;
-                                  if (current.includes(clean)) return prev;
-                                  return { ...prev, customCategories: [...current, clean] };
-                                });
+                                const current = categoryData?.customCategories || defaultCategories;
+                                if (current.includes(clean)) {
+                                  setProdCategory(clean);
+                                  return;
+                                }
+                                const updated = [...current, clean];
+                                const updatedData = { ...categoryData, customCategories: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
                                 setProdCategory(clean);
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Categoria adicionada e salva com sucesso!");
                               }
                             }}
                             className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
@@ -2959,16 +2963,16 @@ function Admin() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               if (window.confirm(`Deseja realmente remover a categoria "${prodCategory}" das opções?`)) {
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customCategories || defaultCategories;
-                                  const updated = current.filter((c: string) => c !== prodCategory);
-                                  return { ...prev, customCategories: updated };
-                                });
-                                const remaining = (categoryData?.customCategories || defaultCategories).filter((c: string) => c !== prodCategory);
+                                const current = categoryData?.customCategories || defaultCategories;
+                                const updated = current.filter((c: string) => c !== prodCategory);
+                                const updatedData = { ...categoryData, customCategories: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
+                                const remaining = updated.filter((c: string) => c !== prodCategory);
                                 setProdCategory(remaining[0] || "");
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Categoria removida e salva com sucesso!");
                               }
                             }}
                             className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
@@ -3041,17 +3045,21 @@ function Admin() {
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               const val = prompt("Digite o nome do novo Formato:");
                               if (val && val.trim()) {
                                 const clean = val.trim();
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customFormats || defaultFormats;
-                                  if (current.includes(clean)) return prev;
-                                  return { ...prev, customFormats: [...current, clean] };
-                                });
+                                const current = categoryData?.customFormats || defaultFormats;
+                                if (current.includes(clean)) {
+                                  setProdFormat(clean);
+                                  return;
+                                }
+                                const updated = [...current, clean];
+                                const updatedData = { ...categoryData, customFormats: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
                                 setProdFormat(clean);
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Formato adicionado e salvo com sucesso!");
                               }
                             }}
                             className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
@@ -3060,16 +3068,16 @@ function Admin() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               if (window.confirm(`Deseja realmente remover o formato "${prodFormat}" das opções?`)) {
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customFormats || defaultFormats;
-                                  const updated = current.filter((c: string) => c !== prodFormat);
-                                  return { ...prev, customFormats: updated };
-                                });
-                                const remaining = (categoryData?.customFormats || defaultFormats).filter((c: string) => c !== prodFormat);
+                                const current = categoryData?.customFormats || defaultFormats;
+                                const updated = current.filter((c: string) => c !== prodFormat);
+                                const updatedData = { ...categoryData, customFormats: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
+                                const remaining = updated.filter((c: string) => c !== prodFormat);
                                 setProdFormat(remaining[0] || "");
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Formato removido e salvo com sucesso!");
                               }
                             }}
                             className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
@@ -3095,17 +3103,21 @@ function Admin() {
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               const val = prompt("Digite o nome do novo Material:");
                               if (val && val.trim()) {
                                 const clean = val.trim();
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customMaterials || defaultMaterials;
-                                  if (current.includes(clean)) return prev;
-                                  return { ...prev, customMaterials: [...current, clean] };
-                                });
+                                const current = categoryData?.customMaterials || defaultMaterials;
+                                if (current.includes(clean)) {
+                                  setProdMaterial(clean);
+                                  return;
+                                }
+                                const updated = [...current, clean];
+                                const updatedData = { ...categoryData, customMaterials: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
                                 setProdMaterial(clean);
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Material adicionado e salvo com sucesso!");
                               }
                             }}
                             className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
@@ -3114,16 +3126,16 @@ function Admin() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               if (window.confirm(`Deseja realmente remover o material "${prodMaterial}" das opções?`)) {
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customMaterials || defaultMaterials;
-                                  const updated = current.filter((c: string) => c !== prodMaterial);
-                                  return { ...prev, customMaterials: updated };
-                                });
-                                const remaining = (categoryData?.customMaterials || defaultMaterials).filter((c: string) => c !== prodMaterial);
+                                const current = categoryData?.customMaterials || defaultMaterials;
+                                const updated = current.filter((c: string) => c !== prodMaterial);
+                                const updatedData = { ...categoryData, customMaterials: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
+                                const remaining = updated.filter((c: string) => c !== prodMaterial);
                                 setProdMaterial(remaining[0] || "");
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Material removido e salvo com sucesso!");
                               }
                             }}
                             className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
@@ -3149,17 +3161,21 @@ function Admin() {
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               const val = prompt("Digite o nome da nova Cor:");
                               if (val && val.trim()) {
                                 const clean = val.trim();
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customColors || defaultColors;
-                                  if (current.includes(clean)) return prev;
-                                  return { ...prev, customColors: [...current, clean] };
-                                });
+                                const current = categoryData?.customColors || defaultColors;
+                                if (current.includes(clean)) {
+                                  setProdColor(clean);
+                                  return;
+                                }
+                                const updated = [...current, clean];
+                                const updatedData = { ...categoryData, customColors: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
                                 setProdColor(clean);
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Cor adicionada e salva com sucesso!");
                               }
                             }}
                             className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
@@ -3168,16 +3184,16 @@ function Admin() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
+                            onClick={async () => {
                               if (window.confirm(`Deseja realmente remover a cor "${prodColor}" das opções?`)) {
-                                setCategoryData((prev: any) => {
-                                  if (!prev) return prev;
-                                  const current = prev.customColors || defaultColors;
-                                  const updated = current.filter((c: string) => c !== prodColor);
-                                  return { ...prev, customColors: updated };
-                                });
-                                const remaining = (categoryData?.customColors || defaultColors).filter((c: string) => c !== prodColor);
+                                const current = categoryData?.customColors || defaultColors;
+                                const updated = current.filter((c: string) => c !== prodColor);
+                                const updatedData = { ...categoryData, customColors: updated } as CategoryPageData;
+                                setCategoryData(updatedData);
+                                const remaining = updated.filter((c: string) => c !== prodColor);
                                 setProdColor(remaining[0] || "");
+                                await savePageContent(activeSection, updatedData);
+                                toast.success("Cor removida e salva com sucesso!");
                               }
                             }}
                             className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
