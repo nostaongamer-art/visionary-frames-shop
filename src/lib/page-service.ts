@@ -50,6 +50,10 @@ export interface CategoryPageData {
     logoAccent?: string;
     logoText?: string;
   };
+  customCategories?: string[];
+  customFormats?: string[];
+  customMaterials?: string[];
+  customColors?: string[];
 }
 
 export const DEFAULT_BENEFITS = [
@@ -412,6 +416,10 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
       })),
       productsShow: saved.productsShow !== undefined ? saved.productsShow : true,
       colors: saved.colors || defaultData.colors,
+      customCategories: saved.customCategories || defaultData.customCategories,
+      customFormats: saved.customFormats || defaultData.customFormats,
+      customMaterials: saved.customMaterials || defaultData.customMaterials,
+      customColors: saved.customColors || defaultData.customColors,
     };
 
     // Salvar localmente

@@ -95,10 +95,7 @@ function Admin() {
   const [prodInstallments, setProdInstallments] = useState(12);
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductPage, setAdminProductPage] = useState(1);
-  const [addedCategories, setAddedCategories] = useState<string[]>([]);
-  const [addedFormats, setAddedFormats] = useState<string[]>([]);
-  const [addedMaterials, setAddedMaterials] = useState<string[]>([]);
-  const [addedColors, setAddedColors] = useState<string[]>([]);
+
 
   useEffect(() => {
     async function checkAuth() {
@@ -350,53 +347,17 @@ function Admin() {
     (activeAdminPage - 1) * ADMIN_ITEMS_PER_PAGE,
     activeAdminPage * ADMIN_ITEMS_PER_PAGE
   );
+  // Listas padrão de opções
+  const defaultCategories = ["Armação de Grau", "Óculos de Sol", "Lentes Azuis"];
+  const defaultFormats = ["Quadrado", "Redondo", "Retangular", "Aviador", "Wayfarer", "Esportivo", "Gatinho", "Hexagonal"];
+  const defaultMaterials = ["Acetato", "Metal", "TR90", "Titânio"];
+  const defaultColors = ["preto", "marrom", "azul", "cinza", "verde", "vermelho", "dourado", "transparente"];
 
-  // Categoria Options
-  const categoryOptions = Array.from(new Set([
-    "Armação de Grau",
-    "Óculos de Sol",
-    "Lentes Azuis",
-    ...(categoryData?.products?.map(p => p.category) || []),
-    ...addedCategories
-  ].filter(Boolean)));
-
-  // Formato Options
-  const formatOptions = Array.from(new Set([
-    "Quadrado",
-    "Redondo",
-    "Retangular",
-    "Aviador",
-    "Wayfarer",
-    "Esportivo",
-    "Gatinho",
-    "Hexagonal",
-    ...(categoryData?.products?.map(p => p.format) || []),
-    ...addedFormats
-  ].filter(Boolean)));
-
-  // Material Options
-  const materialOptions = Array.from(new Set([
-    "Acetato",
-    "Metal",
-    "TR90",
-    "Titânio",
-    ...(categoryData?.products?.map(p => p.material) || []),
-    ...addedMaterials
-  ].filter(Boolean)));
-
-  // Cor Options
-  const colorOptions = Array.from(new Set([
-    "preto",
-    "marrom",
-    "azul",
-    "cinza",
-    "verde",
-    "vermelho",
-    "dourado",
-    "transparente",
-    ...(categoryData?.products?.map(p => p.color) || []),
-    ...addedColors
-  ].filter(Boolean)));
+  // Opções resolvidas a partir do estado do banco ou fallbacks padrão
+  const categoryOptions = Array.from(new Set(categoryData?.customCategories || defaultCategories));
+  const formatOptions = Array.from(new Set(categoryData?.customFormats || defaultFormats));
+  const materialOptions = Array.from(new Set(categoryData?.customMaterials || defaultMaterials));
+  const colorOptions = Array.from(new Set(categoryData?.customColors || defaultColors));
 
   return (
     <div className="min-h-screen bg-[#080A0D] text-white font-sans antialiased pb-12 select-none">
@@ -2980,20 +2941,45 @@ function Admin() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-white/70">Categoria</label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const val = prompt("Digite o nome da nova Categoria:");
-                            if (val && val.trim()) {
-                              const clean = val.trim();
-                              setAddedCategories((prev) => [...prev, clean]);
-                              setProdCategory(clean);
-                            }
-                          }}
-                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
-                        >
-                          + Adicionar personalizada
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const val = prompt("Digite o nome da nova Categoria:");
+                              if (val && val.trim()) {
+                                const clean = val.trim();
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customCategories || defaultCategories;
+                                  if (current.includes(clean)) return prev;
+                                  return { ...prev, customCategories: [...current, clean] };
+                                });
+                                setProdCategory(clean);
+                              }
+                            }}
+                            className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                          >
+                            + Adicionar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (window.confirm(`Deseja realmente remover a categoria "${prodCategory}" das opções?`)) {
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customCategories || defaultCategories;
+                                  const updated = current.filter((c: string) => c !== prodCategory);
+                                  return { ...prev, customCategories: updated };
+                                });
+                                const remaining = (categoryData?.customCategories || defaultCategories).filter((c: string) => c !== prodCategory);
+                                setProdCategory(remaining[0] || "");
+                              }
+                            }}
+                            className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                          >
+                            - Remover
+                          </button>
+                        </div>
                       </div>
                       <select
                         value={prodCategory}
@@ -3056,20 +3042,45 @@ function Admin() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-white/70">Formato da Armação</label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const val = prompt("Digite o nome do novo Formato:");
-                            if (val && val.trim()) {
-                              const clean = val.trim();
-                              setAddedFormats((prev) => [...prev, clean]);
-                              setProdFormat(clean);
-                            }
-                          }}
-                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
-                        >
-                          + Adicionar personalizado
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const val = prompt("Digite o nome do novo Formato:");
+                              if (val && val.trim()) {
+                                const clean = val.trim();
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customFormats || defaultFormats;
+                                  if (current.includes(clean)) return prev;
+                                  return { ...prev, customFormats: [...current, clean] };
+                                });
+                                setProdFormat(clean);
+                              }
+                            }}
+                            className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                          >
+                            + Adicionar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (window.confirm(`Deseja realmente remover o formato "${prodFormat}" das opções?`)) {
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customFormats || defaultFormats;
+                                  const updated = current.filter((c: string) => c !== prodFormat);
+                                  return { ...prev, customFormats: updated };
+                                });
+                                const remaining = (categoryData?.customFormats || defaultFormats).filter((c: string) => c !== prodFormat);
+                                setProdFormat(remaining[0] || "");
+                              }
+                            }}
+                            className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                          >
+                            - Remover
+                          </button>
+                        </div>
                       </div>
                       <select
                         value={prodFormat}
@@ -3085,20 +3096,45 @@ function Admin() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-white/70">Material</label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const val = prompt("Digite o nome do novo Material:");
-                            if (val && val.trim()) {
-                              const clean = val.trim();
-                              setAddedMaterials((prev) => [...prev, clean]);
-                              setProdMaterial(clean);
-                            }
-                          }}
-                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
-                        >
-                          + Adicionar personalizado
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const val = prompt("Digite o nome do novo Material:");
+                              if (val && val.trim()) {
+                                const clean = val.trim();
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customMaterials || defaultMaterials;
+                                  if (current.includes(clean)) return prev;
+                                  return { ...prev, customMaterials: [...current, clean] };
+                                });
+                                setProdMaterial(clean);
+                              }
+                            }}
+                            className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                          >
+                            + Adicionar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (window.confirm(`Deseja realmente remover o material "${prodMaterial}" das opções?`)) {
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customMaterials || defaultMaterials;
+                                  const updated = current.filter((c: string) => c !== prodMaterial);
+                                  return { ...prev, customMaterials: updated };
+                                });
+                                const remaining = (categoryData?.customMaterials || defaultMaterials).filter((c: string) => c !== prodMaterial);
+                                setProdMaterial(remaining[0] || "");
+                              }
+                            }}
+                            className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                          >
+                            - Remover
+                          </button>
+                        </div>
                       </div>
                       <select
                         value={prodMaterial}
@@ -3114,20 +3150,45 @@ function Admin() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-white/70">Cor</label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const val = prompt("Digite o nome da nova Cor:");
-                            if (val && val.trim()) {
-                              const clean = val.trim();
-                              setAddedColors((prev) => [...prev, clean]);
-                              setProdColor(clean);
-                            }
-                          }}
-                          className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
-                        >
-                          + Adicionar personalizada
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const val = prompt("Digite o nome da nova Cor:");
+                              if (val && val.trim()) {
+                                const clean = val.trim();
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customColors || defaultColors;
+                                  if (current.includes(clean)) return prev;
+                                  return { ...prev, customColors: [...current, clean] };
+                                });
+                                setProdColor(clean);
+                              }
+                            }}
+                            className="text-[10px] text-[#FF8A00] font-bold hover:underline cursor-pointer"
+                          >
+                            + Adicionar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (window.confirm(`Deseja realmente remover a cor "${prodColor}" das opções?`)) {
+                                setCategoryData((prev: any) => {
+                                  if (!prev) return prev;
+                                  const current = prev.customColors || defaultColors;
+                                  const updated = current.filter((c: string) => c !== prodColor);
+                                  return { ...prev, customColors: updated };
+                                });
+                                const remaining = (categoryData?.customColors || defaultColors).filter((c: string) => c !== prodColor);
+                                setProdColor(remaining[0] || "");
+                              }
+                            }}
+                            className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                          >
+                            - Remover
+                          </button>
+                        </div>
                       </div>
                       <select
                         value={prodColor}

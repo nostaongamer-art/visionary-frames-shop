@@ -176,18 +176,19 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   };
 
   // Extract unique filters from the current product list dynamically
-  const uniqueCategories = ["Todos", ...Array.from(new Set(productsList.map(p => p.category)))];
-  const uniqueFormats = Array.from(new Set(productsList.map(p => p.format)));
-  const uniqueMaterials = Array.from(new Set(productsList.map(p => p.material)));
-  
-  // As 8 cores padrão definidas no painel admin que sempre devem aparecer nos filtros
+  // Listas padrão para fallback caso não haja configuração personalizada salva no banco
+  const defaultCategoriesList = ["Armação de Grau", "Óculos de Sol", "Lentes Azuis"];
+  const defaultFormatsList = ["Quadrado", "Redondo", "Retangular", "Aviador", "Wayfarer", "Esportivo", "Gatinho", "Hexagonal"];
+  const defaultMaterialsList = ["Acetato", "Metal", "TR90", "Titânio"];
   const defaultColorsList = ["preto", "marrom", "azul", "cinza", "verde", "vermelho", "dourado", "transparente"];
-  
-  // Mescla as cores padrão com as cores personalizadas cadastradas nos produtos daquela página
-  const uniqueColors = Array.from(new Set([
-    ...defaultColorsList,
-    ...productsList.map(p => (p.color || "").trim().toLowerCase()).filter(Boolean)
-  ]));
+
+  // Filtros dinâmicos baseados nas listas salvas no banco de dados (que refletem as adições/remoções do admin)
+  const uniqueCategories = ["Todos", ...Array.from(new Set(pageData.customCategories || defaultCategoriesList))];
+  const uniqueFormats = Array.from(new Set(pageData.customFormats || defaultFormatsList));
+  const uniqueMaterials = Array.from(new Set(pageData.customMaterials || defaultMaterialsList));
+  const uniqueColors = Array.from(new Set(
+    (pageData.customColors || defaultColorsList).map(c => c.trim().toLowerCase())
+  ));
 
   const getColorStyle = (colorName: string): { background: string; border?: string } => {
     if (!colorName) return { background: "#CCCCCC" };
