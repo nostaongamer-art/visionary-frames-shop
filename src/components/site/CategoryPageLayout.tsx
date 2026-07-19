@@ -929,29 +929,6 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
         </section>
       )}
 
-      {/* 9. Dark Benefits Strip */}
-      <section className="bg-[#080A0D] border-t border-white/5 py-6">
-        <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-2 text-center lg:text-left">
-            <div className="flex flex-col lg:flex-row items-center gap-2.5 px-2">
-              <Users className="h-5 w-5 text-brand shrink-0" />
-              <span className="text-[11px] font-medium text-white">Mais de 500 modelos exclusivos</span>
-            </div>
-            <div className="flex flex-col lg:flex-row items-center gap-2.5 px-2">
-              <CreditCard className="h-5 w-5 text-brand shrink-0" />
-              <span className="text-[11px] font-medium text-white">Até 12x sem juros no cartão</span>
-            </div>
-            <div className="flex flex-col lg:flex-row items-center gap-2.5 px-2">
-              <Truck className="h-5 w-5 text-brand shrink-0" />
-              <span className="text-[11px] font-medium text-white">Frete grátis para todo Brasil</span>
-            </div>
-            <div className="flex flex-col lg:flex-row items-center gap-2.5 px-2">
-              <ShieldCheck className="h-5 w-5 text-brand shrink-0" />
-              <span className="text-[11px] font-medium text-white">Satisfação ou seu dinheiro de volta</span>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>
