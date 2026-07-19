@@ -142,58 +142,27 @@ function CustomStylesInjector() {
   const currentPath = location.pathname;
 
   useEffect(() => {
-    let pageId = "home";
-    if (currentPath.includes("/colecoes")) pageId = "colecoes";
-    else if (currentPath.includes("/masculino")) pageId = "masculino";
-    else if (currentPath.includes("/feminino")) pageId = "feminino";
-    else if (currentPath.includes("/solar")) pageId = "solar";
-    else if (currentPath.includes("/premium")) pageId = "premium";
-    else if (currentPath.includes("/promocoes")) pageId = "promocoes";
-
     // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
     if (typeof window !== "undefined") {
       try {
-        const cachedKey = pageId === "home" ? "glasses_home_page_content" : `glasses_page_content_${pageId}`;
-        const cached = localStorage.getItem(cachedKey);
+        const cached = localStorage.getItem("glasses_home_page_content");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.colors) {
             setColors(parsed.colors);
-          } else if (pageId !== "home") {
-            // Se o catálogo não tiver cores próprias, puxa da home
-            const homeCached = localStorage.getItem("glasses_home_page_content");
-            if (homeCached) {
-              const homeParsed = JSON.parse(homeCached);
-              if (homeParsed && homeParsed.colors) {
-                setColors(homeParsed.colors);
-              }
-            }
           }
         }
       } catch (e) {
-        console.error("Failed to read from localStorage:", e);
+        console.error("Failed to read colors from localStorage:", e);
       }
     }
 
     // 2. Fetch do banco de dados para garantir que está atualizado
     async function loadColors() {
       try {
-        if (pageId === "home") {
-          const data = await fetchHomePageContent();
-          if (data && data.colors) {
-            setColors(data.colors);
-          }
-        } else {
-          const data = await fetchPageContent(pageId);
-          if (data && data.colors) {
-            setColors(data.colors);
-          } else {
-            // Se a página não tiver cores, puxa as da home
-            const homeData = await fetchHomePageContent();
-            if (homeData && homeData.colors) {
-              setColors(homeData.colors);
-            }
-          }
+        const data = await fetchHomePageContent();
+        if (data && data.colors) {
+          setColors(data.colors);
         }
       } catch (e) {
         console.error("Failed to fetch colors:", e);
@@ -204,8 +173,7 @@ function CustomStylesInjector() {
     // 3. Ouvir alterações feitas na área administrativa no mesmo navegador
     const handleStorageChange = () => {
       try {
-        const cachedKey = pageId === "home" ? "glasses_home_page_content" : `glasses_page_content_${pageId}`;
-        const cached = localStorage.getItem(cachedKey);
+        const cached = localStorage.getItem("glasses_home_page_content");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.colors) {
