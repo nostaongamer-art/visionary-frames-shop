@@ -24,6 +24,7 @@ export interface HomePageData {
     subtitleFont?: string;
     buttonFont?: string;
     secondaryButtonFont?: string;
+    imagePositionY?: number;
   };
   categories: {
     list: Array<{
@@ -148,6 +149,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     subtitleFont: "default",
     buttonFont: "default",
     secondaryButtonFont: "default",
+    imagePositionY: 50,
   },
   categories: {
     list: [
@@ -421,6 +423,7 @@ function mergeWithDefaults(saved: any): HomePageData {
       subtitleFont: saved.hero?.subtitleFont || "default",
       buttonFont: saved.hero?.buttonFont || "default",
       secondaryButtonFont: saved.hero?.secondaryButtonFont || "default",
+      imagePositionY: saved.hero?.imagePositionY !== undefined ? saved.hero.imagePositionY : DEFAULT_HOME_PAGE_DATA.hero.imagePositionY,
     },
     categories: saved.categories || DEFAULT_HOME_PAGE_DATA.categories,
     bestSellers: {

@@ -41,6 +41,7 @@ export interface HeroData {
   subtitleFont?: string;
   buttonFont?: string;
   secondaryButtonFont?: string;
+  imagePositionY?: number;
 }
 
 export function Hero({ data }: { data?: HeroData }) {
@@ -108,7 +109,8 @@ export function Hero({ data }: { data?: HeroData }) {
                 width={1200}
                 height={1200}
                 referrerPolicy="no-referrer"
-                className="h-full w-full object-cover object-right"
+                className="h-full w-full object-cover"
+                style={{ objectPosition: `right ${data?.imagePositionY !== undefined ? data.imagePositionY : 50}%` }}
               />
             )}
             {/* Gradient from left to right for text readability and side blending */}

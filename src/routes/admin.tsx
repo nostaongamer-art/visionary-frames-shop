@@ -889,6 +889,34 @@ function Admin() {
                 }
               />
 
+              <div className="flex flex-col gap-1.5 bg-[#15181D]/30 border border-[#282C32]/45 rounded-lg p-4 -mt-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-white/70">Ajuste Vertical da Imagem do Hero (Subir / Descer)</label>
+                  <span className="text-[10px] text-[#FF8A00] font-bold">
+                    {data.hero.imagePositionY !== undefined ? data.hero.imagePositionY : 50}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={data.hero.imagePositionY !== undefined ? data.hero.imagePositionY : 50}
+                  onChange={(e) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      hero: { ...prev.hero, imagePositionY: parseInt(e.target.value) },
+                    }))
+                  }
+                  className="w-full accent-[#FF8A00] h-1 bg-[#1C1F26] rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-[9px] text-white/40">
+                  <span>Subir (Topo - 0%)</span>
+                  <span>Centro (50%)</span>
+                  <span>Descer (Base - 100%)</span>
+                </div>
+              </div>
+
               {/* Selos de Vantagens (Benefits Bar) */}
               <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4 mt-2">
                 <div className="flex items-center justify-between border-b border-white/5 pb-3">
