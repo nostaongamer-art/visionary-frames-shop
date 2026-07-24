@@ -445,6 +445,39 @@ function Admin() {
                       <>
                         <button
                           type="button"
+                          onClick={() => {
+                            const title = prompt("Digite o nome da nova seção (ex: Kids, Modelos):");
+                            if (!title) return;
+                            const newId = "custom_" + Date.now();
+                            const newSection = {
+                              id: newId,
+                              title: title,
+                              subtitle: "Subtítulo da sua nova seção",
+                              products: Array.from({ length: 4 }).map((_, idx) => ({
+                                id: idx + 1,
+                                name: `Produto ${idx + 1}`,
+                                discount: "-10%",
+                                reviews: "(50)",
+                                oldPrice: "R$ 199,90",
+                                price: "R$ 179,90",
+                                installment: "12x de R$ 14,99",
+                                imageUrl: ""
+                              }))
+                            };
+                            setData((prev: any) => ({
+                              ...prev,
+                              customSections: [...(prev.customSections || []), newSection]
+                            }));
+                            setActiveTab(`custom-sec-${newId}`);
+                            toast.success(`Seção "${title}" adicionada com sucesso! Lembre-se de Salvar as alterações.`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          ➕ Adicionar Seção
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() => setActiveTab("promo")}
                           className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
                             activeTab === "promo" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
@@ -493,38 +526,7 @@ function Admin() {
                           </button>
                         ))}
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const title = prompt("Digite o nome da nova seção (ex: Kids, Modelos):");
-                            if (!title) return;
-                            const newId = "custom_" + Date.now();
-                            const newSection = {
-                              id: newId,
-                              title: title,
-                              subtitle: "Subtítulo da sua nova seção",
-                              products: Array.from({ length: 4 }).map((_, idx) => ({
-                                id: idx + 1,
-                                name: `Produto ${idx + 1}`,
-                                discount: "-10%",
-                                reviews: "(50)",
-                                oldPrice: "R$ 199,90",
-                                price: "R$ 179,90",
-                                installment: "12x de R$ 14,99",
-                                imageUrl: ""
-                              }))
-                            };
-                            setData((prev: any) => ({
-                              ...prev,
-                              customSections: [...(prev.customSections || []), newSection]
-                            }));
-                            setActiveTab(`custom-sec-${newId}`);
-                            toast.success(`Seção "${title}" adicionada com sucesso! Lembre-se de Salvar as alterações.`);
-                          }}
-                          className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
-                        >
-                          ➕ Adicionar Seção
-                        </button>
+
 
                         <button
                           type="button"
