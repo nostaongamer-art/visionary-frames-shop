@@ -3,7 +3,7 @@ import { PromoBar } from "@/components/site/PromoBar";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { Categories } from "@/components/site/Categories";
-import { BestSellers } from "@/components/site/BestSellers";
+import { BestSellers, CustomProductSection } from "@/components/site/BestSellers";
 import { FlashBanner } from "@/components/site/FlashBanner";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Newsletter } from "@/components/site/Newsletter";
@@ -29,6 +29,9 @@ function Index() {
         <Hero data={homeData.hero} />
         <Categories data={homeData.categories} />
         <BestSellers data={homeData.bestSellers} />
+        {homeData.customSections?.map((customSec) => (
+          <CustomProductSection key={customSec.id} data={customSec as any} />
+        ))}
         <FlashBanner />
         <Testimonials data={homeData.testimonials} />
         <Newsletter data={homeData.newsletter} />

@@ -110,7 +110,7 @@ export function Hero({ data }: { data?: HeroData }) {
                 height={1200}
                 referrerPolicy="no-referrer"
                 className="h-full w-full object-cover"
-                style={{ objectPosition: `right ${data?.imagePositionY !== undefined ? data.imagePositionY : 50}%` }}
+                style={{ objectPosition: `100% ${data?.imagePositionY !== undefined ? data.imagePositionY : 50}%` }}
               />
             )}
             {/* Gradient from left to right for text readability and side blending */}

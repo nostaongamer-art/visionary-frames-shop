@@ -479,6 +479,53 @@ function Admin() {
                         >
                           • Mais Vendidos
                         </button>
+                        
+                        {data.customSections?.map((customSec: any) => (
+                          <button
+                            key={customSec.id}
+                            type="button"
+                            onClick={() => setActiveTab(`custom-sec-${customSec.id}`)}
+                            className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                              activeTab === `custom-sec-${customSec.id}` ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                            }`}
+                          >
+                            • Seção {customSec.title || "Sem Título"}
+                          </button>
+                        ))}
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const title = prompt("Digite o nome da nova seção (ex: Kids, Modelos):");
+                            if (!title) return;
+                            const newId = "custom_" + Date.now();
+                            const newSection = {
+                              id: newId,
+                              title: title,
+                              subtitle: "Subtítulo da sua nova seção",
+                              products: Array.from({ length: 4 }).map((_, idx) => ({
+                                id: idx + 1,
+                                name: `Produto ${idx + 1}`,
+                                discount: "-10%",
+                                reviews: "(50)",
+                                oldPrice: "R$ 199,90",
+                                price: "R$ 179,90",
+                                installment: "12x de R$ 14,99",
+                                imageUrl: ""
+                              }))
+                            };
+                            setData((prev: any) => ({
+                              ...prev,
+                              customSections: [...(prev.customSections || []), newSection]
+                            }));
+                            setActiveTab(`custom-sec-${newId}`);
+                            toast.success(`Seção "${title}" adicionada com sucesso! Lembre-se de Salvar as alterações.`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          ➕ Adicionar Seção
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => setActiveTab("flash")}
@@ -1197,6 +1244,232 @@ function Admin() {
               </div>
             </div>
           )}
+
+          {/* TAB: Custom Sections */}
+          {activeTab.startsWith("custom-sec-") && (() => {
+            const customSecId = activeTab.replace("custom-sec-", "");
+            const customSecIdx = data.customSections?.findIndex((sec: any) => sec.id === customSecId);
+            if (customSecIdx === -1 || customSecIdx === undefined) return null;
+            const customSec = data.customSections[customSecIdx];
+
+            return (
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <h3 className="text-base font-bold text-[#FF8A00]">
+                    Editar Seção Personalizada: {customSec.title}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm(`Tem certeza de que deseja excluir a seção "${customSec.title}"?`)) {
+                        const newSections = data.customSections.filter((sec: any) => sec.id !== customSecId);
+                        setData((prev: any) => ({
+                          ...prev,
+                          customSections: newSections
+                        }));
+                        setActiveTab("products");
+                        toast.success("Seção excluída com sucesso! Lembre-se de Salvar as alterações.");
+                      }
+                    }}
+                    className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors cursor-pointer shadow-sm"
+                  >
+                    Excluir Esta Seção
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Título da Seção</label>
+                    <input
+                      type="text"
+                      value={customSec.title}
+                      onChange={(e) => {
+                        const newSections = [...data.customSections];
+                        newSections[customSecIdx] = { ...customSec, title: e.target.value };
+                        setData((prev: any) => ({
+                          ...prev,
+                          customSections: newSections
+                        }));
+                      }}
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Subtítulo da Seção</label>
+                    <input
+                      type="text"
+                      value={customSec.subtitle}
+                      onChange={(e) => {
+                        const newSections = [...data.customSections];
+                        newSections[customSecIdx] = { ...customSec, subtitle: e.target.value };
+                        setData((prev: any) => ({
+                          ...prev,
+                          customSections: newSections
+                        }));
+                      }}
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                  <h4 className="text-sm font-bold text-white/80">Produtos da Seção ({customSec.products?.length || 0})</h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newProducts = [...(customSec.products || [])];
+                      const newId = newProducts.length + 1;
+                      newProducts.push({
+                        id: newId,
+                        name: `Novo Produto ${newId}`,
+                        discount: "-10%",
+                        reviews: "(50)",
+                        oldPrice: "R$ 199,90",
+                        price: "R$ 179,90",
+                        installment: "12x de R$ 14,99",
+                        imageUrl: ""
+                      });
+                      const newSections = [...data.customSections];
+                      newSections[customSecIdx] = { ...customSec, products: newProducts };
+                      setData((prev: any) => ({
+                        ...prev,
+                        customSections: newSections
+                      }));
+                      toast.success("Produto adicionado! Lembre-se de salvar.");
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
+                  >
+                    + Adicionar Produto
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  {customSec.products?.map((product: any, prodIdx: number) => (
+                    <div key={product.id} className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4 relative">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-brand uppercase tracking-wider">
+                          Produto {product.id}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm("Tem certeza de que deseja remover este produto da seção?")) {
+                              const newProducts = customSec.products.filter((p: any) => p.id !== product.id)
+                                .map((p: any, i: number) => ({ ...p, id: i + 1 })); // reindex
+                              const newSections = [...data.customSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProducts };
+                              setData((prev: any) => ({
+                                ...prev,
+                                customSections: newSections
+                              }));
+                              toast.success("Produto removido! Lembre-se de salvar.");
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-400 text-[10px] font-bold cursor-pointer"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Nome do Produto</label>
+                          <input
+                            type="text"
+                            value={product.name}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, name: e.target.value };
+                              const newSections = [...data.customSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Porcentagem de Desconto</label>
+                          <input
+                            type="text"
+                            value={product.discount}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, discount: e.target.value };
+                              const newSections = [...data.customSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Preço Original (Riscado)</label>
+                          <input
+                            type="text"
+                            value={product.oldPrice}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, oldPrice: e.target.value };
+                              const newSections = [...data.customSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Preço com Desconto (Preço de Venda)</label>
+                          <input
+                            type="text"
+                            value={product.price}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, price: e.target.value };
+                              const newSections = [...data.customSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-white/60">Parcelas</label>
+                          <input
+                            type="text"
+                            value={product.installment}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, installment: e.target.value };
+                              const newSections = [...data.customSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                            }}
+                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+
+                      <ImageInputWithPreview
+                        label={`Imagem do Produto - ${product.name}`}
+                        value={product.imageUrl || ""}
+                        recommendedSize="700 X 600 PX"
+                        onChange={(val) => {
+                          const newProds = [...customSec.products];
+                          newProds[prodIdx] = { ...product, imageUrl: val };
+                          const newSections = [...data.customSections];
+                          newSections[customSecIdx] = { ...customSec, products: newProds };
+                          setData((prev: any) => ({ ...prev, customSections: newSections }));
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* TAB: Oferta Relâmpago */}
           {activeTab === "flash" && (

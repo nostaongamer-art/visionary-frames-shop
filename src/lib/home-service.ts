@@ -1,6 +1,25 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export interface CustomSectionProduct {
+  id: number;
+  name: string;
+  discount: string;
+  reviews: string;
+  oldPrice: string;
+  price: string;
+  installment: string;
+  imageUrl?: string;
+}
+
+export interface CustomSectionData {
+  id: string;
+  title: string;
+  subtitle: string;
+  products: CustomSectionProduct[];
+}
+
 export interface HomePageData {
+  customSections?: CustomSectionData[];
   promoBar: {
     show?: boolean;
     text: string;
@@ -124,6 +143,7 @@ export interface HomePageData {
 }
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
+  customSections: [],
   promoBar: {
     show: true,
     text: "PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS",
@@ -484,6 +504,7 @@ function mergeWithDefaults(saved: any): HomePageData {
       paymentsTitle: savedFooter.paymentsTitle !== undefined ? savedFooter.paymentsTitle : defaultFooter.paymentsTitle,
       payments: mergePayments(savedFooter.payments, defaultFooter.payments),
     },
+    customSections: Array.isArray(saved.customSections) ? saved.customSections : [],
     colors: {
       brand: saved.colors?.brand !== undefined ? saved.colors.brand : DEFAULT_HOME_PAGE_DATA.colors!.brand,
       brandHover: saved.colors?.brandHover !== undefined ? saved.colors.brandHover : DEFAULT_HOME_PAGE_DATA.colors!.brandHover,

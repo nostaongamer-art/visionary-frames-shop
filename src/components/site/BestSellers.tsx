@@ -132,3 +132,45 @@ export function BestSellers({ data }: { data?: BestSellersData }) {
     </section>
   );
 }
+
+export interface CustomSectionData {
+  id: string;
+  title: string;
+  subtitle: string;
+  products: Array<{
+    id: number;
+    name: string;
+    discount: string;
+    reviews: string;
+    oldPrice: string;
+    price: string;
+    installment: string;
+    imageUrl?: string;
+  }>;
+}
+
+export function CustomProductSection({ data }: { data: CustomSectionData }) {
+  const title = data.title;
+  const subtitle = data.subtitle;
+  const products = data.products || [];
+
+  return (
+    <section className="bg-background py-14 border-t border-border/20">
+      <div className="mx-auto max-w-[1240px] px-4 sm:px-6">
+        <div className="relative mb-8 text-center">
+          <p className="text-xs font-bold tracking-[0.2em] text-brand">COLEÇÃO EXCLUSIVA</p>
+          <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-foreground">
+            {title}
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">{subtitle}</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
