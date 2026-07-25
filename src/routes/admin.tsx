@@ -120,6 +120,30 @@ function Admin() {
     toast.success("Seção movida para baixo! Salve as alterações para aplicar no site.");
   };
 
+  const moveCategorySectionUp = (secKey: string) => {
+    if (!categoryData || !categoryData.sectionOrder) return;
+    const idx = categoryData.sectionOrder.indexOf(secKey);
+    if (idx <= 0) return;
+    const newOrder = [...categoryData.sectionOrder];
+    const temp = newOrder[idx - 1];
+    newOrder[idx - 1] = newOrder[idx];
+    newOrder[idx] = temp;
+    setCategoryData((prev: any) => ({ ...prev, sectionOrder: newOrder }));
+    toast.success("Seção movida para cima! Salve as alterações para aplicar no site.");
+  };
+
+  const moveCategorySectionDown = (secKey: string) => {
+    if (!categoryData || !categoryData.sectionOrder) return;
+    const idx = categoryData.sectionOrder.indexOf(secKey);
+    if (idx === -1 || idx >= categoryData.sectionOrder.length - 1) return;
+    const newOrder = [...categoryData.sectionOrder];
+    const temp = newOrder[idx + 1];
+    newOrder[idx + 1] = newOrder[idx];
+    newOrder[idx] = temp;
+    setCategoryData((prev: any) => ({ ...prev, sectionOrder: newOrder }));
+    toast.success("Seção movida para baixo! Salve as alterações para aplicar no site.");
+  };
+
 
   useEffect(() => {
     async function checkAuth() {
@@ -601,36 +625,103 @@ function Admin() {
                           • Paleta de Cores
                         </button>
                       </>
-                    ) : (
+                     ) : (
                       <>
                         <button
                           type="button"
-                          onClick={() => setActiveTab("cat-banner")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "cat-banner" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
+                          onClick={() => {
+                            const title = prompt("Digite o nome da nova seção (ex: Kids, Modelos):");
+                            if (!title) return;
+                            const newId = "custom_" + Date.now();
+                            const newSection = {
+                              id: newId,
+                              title: title,
+                              subtitle: "Subtítulo da sua nova seção",
+                              products: Array.from({ length: 4 }).map((_, idx) => ({
+                                id: idx + 1,
+                                name: `Produto ${idx + 1}`,
+                                discount: "-10%",
+                                reviews: "(50)",
+                                oldPrice: "R$ 199,90",
+                                price: "R$ 179,90",
+                                installment: "12x de R$ 14,99",
+                                imageUrl: ""
+                              }))
+                            };
+                            setCategoryData((prev: any) => ({
+                              ...prev,
+                              customSections: [...(prev?.customSections || []), newSection],
+                              sectionOrder: [...(prev?.sectionOrder || ["header", "benefits", "products"]), `custom-sec-${newId}`]
+                            }));
+                            setActiveTab(`custom-sec-${newId}`);
+                            toast.success(`Seção "${title}" adicionada com sucesso! Lembre-se de Salvar as alterações.`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
                         >
-                          • Banner Superior
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("cat-benefits")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "cat-benefits" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Barra de Benefícios
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("cat-products")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "cat-products" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Produtos (CRUD)
+                          ➕ Adicionar Seção
                         </button>
 
+                        {categoryData?.sectionOrder?.map((secKey, index) => {
+                          let label = "";
+                          let tabKey: TabType = "cat-banner";
+
+                          if (secKey === "header") {
+                            label = "• Banner Superior";
+                            tabKey = "cat-banner";
+                          } else if (secKey === "benefits") {
+                            label = "• Barra de Benefícios";
+                            tabKey = "cat-benefits";
+                          } else if (secKey === "products") {
+                            label = "• Produtos (CRUD)";
+                            tabKey = "cat-products";
+                          } else if (secKey.startsWith("custom-sec-")) {
+                            const cId = secKey.replace("custom-sec-", "");
+                            const customSec = categoryData.customSections?.find((s) => s.id === cId);
+                            if (!customSec) return null;
+                            label = `• Seção ${customSec.title || "Sem Título"}`;
+                            tabKey = secKey as TabType;
+                          }
+
+                          return (
+                            <div key={secKey} className="group flex items-center justify-between w-full rounded hover:bg-white/5 pr-1">
+                              <button
+                                type="button"
+                                onClick={() => setActiveTab(tabKey)}
+                                className={`flex-1 text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                                  activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                                }`}
+                              >
+                                {label}
+                              </button>
+                              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveCategorySectionUp(secKey);
+                                  }}
+                                  disabled={index === 0}
+                                  className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                                  title="Mover para cima"
+                                >
+                                  ▲
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveCategorySectionDown(secKey);
+                                  }}
+                                  disabled={index === categoryData.sectionOrder!.length - 1}
+                                  className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                                  title="Mover para baixo"
+                                >
+                                  ▼
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </>
                     )}
                   </div>
@@ -1268,9 +1359,27 @@ function Admin() {
           {/* TAB: Custom Sections */}
           {activeTab.startsWith("custom-sec-") && (() => {
             const customSecId = activeTab.replace("custom-sec-", "");
-            const customSecIdx = data.customSections?.findIndex((sec: any) => sec.id === customSecId);
+            const isHome = activeSection === "home";
+            const currentData = isHome ? data : categoryData;
+            if (!currentData) return null;
+            const currentSections = currentData.customSections || [];
+            const customSecIdx = currentSections.findIndex((sec: any) => sec.id === customSecId);
             if (customSecIdx === -1 || customSecIdx === undefined) return null;
-            const customSec = data.customSections[customSecIdx];
+            const customSec = currentSections[customSecIdx];
+
+            const updateSections = (newSections: any[]) => {
+              if (isHome) {
+                setData((prev: any) => ({
+                  ...prev,
+                  customSections: newSections
+                }));
+              } else {
+                setCategoryData((prev: any) => ({
+                  ...prev,
+                  customSections: newSections
+                }));
+              }
+            };
 
             return (
               <div className="flex flex-col gap-5">
@@ -1282,12 +1391,22 @@ function Admin() {
                     type="button"
                     onClick={() => {
                       if (confirm(`Tem certeza de que deseja excluir a seção "${customSec.title}"?`)) {
-                        const newSections = data.customSections.filter((sec: any) => sec.id !== customSecId);
-                        setData((prev: any) => ({
-                          ...prev,
-                          customSections: newSections
-                        }));
-                        setActiveTab("products");
+                        const newSections = currentSections.filter((sec: any) => sec.id !== customSecId);
+                        if (isHome) {
+                          setData((prev: any) => ({
+                            ...prev,
+                            customSections: newSections
+                          }));
+                          setActiveTab("products");
+                        } else {
+                          const newOrder = (categoryData?.sectionOrder || []).filter(k => k !== `custom-sec-${customSecId}`);
+                          setCategoryData((prev: any) => ({
+                            ...prev,
+                            customSections: newSections,
+                            sectionOrder: newOrder
+                          }));
+                          setActiveTab("cat-products");
+                        }
                         toast.success("Seção excluída com sucesso! Lembre-se de Salvar as alterações.");
                       }
                     }}
@@ -1304,12 +1423,9 @@ function Admin() {
                       type="text"
                       value={customSec.title}
                       onChange={(e) => {
-                        const newSections = [...data.customSections];
+                        const newSections = [...currentSections];
                         newSections[customSecIdx] = { ...customSec, title: e.target.value };
-                        setData((prev: any) => ({
-                          ...prev,
-                          customSections: newSections
-                        }));
+                        updateSections(newSections);
                       }}
                       className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                     />
@@ -1320,12 +1436,9 @@ function Admin() {
                       type="text"
                       value={customSec.subtitle}
                       onChange={(e) => {
-                        const newSections = [...data.customSections];
+                        const newSections = [...currentSections];
                         newSections[customSecIdx] = { ...customSec, subtitle: e.target.value };
-                        setData((prev: any) => ({
-                          ...prev,
-                          customSections: newSections
-                        }));
+                        updateSections(newSections);
                       }}
                       className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                     />
@@ -1349,12 +1462,9 @@ function Admin() {
                         installment: "12x de R$ 14,99",
                         imageUrl: ""
                       });
-                      const newSections = [...data.customSections];
+                      const newSections = [...currentSections];
                       newSections[customSecIdx] = { ...customSec, products: newProducts };
-                      setData((prev: any) => ({
-                        ...prev,
-                        customSections: newSections
-                      }));
+                      updateSections(newSections);
                       toast.success("Produto adicionado! Lembre-se de salvar.");
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
@@ -1376,12 +1486,9 @@ function Admin() {
                             if (confirm("Tem certeza de que deseja remover este produto da seção?")) {
                               const newProducts = customSec.products.filter((p: any) => p.id !== product.id)
                                 .map((p: any, i: number) => ({ ...p, id: i + 1 })); // reindex
-                              const newSections = [...data.customSections];
+                              const newSections = [...currentSections];
                               newSections[customSecIdx] = { ...customSec, products: newProducts };
-                              setData((prev: any) => ({
-                                ...prev,
-                                customSections: newSections
-                              }));
+                              updateSections(newSections);
                               toast.success("Produto removido! Lembre-se de salvar.");
                             }
                           }}
@@ -1400,9 +1507,9 @@ function Admin() {
                             onChange={(e) => {
                               const newProds = [...customSec.products];
                               newProds[prodIdx] = { ...product, name: e.target.value };
-                              const newSections = [...data.customSections];
+                              const newSections = [...currentSections];
                               newSections[customSecIdx] = { ...customSec, products: newProds };
-                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                              updateSections(newSections);
                             }}
                             className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
@@ -1415,9 +1522,9 @@ function Admin() {
                             onChange={(e) => {
                               const newProds = [...customSec.products];
                               newProds[prodIdx] = { ...product, discount: e.target.value };
-                              const newSections = [...data.customSections];
+                              const newSections = [...currentSections];
                               newSections[customSecIdx] = { ...customSec, products: newProds };
-                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                              updateSections(newSections);
                             }}
                             className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
@@ -1433,9 +1540,9 @@ function Admin() {
                             onChange={(e) => {
                               const newProds = [...customSec.products];
                               newProds[prodIdx] = { ...product, oldPrice: e.target.value };
-                              const newSections = [...data.customSections];
+                              const newSections = [...currentSections];
                               newSections[customSecIdx] = { ...customSec, products: newProds };
-                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                              updateSections(newSections);
                             }}
                             className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
@@ -1448,9 +1555,9 @@ function Admin() {
                             onChange={(e) => {
                               const newProds = [...customSec.products];
                               newProds[prodIdx] = { ...product, price: e.target.value };
-                              const newSections = [...data.customSections];
+                              const newSections = [...currentSections];
                               newSections[customSecIdx] = { ...customSec, products: newProds };
-                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                              updateSections(newSections);
                             }}
                             className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
@@ -1463,9 +1570,9 @@ function Admin() {
                             onChange={(e) => {
                               const newProds = [...customSec.products];
                               newProds[prodIdx] = { ...product, installment: e.target.value };
-                              const newSections = [...data.customSections];
+                              const newSections = [...currentSections];
                               newSections[customSecIdx] = { ...customSec, products: newProds };
-                              setData((prev: any) => ({ ...prev, customSections: newSections }));
+                              updateSections(newSections);
                             }}
                             className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
                           />
@@ -1479,9 +1586,9 @@ function Admin() {
                         onChange={(val) => {
                           const newProds = [...customSec.products];
                           newProds[prodIdx] = { ...product, imageUrl: val };
-                          const newSections = [...data.customSections];
+                          const newSections = [...currentSections];
                           newSections[customSecIdx] = { ...customSec, products: newProds };
-                          setData((prev: any) => ({ ...prev, customSections: newSections }));
+                          updateSections(newSections);
                         }}
                       />
                     </div>

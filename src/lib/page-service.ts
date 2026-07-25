@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { CustomSectionData } from "./home-service";
 
 export interface PageProduct {
   id: number;
@@ -19,6 +20,8 @@ export interface PageProduct {
 }
 
 export interface CategoryPageData {
+  customSections?: CustomSectionData[];
+  sectionOrder?: string[];
   header: {
     show?: boolean;
     title: string;
@@ -423,6 +426,43 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
       })),
       productsShow: saved.productsShow !== undefined ? saved.productsShow : true,
       colors: saved.colors || defaultData.colors,
+      customSections: Array.isArray(saved.customSections) ? saved.customSections : [],
+      sectionOrder: (() => {
+        const defaultOrder = ["header", "benefits", "products"];
+        let savedOrder = Array.isArray(saved.sectionOrder) ? [...saved.sectionOrder] : [...defaultOrder];
+        
+        // Garante que todas as seções padrão estejam presentes
+        defaultOrder.forEach((sec) => {
+          if (!savedOrder.includes(sec)) {
+            savedOrder.push(sec);
+          }
+        });
+
+        // Garante que todas as seções personalizadas criadas estejam presentes
+        const customSectionsList = Array.isArray(saved.customSections) ? saved.customSections : [];
+        customSectionsList.forEach((cSec: any) => {
+          const key = `custom-sec-${cSec.id}`;
+          if (!savedOrder.includes(key)) {
+            const productsIdx = savedOrder.indexOf("products");
+            if (productsIdx !== -1) {
+              savedOrder.splice(productsIdx + 1, 0, key);
+            } else {
+              savedOrder.push(key);
+            }
+          }
+        });
+
+        // Remove seções personalizadas que foram deletadas
+        savedOrder = savedOrder.filter((key) => {
+          if (key.startsWith("custom-sec-")) {
+            const cId = key.replace("custom-sec-", "");
+            return customSectionsList.some((cSec: any) => cSec.id === cId);
+          }
+          return true;
+        });
+
+        return savedOrder;
+      })(),
       customCategories: saved.customCategories || defaultData.customCategories,
       customFormats: saved.customFormats || defaultData.customFormats,
       customMaterials: saved.customMaterials || defaultData.customMaterials,
