@@ -33,6 +33,7 @@ export interface HomePageData {
   customSections?: CustomSectionData[];
   customBanners?: CustomBannerData[];
   sectionOrder?: string[];
+  customMenus?: Array<{ id: string; title: string }>;
   promoBar: {
     show?: boolean;
     text: string;
@@ -158,6 +159,7 @@ export interface HomePageData {
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   customSections: [],
   customBanners: [],
+  customMenus: [],
   sectionOrder: ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"],
   promoBar: {
     show: true,
@@ -586,6 +588,7 @@ function mergeWithDefaults(saved: any): HomePageData {
 
       return savedOrder;
     })(),
+    customMenus: Array.isArray(saved.customMenus) ? saved.customMenus : [],
     colors: {
       brand: saved.colors?.brand !== undefined ? saved.colors.brand : DEFAULT_HOME_PAGE_DATA.colors!.brand,
       brandHover: saved.colors?.brandHover !== undefined ? saved.colors.brandHover : DEFAULT_HOME_PAGE_DATA.colors!.brandHover,

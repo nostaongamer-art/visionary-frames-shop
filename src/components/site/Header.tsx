@@ -89,41 +89,41 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
-  const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [customMenusList, setCustomMenusList] = useState<any[]>([]);
 
   useEffect(() => {
-    function readCategories() {
+    function readCustomMenus() {
       if (typeof window !== "undefined") {
         try {
           const cached = localStorage.getItem("glasses_home_page_content");
           if (cached) {
             const parsed = JSON.parse(cached);
-            if (parsed?.categories?.list) {
-              setCategoriesList(parsed.categories.list);
+            if (parsed?.customMenus) {
+              setCustomMenusList(parsed.customMenus);
               return;
             }
           }
         } catch (e) {
-          console.error("Error reading categories from localStorage:", e);
+          console.error("Error reading customMenus from localStorage:", e);
         }
       }
     }
-    readCategories();
+    readCustomMenus();
 
     async function loadFromDb() {
       try {
         const data = await fetchHomePageContent();
-        if (data?.categories?.list) {
-          setCategoriesList(data.categories.list);
+        if (data?.customMenus) {
+          setCustomMenusList(data.customMenus);
         }
       } catch (e) {
-        console.error("Error loading categories from db:", e);
+        console.error("Error loading customMenus from db:", e);
       }
     }
     loadFromDb();
 
     const handleStorage = () => {
-      readCategories();
+      readCustomMenus();
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -139,22 +139,20 @@ export function Header() {
   const navItems: Array<{ label: string; href: string; search?: any; active: boolean }> = [
     { label: "INÍCIO", href: "/", active: currentPath === "/" },
     { label: "COLEÇÕES", href: "/colecoes", active: currentPath === "/colecoes" && !location.search },
+    { label: "MASCULINO", href: "/masculino", active: currentPath === "/masculino" },
+    { label: "FEMININO", href: "/feminino", active: currentPath === "/feminino" },
+    { label: "SOLAR", href: "/solar", active: currentPath === "/solar" },
+    { label: "PREMIUM", href: "/premium", active: currentPath === "/premium" },
   ];
 
-  // Append each dynamic category from database
-  categoriesList.forEach((cat) => {
-    const key = cat.title.toUpperCase();
-    const isStatic = ROUTE_MAP[key] !== undefined;
-    const href = ROUTE_MAP[key] || "/colecoes";
-    const search = isStatic ? undefined : { category: cat.title };
+  // Append each dynamic menu page from database
+  customMenusList.forEach((menu) => {
+    const key = menu.title.toUpperCase();
+    const href = "/colecoes";
+    const search = { pageId: menu.id };
 
-    let active = false;
-    if (isStatic) {
-      active = currentPath === ROUTE_MAP[key];
-    } else {
-      const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-      active = currentPath === "/colecoes" && searchParams.get("category") === cat.title;
-    }
+    const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    const active = currentPath === "/colecoes" && searchParams.get("pageId") === menu.id;
 
     if (!navItems.some(item => item.label === key)) {
       navItems.push({

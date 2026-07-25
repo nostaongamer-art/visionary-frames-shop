@@ -453,37 +453,70 @@ function Admin() {
           <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mb-1">
             Páginas do Site
           </h4>
-          {[
-            { id: "home", label: "Seção 1: Página Inicial" },
-            { id: "colecoes", label: "Seção 2: Coleções" },
-            { id: "masculino", label: "Seção 3: Masculino" },
-            { id: "feminino", label: "Seção 4: Feminino" },
-            { id: "solar", label: "Seção 5: Solar" },
-            { id: "premium", label: "Seção 6: Premium" },
-            { id: "promocoes", label: "Seção 7: Promoções" },
-          ].map((sec) => {
-            const isExpanded = activeSection === sec.id;
-            return (
-              <div key={sec.id} className="flex flex-col gap-1 border-b border-white/5 pb-2 last:border-0 last:pb-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveSection(sec.id);
-                    if (sec.id === "home") {
-                      setActiveTab("promo");
-                    } else {
-                      setActiveTab("cat-banner");
-                    }
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
-                    activeSection === sec.id ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
-                  }`}
-                >
-                  <span>{sec.label}</span>
-                  <span className="text-[9px] opacity-70">
-                    {isExpanded ? "▲" : "▼"}
-                  </span>
-                </button>
+          {(() => {
+            const baseSections = [
+              { id: "home", label: "Seção 1: Página Inicial" },
+              { id: "colecoes", label: "Seção 2: Coleções" },
+              { id: "masculino", label: "Seção 3: Masculino" },
+              { id: "feminino", label: "Seção 4: Feminino" },
+              { id: "solar", label: "Seção 5: Solar" },
+              { id: "premium", label: "Seção 6: Premium" },
+              { id: "promocoes", label: "Seção 7: Promoções" },
+            ];
+            const allSections = [...baseSections];
+            (data?.customMenus || []).forEach((menu: any) => {
+              allSections.push({
+                id: menu.id,
+                label: `Seção ${allSections.length + 1}: ${menu.title}`
+              });
+            });
+            return allSections.map((sec) => {
+              const isExpanded = activeSection === sec.id;
+              const isCustomPage = sec.id.startsWith("custom-page-");
+              return (
+                <div key={sec.id} className="flex flex-col gap-1 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <div className="flex items-center justify-between gap-1 w-full">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveSection(sec.id);
+                        if (sec.id === "home") {
+                          setActiveTab("promo");
+                        } else {
+                          setActiveTab("cat-banner");
+                        }
+                      }}
+                      className={`flex-1 text-left px-3 py-2 rounded text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                        activeSection === sec.id ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+                      }`}
+                    >
+                      <span>{sec.label}</span>
+                      <span className="text-[9px] opacity-70">
+                        {isExpanded ? "▲" : "▼"}
+                      </span>
+                    </button>
+                    {isCustomPage && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Tem certeza de que deseja excluir permanentemente a seção "${sec.label.split(": ")[1]}" e todo o seu conteúdo?`)) {
+                            const newCustomMenus = (data.customMenus || []).filter((m: any) => m.id !== sec.id);
+                            setData((prev: any) => ({
+                              ...prev,
+                              customMenus: newCustomMenus
+                            }));
+                            setActiveSection("home");
+                            setActiveTab("promo");
+                            toast.success("Seção removida! Lembre-se de salvar as alterações.");
+                          }
+                        }}
+                        className="p-2 text-red-500 hover:text-red-400 text-xs font-bold cursor-pointer transition-colors"
+                        title="Excluir Seção Completa"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 
                 {isExpanded && (
                   <div className="flex flex-col gap-1 pl-2.5 mt-1.5 border-l border-[#FF8A00]/40 ml-2.5">
@@ -545,6 +578,30 @@ function Admin() {
                           className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           ➕ Adicionar Banner
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const title = prompt("Digite o nome da nova seção completa/página (ex: Infantil, Esportivo, Outlet):");
+                            if (!title) return;
+                            const slug = title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "-");
+                            const newId = `custom-page-${slug || Date.now()}`;
+                            
+                            // Add to customMenus
+                            setData((prev: any) => ({
+                              ...prev,
+                              customMenus: [...(prev.customMenus || []), { id: newId, title: title }]
+                            }));
+                            
+                            // Set the newly created section as active
+                            setActiveSection(newId);
+                            setActiveTab("cat-banner");
+                            toast.success(`Seção "${title}" criada com sucesso! Configure-a e salve as alterações.`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          ➕ Adicionar Seção Completa
                         </button>
 
                         <button
@@ -757,7 +814,7 @@ function Admin() {
                 )}
               </div>
             );
-          })}
+          })})()}
         </div>
 
         {/* Content Form Editor */}

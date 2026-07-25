@@ -59,10 +59,11 @@ interface CategoryPageLayoutProps {
   pageId: string;
 }
 
-export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
+export function CategoryPageLayout({ pageId: propPageId }: CategoryPageLayoutProps) {
   const { addItem } = useCart();
+  const [activePageId, setActivePageId] = useState(propPageId);
   const [pageData, setPageData] = useState<CategoryPageData | null>(null);
-  const BREADCRUMB_LABEL = BREADCRUMB_MAP[pageId] || "Coleções";
+  const BREADCRUMB_LABEL = BREADCRUMB_MAP[activePageId] || "Coleções";
   const [loading, setLoading] = useState(true);
 
   // Filter States
@@ -84,7 +85,19 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   // Reset page to 1 whenever filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedFormats, selectedMaterials, selectedColor, priceMax, pageId]);
+  }, [selectedCategory, selectedFormats, selectedMaterials, selectedColor, priceMax, activePageId]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlPageId = params.get("pageId");
+      if (urlPageId) {
+        setActivePageId(urlPageId);
+      } else {
+        setActivePageId(propPageId);
+      }
+    }
+  }, [propPageId, typeof window !== "undefined" ? window.location.search : ""]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -96,12 +109,12 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
         setSelectedCategory("Todos");
       }
     }
-  }, [pageId, typeof window !== "undefined" ? window.location.search : ""]);
+  }, [activePageId, typeof window !== "undefined" ? window.location.search : ""]);
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const data = await fetchPageContent(pageId);
+      const data = await fetchPageContent(activePageId);
       setPageData(data);
       
       // Ajustar preço máximo padrão com base no maior preço da lista
@@ -119,7 +132,7 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [pageId]);
+  }, [activePageId]);
 
   if (loading || !pageData) {
     return (
