@@ -18,8 +18,17 @@ export interface CustomSectionData {
   products: CustomSectionProduct[];
 }
 
+export interface CustomBannerData {
+  id: string;
+  name: string;
+  imageUrl: string;
+  linkUrl: string;
+  imagePositionY?: number;
+}
+
 export interface HomePageData {
   customSections?: CustomSectionData[];
+  customBanners?: CustomBannerData[];
   sectionOrder?: string[];
   promoBar: {
     show?: boolean;
@@ -145,6 +154,7 @@ export interface HomePageData {
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   customSections: [],
+  customBanners: [],
   sectionOrder: ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"],
   promoBar: {
     show: true,
@@ -507,6 +517,7 @@ function mergeWithDefaults(saved: any): HomePageData {
       payments: mergePayments(savedFooter.payments, defaultFooter.payments),
     },
     customSections: Array.isArray(saved.customSections) ? saved.customSections : [],
+    customBanners: Array.isArray(saved.customBanners) ? saved.customBanners : [],
     sectionOrder: (() => {
       const defaultOrder = ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"];
       let savedOrder = Array.isArray(saved.sectionOrder) ? [...saved.sectionOrder] : [...defaultOrder];
@@ -532,11 +543,29 @@ function mergeWithDefaults(saved: any): HomePageData {
         }
       });
 
-      // Remove seções personalizadas que foram deletadas
+      // Garante que todos os banners personalizados criados estejam presentes
+      const customBannersList = Array.isArray(saved.customBanners) ? saved.customBanners : [];
+      customBannersList.forEach((cBanner: any) => {
+        const key = `custom-banner-${cBanner.id}`;
+        if (!savedOrder.includes(key)) {
+          const bestSellersIdx = savedOrder.indexOf("bestSellers");
+          if (bestSellersIdx !== -1) {
+            savedOrder.splice(bestSellersIdx + 1, 0, key);
+          } else {
+            savedOrder.push(key);
+          }
+        }
+      });
+
+      // Remove seções e banners personalizados que foram deletados
       savedOrder = savedOrder.filter((key) => {
         if (key.startsWith("custom-sec-")) {
           const cId = key.replace("custom-sec-", "");
           return customSectionsList.some((cSec: any) => cSec.id === cId);
+        }
+        if (key.startsWith("custom-banner-")) {
+          const cId = key.replace("custom-banner-", "");
+          return customBannersList.some((cBanner: any) => cBanner.id === cId);
         }
         return true;
       });

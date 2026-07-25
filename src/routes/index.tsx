@@ -8,6 +8,7 @@ import { FlashBanner } from "@/components/site/FlashBanner";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Newsletter } from "@/components/site/Newsletter";
 import { Footer } from "@/components/site/Footer";
+import { CustomBanner } from "@/components/site/CustomBanner";
 
 import { fetchHomePageContent } from "@/lib/home-service";
 
@@ -50,6 +51,13 @@ function Index() {
             const customSec = homeData.customSections?.find((s) => s.id === customId);
             if (customSec) {
               return <CustomProductSection key={customSec.id} data={customSec as any} />;
+            }
+          }
+          if (secKey.startsWith("custom-banner-")) {
+            const customId = secKey.replace("custom-banner-", "");
+            const customBanner = homeData.customBanners?.find((b) => b.id === customId);
+            if (customBanner) {
+              return <CustomBanner key={customBanner.id} data={customBanner} />;
             }
           }
           return null;

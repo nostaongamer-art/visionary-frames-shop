@@ -63,9 +63,7 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type TabType = 
-  | "promo" | "hero" | "categories" | "products" | "flash" | "testimonials" | "brands" | "newsletter" | "footer" | "colors"
-  | "cat-banner" | "cat-benefits" | "cat-products" | "cat-colors";
+type TabType = string;
 
 function Admin() {
   const navigate = useNavigate();
@@ -523,6 +521,31 @@ function Admin() {
                         >
                           ➕ Adicionar Seção
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const name = prompt("Digite o nome identificador do novo banner (ex: Banner Promo, Banner Marcas):");
+                            if (!name) return;
+                            const newId = "banner_" + Date.now();
+                            const newBanner = {
+                              id: newId,
+                              name: name,
+                              imageUrl: "",
+                              linkUrl: "",
+                              imagePositionY: 50
+                            };
+                            setData((prev: any) => ({
+                              ...prev,
+                              customBanners: [...(prev.customBanners || []), newBanner],
+                              sectionOrder: [...(prev.sectionOrder || []), `custom-banner-${newId}`]
+                            }));
+                            setActiveTab(`custom-banner-${newId}`);
+                            toast.success(`Banner "${name}" adicionado com sucesso! Adicione uma imagem e salve.`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 rounded text-xs font-bold text-green-400 hover:text-green-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          ➕ Adicionar Banner
+                        </button>
 
                         <button
                           type="button"
@@ -563,6 +586,12 @@ function Admin() {
                             const customSec = data.customSections?.find((s) => s.id === cId);
                             if (!customSec) return null;
                             label = `• Seção ${customSec.title || "Sem Título"}`;
+                            tabKey = secKey as TabType;
+                          } else if (secKey.startsWith("custom-banner-")) {
+                            const cId = secKey.replace("custom-banner-", "");
+                            const customBanner = data.customBanners?.find((b) => b.id === cId);
+                            if (!customBanner) return null;
+                            label = `• Banner: ${customBanner.name || "Sem Nome"}`;
                             tabKey = secKey as TabType;
                           }
 
@@ -1593,6 +1622,113 @@ function Admin() {
                       />
                     </div>
                   ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* TAB: Custom Banners */}
+          {activeTab.startsWith("custom-banner-") && (() => {
+            const bannerId = activeTab.replace("custom-banner-", "");
+            const bannerIdx = data.customBanners?.findIndex((b: any) => b.id === bannerId);
+            if (bannerIdx === -1 || bannerIdx === undefined) return null;
+            const banner = data.customBanners[bannerIdx];
+
+            return (
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <h3 className="text-base font-bold text-[#FF8A00]">
+                    Editar Banner: {banner.name}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm(`Tem certeza de que deseja excluir o banner "${banner.name}"?`)) {
+                        const newBanners = data.customBanners.filter((b: any) => b.id !== bannerId);
+                        const newOrder = (data.sectionOrder || []).filter(k => k !== `custom-banner-${bannerId}`);
+                        setData((prev: any) => ({
+                          ...prev,
+                          customBanners: newBanners,
+                          sectionOrder: newOrder
+                        }));
+                        setActiveTab("promo");
+                        toast.success("Banner excluído com sucesso! Lembre-se de Salvar as alterações.");
+                      }
+                    }}
+                    className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors cursor-pointer shadow-sm"
+                  >
+                    Excluir Este Banner
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Nome Identificador (Admin)</label>
+                    <input
+                      type="text"
+                      value={banner.name}
+                      onChange={(e) => {
+                        const newBanners = [...data.customBanners];
+                        newBanners[bannerIdx] = { ...banner, name: e.target.value };
+                        setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                      }}
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-white/70">Link de Redirecionamento (URL)</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: /masculino, /solar ou https://..."
+                      value={banner.linkUrl}
+                      onChange={(e) => {
+                        const newBanners = [...data.customBanners];
+                        newBanners[bannerIdx] = { ...banner, linkUrl: e.target.value };
+                        setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                      }}
+                      className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4 border-t border-white/5 pt-4">
+                  <ImageInputWithPreview
+                    label="Imagem do Banner (Recomendado: 1240 X 260 PX)"
+                    value={banner.imageUrl || ""}
+                    recommendedSize="1240 X 260 PX"
+                    onChange={(val) => {
+                      const newBanners = [...data.customBanners];
+                      newBanners[bannerIdx] = { ...banner, imageUrl: val };
+                      setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                    }}
+                  />
+
+                  <div className="flex flex-col gap-2 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-white/80">Ajuste Vertical da Imagem (Posição Y)</label>
+                      <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">{banner.imagePositionY !== undefined ? banner.imagePositionY : 50}%</span>
+                    </div>
+                    <p className="text-[10px] text-white/40 leading-relaxed">
+                      Se o banner for cortado, use esta barra para subir ou descer a imagem de fundo para o melhor enquadramento.
+                    </p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-[10px] text-white/30 font-bold">Topo</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={banner.imagePositionY !== undefined ? banner.imagePositionY : 50}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          const newBanners = [...data.customBanners];
+                          newBanners[bannerIdx] = { ...banner, imagePositionY: val };
+                          setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                        }}
+                        className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <span className="text-[10px] text-white/30 font-bold">Base</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
