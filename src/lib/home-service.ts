@@ -26,6 +26,7 @@ export interface CustomBannerData {
   imagePositionY?: number;
   desktopHeight?: number;
   mobileHeight?: number;
+  desktopWidth?: number;
 }
 
 export interface HomePageData {
@@ -528,6 +529,7 @@ function mergeWithDefaults(saved: any): HomePageData {
           imagePositionY: b.imagePositionY !== undefined ? b.imagePositionY : 50,
           desktopHeight: b.desktopHeight !== undefined ? b.desktopHeight : 200,
           mobileHeight: b.mobileHeight !== undefined ? b.mobileHeight : 120,
+          desktopWidth: b.desktopWidth !== undefined ? b.desktopWidth : 1240,
         }))
       : [],
     sectionOrder: (() => {

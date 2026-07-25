@@ -1791,6 +1791,36 @@ function Admin() {
                       </div>
                     </div>
                   </div>
+
+                  <div className="flex flex-col gap-2 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-white/80">Largura Máxima do Banner (Desktop)</label>
+                      <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                        {banner.desktopWidth !== undefined ? banner.desktopWidth : 1240}px
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-white/40 leading-relaxed">
+                      Defina a largura máxima do banner. Se for menor que 1240px, o banner será centralizado na tela (ex: use 1240px para preencher o grid padrão, ou menor se quiser um banner mais compacto).
+                    </p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-[10px] text-white/30 font-bold">200px</span>
+                      <input
+                        type="range"
+                        min="200"
+                        max="1240"
+                        step="20"
+                        value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1240}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          const newBanners = [...data.customBanners];
+                          newBanners[bannerIdx] = { ...banner, desktopWidth: val };
+                          setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                        }}
+                        className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <span className="text-[10px] text-white/30 font-bold">1240px (Máx)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
