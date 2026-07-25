@@ -20,6 +20,7 @@ export interface CustomSectionData {
 
 export interface HomePageData {
   customSections?: CustomSectionData[];
+  sectionOrder?: string[];
   promoBar: {
     show?: boolean;
     text: string;
@@ -144,6 +145,7 @@ export interface HomePageData {
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   customSections: [],
+  sectionOrder: ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"],
   promoBar: {
     show: true,
     text: "PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS",
@@ -505,6 +507,42 @@ function mergeWithDefaults(saved: any): HomePageData {
       payments: mergePayments(savedFooter.payments, defaultFooter.payments),
     },
     customSections: Array.isArray(saved.customSections) ? saved.customSections : [],
+    sectionOrder: (() => {
+      const defaultOrder = ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"];
+      let savedOrder = Array.isArray(saved.sectionOrder) ? [...saved.sectionOrder] : [...defaultOrder];
+      
+      // Garante que todas as seções padrão estejam presentes
+      defaultOrder.forEach((sec) => {
+        if (!savedOrder.includes(sec)) {
+          savedOrder.push(sec);
+        }
+      });
+
+      // Garante que todas as seções personalizadas criadas estejam presentes
+      const customSectionsList = Array.isArray(saved.customSections) ? saved.customSections : [];
+      customSectionsList.forEach((cSec: any) => {
+        const key = `custom-sec-${cSec.id}`;
+        if (!savedOrder.includes(key)) {
+          const bestSellersIdx = savedOrder.indexOf("bestSellers");
+          if (bestSellersIdx !== -1) {
+            savedOrder.splice(bestSellersIdx + 1, 0, key);
+          } else {
+            savedOrder.push(key);
+          }
+        }
+      });
+
+      // Remove seções personalizadas que foram deletadas
+      savedOrder = savedOrder.filter((key) => {
+        if (key.startsWith("custom-sec-")) {
+          const cId = key.replace("custom-sec-", "");
+          return customSectionsList.some((cSec: any) => cSec.id === cId);
+        }
+        return true;
+      });
+
+      return savedOrder;
+    })(),
     colors: {
       brand: saved.colors?.brand !== undefined ? saved.colors.brand : DEFAULT_HOME_PAGE_DATA.colors!.brand,
       brandHover: saved.colors?.brandHover !== undefined ? saved.colors.brandHover : DEFAULT_HOME_PAGE_DATA.colors!.brandHover,

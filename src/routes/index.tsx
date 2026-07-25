@@ -26,15 +26,34 @@ function Index() {
       <PromoBar text={homeData.promoBar.text} />
       <Header />
       <main>
-        <Hero data={homeData.hero} />
-        <Categories data={homeData.categories} />
-        <BestSellers data={homeData.bestSellers} />
-        {homeData.customSections?.map((customSec) => (
-          <CustomProductSection key={customSec.id} data={customSec as any} />
-        ))}
-        <FlashBanner />
-        <Testimonials data={homeData.testimonials} />
-        <Newsletter data={homeData.newsletter} />
+        {homeData.sectionOrder?.map((secKey) => {
+          if (secKey === "hero") {
+            return <Hero key="hero" data={homeData.hero} />;
+          }
+          if (secKey === "categories") {
+            return <Categories key="categories" data={homeData.categories} />;
+          }
+          if (secKey === "bestSellers") {
+            return <BestSellers key="bestSellers" data={homeData.bestSellers} />;
+          }
+          if (secKey === "flash") {
+            return <FlashBanner key="flash" />;
+          }
+          if (secKey === "testimonials") {
+            return <Testimonials key="testimonials" data={homeData.testimonials} />;
+          }
+          if (secKey === "newsletter") {
+            return <Newsletter key="newsletter" data={homeData.newsletter} />;
+          }
+          if (secKey.startsWith("custom-sec-")) {
+            const customId = secKey.replace("custom-sec-", "");
+            const customSec = homeData.customSections?.find((s) => s.id === customId);
+            if (customSec) {
+              return <CustomProductSection key={customSec.id} data={customSec as any} />;
+            }
+          }
+          return null;
+        })}
       </main>
       <Footer />
     </div>

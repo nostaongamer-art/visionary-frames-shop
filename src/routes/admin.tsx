@@ -96,6 +96,30 @@ function Admin() {
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductPage, setAdminProductPage] = useState(1);
 
+  const moveSectionUp = (secKey: string) => {
+    if (!data.sectionOrder) return;
+    const idx = data.sectionOrder.indexOf(secKey);
+    if (idx <= 0) return;
+    const newOrder = [...data.sectionOrder];
+    const temp = newOrder[idx - 1];
+    newOrder[idx - 1] = newOrder[idx];
+    newOrder[idx] = temp;
+    setData((prev) => ({ ...prev, sectionOrder: newOrder }));
+    toast.success("Seção movida para cima! Salve as alterações para aplicar no site.");
+  };
+
+  const moveSectionDown = (secKey: string) => {
+    if (!data.sectionOrder) return;
+    const idx = data.sectionOrder.indexOf(secKey);
+    if (idx === -1 || idx >= data.sectionOrder.length - 1) return;
+    const newOrder = [...data.sectionOrder];
+    const temp = newOrder[idx + 1];
+    newOrder[idx + 1] = newOrder[idx];
+    newOrder[idx] = temp;
+    setData((prev) => ({ ...prev, sectionOrder: newOrder }));
+    toast.success("Seção movida para baixo! Salve as alterações para aplicar no site.");
+  };
+
 
   useEffect(() => {
     async function checkAuth() {
@@ -485,85 +509,79 @@ function Admin() {
                         >
                           • Banner Promocional
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("hero")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "hero" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Banner Principal (Hero)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("categories")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "categories" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Categorias
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("products")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "products" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Mais Vendidos
-                        </button>
-                        
-                        {data.customSections?.map((customSec: any) => (
-                          <button
-                            key={customSec.id}
-                            type="button"
-                            onClick={() => setActiveTab(`custom-sec-${customSec.id}`)}
-                            className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                              activeTab === `custom-sec-${customSec.id}` ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                            }`}
-                          >
-                            • Seção {customSec.title || "Sem Título"}
-                          </button>
-                        ))}
+                        {data.sectionOrder?.map((secKey, index) => {
+                          let label = "";
+                          let tabKey: TabType = "hero";
 
+                          if (secKey === "hero") {
+                            label = "• Banner Principal (Hero)";
+                            tabKey = "hero";
+                          } else if (secKey === "categories") {
+                            label = "• Categorias";
+                            tabKey = "categories";
+                          } else if (secKey === "bestSellers") {
+                            label = "• Mais Vendidos";
+                            tabKey = "products";
+                          } else if (secKey === "flash") {
+                            label = "• Oferta Relâmpago";
+                            tabKey = "flash";
+                          } else if (secKey === "testimonials") {
+                            label = "• Depoimentos";
+                            tabKey = "testimonials";
+                          } else if (secKey === "brands") {
+                            label = "• Marcas Parceiras";
+                            tabKey = "brands";
+                          } else if (secKey === "newsletter") {
+                            label = "• Newsletter";
+                            tabKey = "newsletter";
+                          } else if (secKey.startsWith("custom-sec-")) {
+                            const cId = secKey.replace("custom-sec-", "");
+                            const customSec = data.customSections?.find((s) => s.id === cId);
+                            if (!customSec) return null;
+                            label = `• Seção ${customSec.title || "Sem Título"}`;
+                            tabKey = secKey as TabType;
+                          }
 
-
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("flash")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "flash" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Oferta Relâmpago
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("testimonials")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "testimonials" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Depoimentos
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("brands")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "brands" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Marcas Parceiras
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab("newsletter")}
-                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "newsletter" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                          }`}
-                        >
-                          • Newsletter
-                        </button>
+                          return (
+                            <div key={secKey} className="group flex items-center justify-between w-full rounded hover:bg-white/5 pr-1">
+                              <button
+                                type="button"
+                                onClick={() => setActiveTab(tabKey)}
+                                className={`flex-1 text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                                  activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                                }`}
+                              >
+                                {label}
+                              </button>
+                              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveSectionUp(secKey);
+                                  }}
+                                  disabled={index === 0}
+                                  className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                                  title="Mover para cima"
+                                >
+                                  ▲
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveSectionDown(secKey);
+                                  }}
+                                  disabled={index === data.sectionOrder!.length - 1}
+                                  className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                                  title="Mover para baixo"
+                                >
+                                  ▼
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                         <button
                           type="button"
                           onClick={() => setActiveTab("footer")}
