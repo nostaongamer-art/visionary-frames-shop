@@ -87,6 +87,18 @@ export function CategoryPageLayout({ pageId }: CategoryPageLayoutProps) {
   }, [selectedCategory, selectedFormats, selectedMaterials, selectedColor, priceMax, pageId]);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const catParam = params.get("category");
+      if (catParam) {
+        setSelectedCategory(catParam);
+      } else {
+        setSelectedCategory("Todos");
+      }
+    }
+  }, [pageId, typeof window !== "undefined" ? window.location.search : ""]);
+
+  useEffect(() => {
     async function loadData() {
       setLoading(true);
       const data = await fetchPageContent(pageId);

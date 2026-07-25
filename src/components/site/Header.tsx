@@ -89,16 +89,87 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
+  const [categoriesList, setCategoriesList] = useState<any[]>([]);
 
-  const navItems = [
+  useEffect(() => {
+    function readCategories() {
+      if (typeof window !== "undefined") {
+        try {
+          const cached = localStorage.getItem("glasses_home_page_content");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed?.categories?.list) {
+              setCategoriesList(parsed.categories.list);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("Error reading categories from localStorage:", e);
+        }
+      }
+    }
+    readCategories();
+
+    async function loadFromDb() {
+      try {
+        const data = await fetchHomePageContent();
+        if (data?.categories?.list) {
+          setCategoriesList(data.categories.list);
+        }
+      } catch (e) {
+        console.error("Error loading categories from db:", e);
+      }
+    }
+    loadFromDb();
+
+    const handleStorage = () => {
+      readCategories();
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const ROUTE_MAP: Record<string, string> = {
+    MASCULINO: "/masculino",
+    FEMININO: "/feminino",
+    SOLAR: "/solar",
+    PREMIUM: "/premium",
+  };
+
+  const navItems: Array<{ label: string; href: string; search?: any; active: boolean }> = [
     { label: "INÍCIO", href: "/", active: currentPath === "/" },
-    { label: "COLEÇÕES", href: "/colecoes", active: currentPath === "/colecoes" },
-    { label: "MASCULINO", href: "/masculino", active: currentPath === "/masculino" },
-    { label: "FEMININO", href: "/feminino", active: currentPath === "/feminino" },
-    { label: "SOLAR", href: "/solar", active: currentPath === "/solar" },
-    { label: "PREMIUM", href: "/premium", active: currentPath === "/premium" },
-    { label: "PROMOÇÕES", href: "/promocoes", active: currentPath === "/promocoes" },
+    { label: "COLEÇÕES", href: "/colecoes", active: currentPath === "/colecoes" && !location.search },
   ];
+
+  // Append each dynamic category from database
+  categoriesList.forEach((cat) => {
+    const key = cat.title.toUpperCase();
+    const isStatic = ROUTE_MAP[key] !== undefined;
+    const href = ROUTE_MAP[key] || "/colecoes";
+    const search = isStatic ? undefined : { category: cat.title };
+
+    let active = false;
+    if (isStatic) {
+      active = currentPath === ROUTE_MAP[key];
+    } else {
+      const searchParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+      active = currentPath === "/colecoes" && searchParams.get("category") === cat.title;
+    }
+
+    if (!navItems.some(item => item.label === key)) {
+      navItems.push({
+        label: key,
+        href,
+        search,
+        active
+      });
+    }
+  });
+
+  // Always keep PROMOÇÕES at the end
+  if (!navItems.some(item => item.label === "PROMOÇÕES")) {
+    navItems.push({ label: "PROMOÇÕES", href: "/promocoes", active: currentPath === "/promocoes" });
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-hairline/60 bg-ink">
@@ -110,6 +181,7 @@ export function Header() {
             <Link
               key={item.label}
               to={item.href}
+              search={item.search}
               className={`text-[13px] font-semibold tracking-wide transition-colors relative py-1.5 outline-none ${
                 item.active ? "text-brand font-bold" : "text-white/80 hover:text-brand"
               }`}
@@ -151,6 +223,7 @@ export function Header() {
             <Link
               key={item.label}
               to={item.href}
+              search={item.search}
               onClick={() => setMenuOpen(false)}
               className={`py-2 text-sm font-semibold tracking-wide outline-none relative inline-block self-start ${
                 item.active ? "text-brand font-bold" : "text-white/80"
