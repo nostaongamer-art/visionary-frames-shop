@@ -1170,16 +1170,62 @@ function Admin() {
           {/* TAB 3: Categorias */}
           {activeTab === "categories" && (
             <div className="flex flex-col gap-5">
-              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
-                Seção de Categorias
-              </h3>
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <h3 className="text-base font-bold text-[#FF8A00]">
+                  Seção de Categorias
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const title = prompt("Digite o nome da nova categoria (ex: Infantil, Esportivo):");
+                    if (!title) return;
+                    const newCategory = {
+                      title: title,
+                      description: `Explore os modelos de óculos da linha ${title}`,
+                      imageUrl: "",
+                      imageKey: `cat_${Date.now()}`
+                    };
+                    setData((prev: any) => ({
+                      ...prev,
+                      categories: {
+                        ...prev.categories,
+                        list: [...(prev.categories?.list || []), newCategory]
+                      }
+                    }));
+                    toast.success(`Categoria "${title}" adicionada com sucesso! Lembre-se de salvar.`);
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded transition-colors cursor-pointer"
+                >
+                  + Adicionar Nova Categoria
+                </button>
+              </div>
 
               <div className="flex flex-col gap-6">
                 {data.categories.list.map((cat, idx) => (
-                  <div key={cat.title} className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
-                    <span className="text-xs font-bold text-brand uppercase tracking-wider">
-                      Categoria: {cat.title}
-                    </span>
+                  <div key={cat.imageKey || cat.title} className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4 relative">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand uppercase tracking-wider">
+                        Categoria {idx + 1}: {cat.title}
+                      </span>
+                      {data.categories.list.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`Tem certeza de que deseja remover a categoria "${cat.title}"?`)) {
+                              const newList = data.categories.list.filter((_, i) => i !== idx);
+                              setData((prev) => ({
+                                ...prev,
+                                categories: { ...prev.categories, list: newList }
+                              }));
+                              toast.success("Categoria removida! Lembre-se de salvar.");
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-400 text-xs font-bold cursor-pointer"
+                        >
+                          Remover Categoria
+                        </button>
+                      )}
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-1.5">
@@ -1796,20 +1842,20 @@ function Admin() {
                     <div className="flex justify-between items-center">
                       <label className="text-xs font-bold text-white/80">Largura Máxima do Banner (Desktop)</label>
                       <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
-                        {banner.desktopWidth !== undefined ? banner.desktopWidth : 1240}px
+                        {banner.desktopWidth !== undefined ? banner.desktopWidth : 1395}px
                       </span>
                     </div>
                     <p className="text-[10px] text-white/40 leading-relaxed">
-                      Defina a largura máxima do banner. Se for menor que 1240px, o banner será centralizado na tela (ex: use 1240px para preencher o grid padrão, ou menor se quiser um banner mais compacto).
+                      Defina a largura máxima do banner. Se for menor que 1395px, o banner será centralizado na tela (ex: use 1395px para preencher o grid ampliado, ou menor se quiser um banner mais compacto).
                     </p>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-[10px] text-white/30 font-bold">200px</span>
                       <input
                         type="range"
                         min="200"
-                        max="1240"
-                        step="20"
-                        value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1240}
+                        max="1395"
+                        step="5"
+                        value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1395}
                         onChange={(e) => {
                           const val = parseInt(e.target.value);
                           const newBanners = [...data.customBanners];
@@ -1818,7 +1864,7 @@ function Admin() {
                         }}
                         className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
                       />
-                      <span className="text-[10px] text-white/30 font-bold">1240px (Máx)</span>
+                      <span className="text-[10px] text-white/30 font-bold">1395px (Máx)</span>
                     </div>
                   </div>
                 </div>
