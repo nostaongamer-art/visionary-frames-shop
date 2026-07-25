@@ -8,6 +8,9 @@ export function CustomBanner({ data }: CustomBannerProps) {
   const imageUrl = data.imageUrl ? getDirectDriveUrl(data.imageUrl) : "";
   const posY = data.imagePositionY !== undefined ? data.imagePositionY : 50;
 
+  const desktopHeight = data.desktopHeight !== undefined ? data.desktopHeight : 200;
+  const mobileHeight = data.mobileHeight !== undefined ? data.mobileHeight : 120;
+
   if (!imageUrl) {
     return (
       <div className="mx-auto max-w-[1240px] px-4 sm:px-6 my-6">
@@ -32,8 +35,16 @@ export function CustomBanner({ data }: CustomBannerProps) {
     </div>
   );
 
+  const style = {
+    "--banner-desktop-h": `${desktopHeight}px`,
+    "--banner-mobile-h": `${mobileHeight}px`,
+  } as React.CSSProperties;
+
   return (
-    <section className="mx-auto max-w-[1240px] px-4 sm:px-6 my-6 md:my-8 h-[120px] sm:h-[180px] md:h-[220px] lg:h-[260px]">
+    <section 
+      style={style}
+      className="mx-auto max-w-[1240px] px-4 sm:px-6 my-6 md:my-8 h-[var(--banner-mobile-h)] md:h-[var(--banner-desktop-h)]"
+    >
       {data.linkUrl ? (
         <a 
           href={data.linkUrl} 

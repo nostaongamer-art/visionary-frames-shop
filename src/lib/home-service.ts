@@ -24,6 +24,8 @@ export interface CustomBannerData {
   imageUrl: string;
   linkUrl: string;
   imagePositionY?: number;
+  desktopHeight?: number;
+  mobileHeight?: number;
 }
 
 export interface HomePageData {
@@ -517,7 +519,17 @@ function mergeWithDefaults(saved: any): HomePageData {
       payments: mergePayments(savedFooter.payments, defaultFooter.payments),
     },
     customSections: Array.isArray(saved.customSections) ? saved.customSections : [],
-    customBanners: Array.isArray(saved.customBanners) ? saved.customBanners : [],
+    customBanners: Array.isArray(saved.customBanners)
+      ? saved.customBanners.map((b: any) => ({
+          id: b.id,
+          name: b.name || "Sem Nome",
+          imageUrl: b.imageUrl || "",
+          linkUrl: b.linkUrl || "",
+          imagePositionY: b.imagePositionY !== undefined ? b.imagePositionY : 50,
+          desktopHeight: b.desktopHeight !== undefined ? b.desktopHeight : 200,
+          mobileHeight: b.mobileHeight !== undefined ? b.mobileHeight : 120,
+        }))
+      : [],
     sectionOrder: (() => {
       const defaultOrder = ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"];
       let savedOrder = Array.isArray(saved.sectionOrder) ? [...saved.sectionOrder] : [...defaultOrder];

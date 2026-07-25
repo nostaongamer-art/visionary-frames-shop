@@ -1729,6 +1729,68 @@ function Admin() {
                       <span className="text-[10px] text-white/30 font-bold">Base</span>
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-white/80">Altura do Banner (Desktop / Tablet)</label>
+                        <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                          {banner.desktopHeight !== undefined ? banner.desktopHeight : 200}px
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-white/40 leading-relaxed">
+                        Defina a altura do banner em pixels em telas de computador (ex: 200px para banner 1392x200).
+                      </p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[10px] text-white/30 font-bold">60px</span>
+                        <input
+                          type="range"
+                          min="60"
+                          max="600"
+                          step="10"
+                          value={banner.desktopHeight !== undefined ? banner.desktopHeight : 200}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            const newBanners = [...data.customBanners];
+                            newBanners[bannerIdx] = { ...banner, desktopHeight: val };
+                            setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                          }}
+                          className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <span className="text-[10px] text-white/30 font-bold">600px</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-white/80">Altura do Banner (Celular)</label>
+                        <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                          {banner.mobileHeight !== undefined ? banner.mobileHeight : 120}px
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-white/40 leading-relaxed">
+                        Defina a altura do banner em pixels em telas de celulares (ex: 80px a 150px).
+                      </p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[10px] text-white/30 font-bold">40px</span>
+                        <input
+                          type="range"
+                          min="40"
+                          max="350"
+                          step="5"
+                          value={banner.mobileHeight !== undefined ? banner.mobileHeight : 120}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            const newBanners = [...data.customBanners];
+                            newBanners[bannerIdx] = { ...banner, mobileHeight: val };
+                            setData((prev: any) => ({ ...prev, customBanners: newBanners }));
+                          }}
+                          className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <span className="text-[10px] text-white/30 font-bold">350px</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
