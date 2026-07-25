@@ -138,7 +138,7 @@ export function Header() {
 
   const navItems: Array<{ label: string; href: string; search?: any; active: boolean }> = [
     { label: "INÍCIO", href: "/", active: currentPath === "/" },
-    { label: "COLEÇÕES", href: "/colecoes", active: currentPath === "/colecoes" && !location.search },
+    { label: "COLEÇÕES", href: "/colecoes", active: currentPath === "/colecoes" && Object.keys(location.search || {}).length === 0 },
     { label: "MASCULINO", href: "/masculino", active: currentPath === "/masculino" },
     { label: "FEMININO", href: "/feminino", active: currentPath === "/feminino" },
     { label: "SOLAR", href: "/solar", active: currentPath === "/solar" },
