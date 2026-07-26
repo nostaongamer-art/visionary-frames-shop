@@ -146,7 +146,9 @@ export function CategoryPageLayout({ pageId: propPageId }: CategoryPageLayoutPro
   // Fallbacks
   const headerData = pageData.header || { show: true, title: "Catálogo", subtitle: "" };
   const showBanner = headerData.show !== false;
-  const bannerImage = headerData.imageUrl ? getDirectDriveUrl(headerData.imageUrl) : DEFAULT_BANNER_MAP[pageId];
+  const bannerImage = headerData.imageUrl 
+    ? getDirectDriveUrl(headerData.imageUrl) 
+    : (DEFAULT_BANNER_MAP[activePageId] || DEFAULT_BANNER_MAP.colecoes);
 
   const bannerHeightSetting = (headerData as any).bannerHeight || "giant";
 

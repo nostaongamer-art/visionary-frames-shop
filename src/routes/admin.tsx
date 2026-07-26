@@ -190,26 +190,44 @@ function Admin() {
     }
   }, [categoryData, activeSection]);
 
+  // Autosave data (home page data) to localStorage whenever it changes in admin panel
+  useEffect(() => {
+    if (data) {
+      try {
+        localStorage.setItem("glasses_home_page_content", JSON.stringify(data));
+        window.dispatchEvent(new Event("storage"));
+      } catch (e) {
+        console.error("Failed to autosave home page data to localStorage:", e);
+      }
+    }
+  }, [data]);
+
   const handleSave = async () => {
     setSaving(true);
-    let result;
-    if (activeSection === "home") {
-      result = await saveHomePageContent(data);
-    } else if (categoryData) {
-      result = await savePageContent(activeSection, categoryData);
-    }
-    setSaving(false);
-
-    if (result && result.success) {
-      if (result.isLocalOnly) {
-        toast.warning(
-          `Salvo temporariamente no navegador! Sincronização falhou: ${result.error || "Sem permissão"}.`
-        );
-      } else {
-        toast.success("Alterações salvas com sucesso!");
+    try {
+      // Sempre salva as configurações gerais/estruturais da Página Inicial (incluindo customMenus)
+      const homeResult = await saveHomePageContent(data);
+      
+      let pageResult = { success: true, isLocalOnly: false, error: null };
+      if (activeSection !== "home" && categoryData) {
+        pageResult = await savePageContent(activeSection, categoryData);
       }
-    } else {
-      toast.error(`Erro ao salvar: ${result?.error || "Erro desconhecido"}`);
+      
+      setSaving(false);
+
+      if (homeResult.success && pageResult.success) {
+        if (homeResult.isLocalOnly || pageResult.isLocalOnly) {
+          toast.warning("Salvo temporariamente no navegador! Sincronização falhou.");
+        } else {
+          toast.success("Alterações salvas com sucesso!");
+        }
+      } else {
+        const err = homeResult.error || pageResult.error || "Erro desconhecido";
+        toast.error(`Erro ao salvar: ${err}`);
+      }
+    } catch (err: any) {
+      setSaving(false);
+      toast.error(`Erro ao salvar: ${err.message || err}`);
     }
   };
 
