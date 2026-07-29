@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { useCart } from "@/hooks/use-cart";
 import { PromoBar } from "@/components/site/PromoBar";
 import { Header } from "@/components/site/Header";
@@ -61,6 +62,7 @@ interface CategoryPageLayoutProps {
 
 export function CategoryPageLayout({ pageId: propPageId }: CategoryPageLayoutProps) {
   const { addItem } = useCart();
+  const location = useLocation();
   const [activePageId, setActivePageId] = useState(propPageId);
   const [pageData, setPageData] = useState<CategoryPageData | null>(null);
   const BREADCRUMB_LABEL = BREADCRUMB_MAP[activePageId] || "Coleções";
@@ -88,28 +90,36 @@ export function CategoryPageLayout({ pageId: propPageId }: CategoryPageLayoutPro
   }, [selectedCategory, selectedFormats, selectedMaterials, selectedColor, priceMax, activePageId]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const urlPageId = params.get("pageId");
-      if (urlPageId) {
-        setActivePageId(urlPageId);
-      } else {
-        setActivePageId(propPageId);
-      }
+    let urlPageId: string | null = null;
+    if (location.search && typeof location.search === "object") {
+      urlPageId = (location.search as any).pageId || null;
+    } else if (typeof location.search === "string") {
+      const params = new URLSearchParams(location.search);
+      urlPageId = params.get("pageId");
     }
-  }, [propPageId, typeof window !== "undefined" ? window.location.search : ""]);
+    
+    if (urlPageId) {
+      setActivePageId(urlPageId);
+    } else {
+      setActivePageId(propPageId);
+    }
+  }, [propPageId, location.search]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const catParam = params.get("category");
-      if (catParam) {
-        setSelectedCategory(catParam);
-      } else {
-        setSelectedCategory("Todos");
-      }
+    let catParam: string | null = null;
+    if (location.search && typeof location.search === "object") {
+      catParam = (location.search as any).category || null;
+    } else if (typeof location.search === "string") {
+      const params = new URLSearchParams(location.search);
+      catParam = params.get("category");
     }
-  }, [activePageId, typeof window !== "undefined" ? window.location.search : ""]);
+    
+    if (catParam) {
+      setSelectedCategory(catParam);
+    } else {
+      setSelectedCategory("Todos");
+    }
+  }, [activePageId, location.search]);
 
   useEffect(() => {
     async function loadData() {

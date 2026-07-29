@@ -1917,20 +1917,20 @@ function Admin() {
                     <div className="flex justify-between items-center">
                       <label className="text-xs font-bold text-white/80">Largura Máxima do Banner (Desktop)</label>
                       <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
-                        {banner.desktopWidth !== undefined ? banner.desktopWidth : 1395}px
+                        {banner.desktopWidth !== undefined ? banner.desktopWidth : 1500}px
                       </span>
                     </div>
                     <p className="text-[10px] text-white/40 leading-relaxed">
-                      Defina a largura máxima do banner. Se for menor que 1395px, o banner será centralizado na tela (ex: use 1395px para preencher o grid ampliado, ou menor se quiser um banner mais compacto).
+                      Defina a largura máxima do banner. Se for menor que 1500px, o banner será centralizado na tela (ex: use 1500px para preencher o grid ampliado, ou menor se quiser um banner mais compacto).
                     </p>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-[10px] text-white/30 font-bold">200px</span>
                       <input
                         type="range"
                         min="200"
-                        max="1395"
+                        max="1500"
                         step="5"
-                        value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1395}
+                        value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1500}
                         onChange={(e) => {
                           const val = parseInt(e.target.value);
                           const newBanners = [...data.customBanners];
@@ -1939,7 +1939,7 @@ function Admin() {
                         }}
                         className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
                       />
-                      <span className="text-[10px] text-white/30 font-bold">1395px (Máx)</span>
+                      <span className="text-[10px] text-white/30 font-bold">1500px (Máx)</span>
                     </div>
                   </div>
                 </div>

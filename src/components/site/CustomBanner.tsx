@@ -10,7 +10,7 @@ export function CustomBanner({ data }: CustomBannerProps) {
 
   const desktopHeight = data.desktopHeight !== undefined ? data.desktopHeight : 200;
   const mobileHeight = data.mobileHeight !== undefined ? data.mobileHeight : 120;
-  const desktopWidth = data.desktopWidth !== undefined ? data.desktopWidth : 1240;
+  const desktopWidth = data.desktopWidth !== undefined ? data.desktopWidth : 1500;
 
   if (!imageUrl) {
     return (
