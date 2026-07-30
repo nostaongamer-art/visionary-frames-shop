@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { Newsletter } from "@/components/site/Newsletter";
 import { Footer } from "@/components/site/Footer";
 import { CustomBanner } from "@/components/site/CustomBanner";
+import { Hero2 } from "@/components/site/Hero2";
 
 import { fetchHomePageContent } from "@/lib/home-service";
 
@@ -30,6 +31,9 @@ function Index() {
         {homeData.sectionOrder?.map((secKey) => {
           if (secKey === "hero") {
             return <Hero key="hero" data={homeData.hero} />;
+          }
+          if (secKey === "hero2") {
+            return <Hero2 key="hero2" data={homeData.hero2 || { show: false }} />;
           }
           if (secKey === "categories") {
             return <Categories key="categories" data={homeData.categories} />;

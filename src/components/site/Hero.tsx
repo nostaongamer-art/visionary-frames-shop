@@ -44,7 +44,8 @@ export interface HeroData {
   imagePositionY?: number;
 }
 
-export function Hero({ data }: { data?: HeroData }) {
+export function Hero({ data }: { data?: HeroData & { show?: boolean } }) {
+  if (data?.show === false) return null;
   const title = data?.title || "Encontre o\nÓculos Perfeito\nPara Seu Estilo";
   const subtitle = data?.subtitle || "Mais de 200 modelos exclusivos para transformar sua aparência e sua confiança.";
   const buttonText = data?.buttonText || "COMPRAR AGORA";

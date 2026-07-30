@@ -638,6 +638,9 @@ function Admin() {
                           if (secKey === "hero") {
                             label = "• Banner Principal (Hero)";
                             tabKey = "hero";
+                          } else if (secKey === "hero2") {
+                            label = "• Banner Principal 2";
+                            tabKey = "hero2";
                           } else if (secKey === "categories") {
                             label = "• Categorias";
                             tabKey = "categories";
@@ -960,6 +963,17 @@ function Admin() {
                 Banner Principal (Hero)
               </h3>
               
+              <ToggleSwitch
+                label="Exibir Banner Principal (Hero)"
+                checked={data.hero.show !== false}
+                onChange={(val) =>
+                  setData((prev) => ({
+                    ...prev,
+                    hero: { ...prev.hero, show: val },
+                  }))
+                }
+              />
+              
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-white/70">Título Principal (Use \n para pular linha)</label>
@@ -1238,6 +1252,191 @@ function Admin() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Banner Principal 2 */}
+          {activeTab === "hero2" && (
+            <div className="flex flex-col gap-5">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Banner Principal 2
+              </h3>
+              
+              <div className="flex flex-col gap-4">
+                <ToggleSwitch
+                  label="Exibir Banner Principal 2"
+                  checked={data.hero2?.show !== false}
+                  onChange={(val) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      hero2: { ...(prev.hero2 || {}), show: val },
+                    }))
+                  }
+                />
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Nome do Banner (Para Controle)</label>
+                  <input
+                    type="text"
+                    value={data.hero2?.name || "Banner Principal 2"}
+                    onChange={(e) =>
+                      setData((prev: any) => ({
+                        ...prev,
+                        hero2: { ...(prev.hero2 || {}), name: e.target.value },
+                      }))
+                    }
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Link de Destino ao Clicar (Ex: /colecoes?pageId=...) </label>
+                  <input
+                    type="text"
+                    value={data.hero2?.linkUrl || ""}
+                    onChange={(e) =>
+                      setData((prev: any) => ({
+                        ...prev,
+                        hero2: { ...(prev.hero2 || {}), linkUrl: e.target.value },
+                      }))
+                    }
+                    placeholder="Deixe em branco se não quiser link"
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">Link da Imagem no Google Drive</label>
+                  <input
+                    type="text"
+                    value={data.hero2?.imageUrl || ""}
+                    onChange={(e) =>
+                      setData((prev: any) => ({
+                        ...prev,
+                        hero2: { ...(prev.hero2 || {}), imageUrl: e.target.value },
+                      }))
+                    }
+                    placeholder="https://drive.google.com/file/d/..."
+                    className="h-10 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-white/80">Posição Vertical da Imagem</label>
+                    <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                      {data.hero2?.imagePositionY !== undefined ? data.hero2.imagePositionY : 50}%
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-white/40 leading-relaxed">
+                    Ajuste o foco vertical da imagem caso ela fique cortada.
+                  </p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-[10px] text-white/30 font-bold">0% (Topo)</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={data.hero2?.imagePositionY !== undefined ? data.hero2.imagePositionY : 50}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setData((prev: any) => ({
+                          ...prev,
+                          hero2: { ...(prev.hero2 || {}), imagePositionY: val },
+                        }));
+                      }}
+                      className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span className="text-[10px] text-white/30 font-bold">100% (Fundo)</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-2 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-white/80">Altura (Computador)</label>
+                      <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                        {data.hero2?.desktopHeight !== undefined ? data.hero2.desktopHeight : 380}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-[10px] text-white/30 font-bold">150px</span>
+                      <input
+                        type="range"
+                        min="150"
+                        max="800"
+                        step="10"
+                        value={data.hero2?.desktopHeight !== undefined ? data.hero2.desktopHeight : 380}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setData((prev: any) => ({
+                            ...prev,
+                            hero2: { ...(prev.hero2 || {}), desktopHeight: val },
+                          }));
+                        }}
+                        className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <span className="text-[10px] text-white/30 font-bold">800px</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-white/80">Altura (Celular)</label>
+                      <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                        {data.hero2?.mobileHeight !== undefined ? data.hero2.mobileHeight : 180}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-[10px] text-white/30 font-bold">80px</span>
+                      <input
+                        type="range"
+                        min="80"
+                        max="500"
+                        step="10"
+                        value={data.hero2?.mobileHeight !== undefined ? data.hero2.mobileHeight : 180}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setData((prev: any) => ({
+                            ...prev,
+                            hero2: { ...(prev.hero2 || {}), mobileHeight: val },
+                          }));
+                        }}
+                        className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <span className="text-[10px] text-white/30 font-bold">500px</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 bg-[#15181D]/30 p-4 border border-[#282C32]/45 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-white/80">Largura Máxima</label>
+                      <span className="text-xs font-black text-brand bg-brand/10 px-2 py-0.5 rounded">
+                        {data.hero2?.desktopWidth !== undefined ? data.hero2.desktopWidth : 1500}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-[10px] text-white/30 font-bold">200px</span>
+                      <input
+                        type="range"
+                        min="200"
+                        max="1500"
+                        step="5"
+                        value={data.hero2?.desktopWidth !== undefined ? data.hero2.desktopWidth : 1500}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setData((prev: any) => ({
+                            ...prev,
+                            hero2: { ...(prev.hero2 || {}), desktopWidth: val },
+                          }));
+                        }}
+                        className="flex-1 accent-brand h-1 bg-[#282C32]/80 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <span className="text-[10px] text-white/30 font-bold">1500px</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}

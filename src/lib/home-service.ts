@@ -41,6 +41,7 @@ export interface HomePageData {
     timerDuration?: number;
   };
   hero: {
+    show?: boolean;
     title: string;
     subtitle: string;
     buttonText: string;
@@ -58,6 +59,16 @@ export interface HomePageData {
     buttonFont?: string;
     secondaryButtonFont?: string;
     imagePositionY?: number;
+  };
+  hero2?: {
+    show?: boolean;
+    name?: string;
+    imageUrl?: string;
+    linkUrl?: string;
+    imagePositionY?: number;
+    desktopHeight?: number;
+    mobileHeight?: number;
+    desktopWidth?: number;
   };
   categories: {
     list: Array<{
@@ -160,7 +171,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   customSections: [],
   customBanners: [],
   customMenus: [],
-  sectionOrder: ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"],
+  sectionOrder: ["hero", "hero2", "categories", "bestSellers", "flash", "testimonials", "newsletter"],
   promoBar: {
     show: true,
     text: "PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS",
@@ -168,6 +179,7 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     timerDuration: 2 * 3600 + 15 * 60 + 30, // 8130 seconds
   },
   hero: {
+    show: true,
     title: "Encontre o\nÓculos Perfeito\nPara Seu Estilo",
     subtitle: "Mais de 200 modelos exclusivos para transformar sua aparência e sua confiança.",
     buttonText: "COMPRAR AGORA",
@@ -187,6 +199,16 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     buttonFont: "default",
     secondaryButtonFont: "default",
     imagePositionY: 50,
+  },
+  hero2: {
+    show: false,
+    name: "Banner Principal 2",
+    imageUrl: "",
+    linkUrl: "",
+    imagePositionY: 50,
+    desktopHeight: 380,
+    mobileHeight: 180,
+    desktopWidth: 1500,
   },
   categories: {
     list: [
@@ -448,6 +470,7 @@ function mergeWithDefaults(saved: any): HomePageData {
     hero: {
       ...DEFAULT_HOME_PAGE_DATA.hero,
       ...saved.hero,
+      show: saved.hero?.show !== undefined ? saved.hero.show : true,
       showBenefits: saved.hero?.showBenefits !== undefined ? saved.hero.showBenefits : true,
       benefits: Array.isArray(saved.hero?.benefits) ? DEFAULT_HOME_PAGE_DATA.hero.benefits!.map((defaultBenefit, idx) => {
         const savedBenefit = saved.hero.benefits[idx] || {};
@@ -461,6 +484,16 @@ function mergeWithDefaults(saved: any): HomePageData {
       buttonFont: saved.hero?.buttonFont || "default",
       secondaryButtonFont: saved.hero?.secondaryButtonFont || "default",
       imagePositionY: saved.hero?.imagePositionY !== undefined ? saved.hero.imagePositionY : DEFAULT_HOME_PAGE_DATA.hero.imagePositionY,
+    },
+    hero2: {
+      show: saved.hero2?.show !== undefined ? saved.hero2.show : false,
+      name: saved.hero2?.name || "Banner Principal 2",
+      imageUrl: saved.hero2?.imageUrl || "",
+      linkUrl: saved.hero2?.linkUrl || "",
+      imagePositionY: saved.hero2?.imagePositionY !== undefined ? saved.hero2.imagePositionY : 50,
+      desktopHeight: saved.hero2?.desktopHeight !== undefined ? saved.hero2.desktopHeight : 380,
+      mobileHeight: saved.hero2?.mobileHeight !== undefined ? saved.hero2.mobileHeight : 180,
+      desktopWidth: saved.hero2?.desktopWidth !== undefined ? saved.hero2.desktopWidth : 1500,
     },
     categories: saved.categories || DEFAULT_HOME_PAGE_DATA.categories,
     bestSellers: {
@@ -535,7 +568,7 @@ function mergeWithDefaults(saved: any): HomePageData {
         }))
       : [],
     sectionOrder: (() => {
-      const defaultOrder = ["hero", "categories", "bestSellers", "flash", "testimonials", "newsletter"];
+      const defaultOrder = ["hero", "hero2", "categories", "bestSellers", "flash", "testimonials", "newsletter"];
       let savedOrder = Array.isArray(saved.sectionOrder) ? [...saved.sectionOrder] : [...defaultOrder];
       
       // Garante que todas as seções padrão estejam presentes
