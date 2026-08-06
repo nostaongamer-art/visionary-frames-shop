@@ -37,26 +37,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const saved = localStorage.getItem("glasses_cart_items");
         if (saved) {
           setItems(JSON.parse(saved));
-        } else {
-          // Default mock data (matching original count = 3)
-          setItems([
-            {
-              id: 1,
-              name: "Armação Classic Black",
-              price: "R$ 199,90",
-              priceVal: 199.90,
-              imageKey: "prod1",
-              quantity: 1,
-            },
-            {
-              id: 2,
-              name: "Óculos Solar Premium",
-              price: "R$ 254,90",
-              priceVal: 254.90,
-              imageKey: "prod2",
-              quantity: 2,
-            }
-          ]);
         }
       } catch (e) {
         console.error("Failed to parse cart items:", e);
@@ -66,10 +46,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Save to localStorage on change
   useEffect(() => {
-    if (typeof window !== "undefined" && items.length > 0) {
+    if (typeof window !== "undefined") {
       localStorage.setItem("glasses_cart_items", JSON.stringify(items));
-    } else if (typeof window !== "undefined") {
-      localStorage.removeItem("glasses_cart_items");
     }
   }, [items]);
 
