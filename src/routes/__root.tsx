@@ -17,6 +17,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/hooks/use-cart";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { CustomerProvider } from "@/hooks/use-customer";
+import { FlushPreviewButton } from "@/components/site/FlushPreviewButton";
 
 function NotFoundComponent() {
   return (
@@ -218,6 +219,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <CustomerProvider>
+          <FlushPreviewButton />
           <CustomStylesInjector />
           <CartDrawer />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
