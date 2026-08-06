@@ -18,6 +18,7 @@ import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, Check
 import { useCart } from "@/hooks/use-cart";
 import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
+import type { Order } from "@/lib/orders-service";
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: (search: Record<string, unknown>) => {
