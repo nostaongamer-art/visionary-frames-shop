@@ -142,7 +142,7 @@ export async function updateOrderTags(
   try {
     await supabase.from("home_page_content").upsert({
       id: "orders_list",
-      content: { orders: updatedOrders },
+      content: { orders: updatedOrders } as unknown as Json,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {
@@ -165,11 +165,12 @@ export async function fetchCustomerAccounts(): Promise<CustomerAccount[]> {
       console.error("Error loading customer accounts from Supabase:", error);
     }
 
-    if (data && data.content && Array.isArray(data.content.accounts)) {
+    const content = asContentRecord(data?.content);
+    if (content && Array.isArray(content.accounts)) {
       if (typeof window !== "undefined") {
-        localStorage.setItem("glasses_customer_accounts", JSON.stringify(data.content.accounts));
+        localStorage.setItem("glasses_customer_accounts", JSON.stringify(content.accounts));
       }
-      return data.content.accounts as CustomerAccount[];
+      return content.accounts as CustomerAccount[];
     }
   } catch (e) {
     console.error("Failed to fetch customer accounts:", e);
@@ -209,7 +210,7 @@ export async function saveCustomerAccount(account: Omit<CustomerAccount, "create
   try {
     await supabase.from("home_page_content").upsert({
       id: "customer_accounts",
-      content: { accounts: updatedAccounts },
+      content: { accounts: updatedAccounts } as unknown as Json,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {
