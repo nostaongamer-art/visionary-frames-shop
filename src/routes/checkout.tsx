@@ -179,7 +179,7 @@ function CheckoutPage() {
           customerCpf: personalData.cpf,
           address: { ...addressData },
           shippingType,
-          paymentMethod,
+          paymentMethod: paymentMethod as Order["paymentMethod"],
           items: items.map((item) => ({
             id: item.id,
             name: item.name,
@@ -192,8 +192,8 @@ function CheckoutPage() {
           shippingCost,
           total,
           tags: {
-            paymentStatus: (paymentMethod === "pix" ? "pendente" : "pago") as any,
-            shippingStatus: (shippingCost > 0 ? "com_frete" : "sem_frete") as any,
+            paymentStatus: (paymentMethod === "pix" ? "pendente" : "pago") as Order["tags"]["paymentStatus"],
+            shippingStatus: (shippingCost > 0 ? "com_frete" : "sem_frete") as Order["tags"]["shippingStatus"],
           },
         };
 
