@@ -80,6 +80,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: async () => {
+    try {
+      const data = await fetchHomePageContent();
+      return {
+        logoUrl: data?.colors?.logoUrl || "",
+        logoWidth: data?.colors?.logoWidth || "",
+        logoHeight: data?.colors?.logoHeight || "",
+        colors: data?.colors || null,
+      };
+    } catch (e) {
+      console.error("Error loading root layout data:", e);
+      return {
+        logoUrl: "",
+        logoWidth: "",
+        logoHeight: "",
+        colors: null,
+      };
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

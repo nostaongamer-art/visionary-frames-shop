@@ -2,60 +2,17 @@ import { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useCustomer } from "@/hooks/use-customer";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useLoaderData } from "@tanstack/react-router";
 import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 
 function Logo() {
-  const [logoUrl, setLogoUrl] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("glasses_home_page_content");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          return parsed?.colors?.logoUrl || "";
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return "";
-  });
+  const rootData = useLoaderData({ from: "__root__" }) as any;
 
-  const [logoWidth, setLogoWidth] = useState<string | number>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("glasses_home_page_content");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          return parsed?.colors?.logoWidth || "";
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return "";
-  });
-
-  const [logoHeight, setLogoHeight] = useState<string | number>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("glasses_home_page_content");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          return parsed?.colors?.logoHeight || "";
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return "";
-  });
-
-  const [isMounted, setIsMounted] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>(() => rootData?.logoUrl || "");
+  const [logoWidth, setLogoWidth] = useState<string | number>(() => rootData?.logoWidth || "");
+  const [logoHeight, setLogoHeight] = useState<string | number>(() => rootData?.logoHeight || "");
 
   useEffect(() => {
-    setIsMounted(true);
-
     function readLogo() {
       if (typeof window !== "undefined") {
         try {
@@ -69,29 +26,11 @@ function Logo() {
               return;
             }
           }
-          setLogoUrl("");
-          setLogoWidth("");
-          setLogoHeight("");
         } catch (e) {
           console.error("Error reading logoUrl from localStorage:", e);
         }
       }
     }
-    readLogo();
-
-    async function loadFromDb() {
-      try {
-        const data = await fetchHomePageContent();
-        if (data?.colors?.logoUrl) {
-          setLogoUrl(data.colors.logoUrl);
-          setLogoWidth(data.colors.logoWidth || "");
-          setLogoHeight(data.colors.logoHeight || "");
-        }
-      } catch (e) {
-        console.error("Error loading logoUrl from db:", e);
-      }
-    }
-    loadFromDb();
 
     const handleStorage = () => {
       readLogo();
@@ -102,17 +41,11 @@ function Logo() {
 
   const directLogoUrl = logoUrl ? getDirectDriveUrl(logoUrl) : "";
 
-  if (!isMounted) {
-    return (
-      <div style={{ height: "40px", width: "150px" }} />
-    );
-  }
-
   if (directLogoUrl) {
     const widthStyle = logoWidth ? `${logoWidth}px` : "auto";
     const heightStyle = logoHeight ? `${logoHeight}px` : "auto";
     return (
-      <Link to="/" className="flex items-center outline-none py-1">
+      <Link to="/" className="flex items-center outline-none py-1 animate-fadeIn">
         <img
           src={directLogoUrl}
           alt="Glasses Logo"
