@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
+import { fetchOrders, updateOrderTags } from "@/lib/orders-service";
 import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket } from "lucide-react";
 
 const GOOGLE_FONTS_LIST = [
@@ -71,11 +72,16 @@ function Admin() {
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("home");
   const [activeTab, setActiveTab] = useState<TabType>("promo");
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ home: true });
   
   // Admin form states
   const [data, setData] = useState<HomePageData>(DEFAULT_HOME_PAGE_DATA);
   const [categoryData, setCategoryData] = useState<CategoryPageData | null>(null);
   const [newBrandName, setNewBrandName] = useState("");
+
+  // Orders management states
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersFilter, setOrdersFilter] = useState("");
 
   // Product CRUD states for catalogue sections (2-7)
   const [isEditingProduct, setIsEditingProduct] = useState(false);
@@ -170,6 +176,9 @@ function Admin() {
       if (activeSection === "home") {
         const content = await fetchHomePageContent();
         setData(content);
+      } else if (activeSection === "orders") {
+        const list = await fetchOrders();
+        setOrders(list);
       } else {
         const content = await fetchPageContent(activeSection);
         setCategoryData(content);
@@ -496,7 +505,7 @@ function Admin() {
               });
             });
             return allSections.map((sec) => {
-              const isExpanded = activeSection === sec.id;
+              const isExpanded = !!expandedSections[sec.id];
               const isCustomPage = sec.id.startsWith("custom-page-");
               return (
                 <div key={sec.id} className="flex flex-col gap-1 border-b border-white/5 pb-2 last:border-0 last:pb-0">
@@ -504,15 +513,13 @@ function Admin() {
                     <button
                       type="button"
                       onClick={() => {
-                        setActiveSection(sec.id);
-                        if (sec.id === "home") {
-                          setActiveTab("promo");
-                        } else {
-                          setActiveTab("cat-banner");
-                        }
+                        setExpandedSections((prev) => ({
+                          ...prev,
+                          [sec.id]: !prev[sec.id],
+                        }));
                       }}
                       className={`flex-1 text-left px-3 py-2 rounded text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
-                        activeSection === sec.id ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+                        activeSection === sec.id ? "bg-[#FF8A00]/10 text-[#FF8A00] border-l-2 border-[#FF8A00]" : "hover:bg-white/5 text-white/80"
                       }`}
                     >
                       <span>{sec.label}</span>
@@ -631,9 +638,12 @@ function Admin() {
 
                         <button
                           type="button"
-                          onClick={() => setActiveTab("promo")}
+                          onClick={() => {
+                            setActiveSection("home");
+                            setActiveTab("promo");
+                          }}
                           className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "promo" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                            activeSection === "home" && activeTab === "promo" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
                           }`}
                         >
                           • Banner Promocional
@@ -641,9 +651,12 @@ function Admin() {
 
                         <button
                           type="button"
-                          onClick={() => setActiveTab("product-page")}
+                          onClick={() => {
+                            setActiveSection("home");
+                            setActiveTab("product-page");
+                          }}
                           className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "product-page" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                            activeSection === "home" && activeTab === "product-page" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
                           }`}
                         >
                           • Página do Produto
@@ -694,9 +707,12 @@ function Admin() {
                             <div key={secKey} className="group flex items-center justify-between w-full rounded hover:bg-white/5 pr-1">
                               <button
                                 type="button"
-                                onClick={() => setActiveTab(tabKey)}
+                                onClick={() => {
+                                  setActiveSection("home");
+                                  setActiveTab(tabKey);
+                                }}
                                 className={`flex-1 text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                                  activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                                  activeSection === "home" && activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
                                 }`}
                               >
                                 {label}
@@ -732,18 +748,24 @@ function Admin() {
                         })}
                         <button
                           type="button"
-                          onClick={() => setActiveTab("footer")}
+                          onClick={() => {
+                            setActiveSection("home");
+                            setActiveTab("footer");
+                          }}
                           className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "footer" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                            activeSection === "home" && activeTab === "footer" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
                           }`}
                         >
                           • Rodapé (Footer)
                         </button>
                         <button
                           type="button"
-                          onClick={() => setActiveTab("colors")}
+                          onClick={() => {
+                            setActiveSection("home");
+                            setActiveTab("colors");
+                          }}
                           className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                            activeTab === "colors" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                            activeSection === "home" && activeTab === "colors" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
                           }`}
                         >
                           • Paleta de Cores
@@ -810,9 +832,12 @@ function Admin() {
                             <div key={secKey} className="group flex items-center justify-between w-full rounded hover:bg-white/5 pr-1">
                               <button
                                 type="button"
-                                onClick={() => setActiveTab(tabKey)}
+                                onClick={() => {
+                                  setActiveSection(sec.id);
+                                  setActiveTab(tabKey);
+                                }}
                                 className={`flex-1 text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                                  activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                                  activeSection === sec.id && activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
                                 }`}
                               >
                                 {label}
@@ -853,6 +878,22 @@ function Admin() {
               </div>
             );
           })})()}
+
+          <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mt-4 mb-1">
+            Gestão da Loja
+          </h4>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("orders");
+              setActiveTab("orders-list");
+            }}
+            className={`w-full text-left px-3 py-2 rounded text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer ${
+              activeSection === "orders" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <span>📦 Pedidos Recebidos</span>
+          </button>
         </div>
 
         {/* Content Form Editor */}
@@ -997,6 +1038,42 @@ function Admin() {
                   className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
                 />
               </div>
+
+              <div className="grid grid-cols-1 gap-4 mt-2">
+                <ToggleSwitch
+                  label="Exibir Segundo Botão (Ex: Adicionar à Sacola)"
+                  checked={data.productPageSettings?.showButton2 !== false}
+                  onChange={(val) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      productPageSettings: {
+                        ...(prev.productPageSettings || {}),
+                        showButton2: val,
+                      },
+                    }))
+                  }
+                />
+              </div>
+
+              {data.productPageSettings?.showButton2 !== false && (
+                <div className="flex flex-col gap-1.5 mt-2">
+                  <label className="text-xs font-semibold text-white/70">Texto do Segundo Botão</label>
+                  <input
+                    type="text"
+                    value={data.productPageSettings?.button2Text || "ADICIONAR À SACOLA"}
+                    onChange={(e) =>
+                      setData((prev: any) => ({
+                        ...prev,
+                        productPageSettings: {
+                          ...(prev.productPageSettings || {}),
+                          button2Text: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 gap-4 mt-2">
                 <ToggleSwitch
@@ -4001,8 +4078,218 @@ function Admin() {
             </div>
           )}
 
+          {/* TAB: Gestão de Pedidos */}
+          {activeSection === "orders" && activeTab === "orders-list" && (
+            <div className="flex flex-col gap-5 text-white text-left select-none animate-fadeIn">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-3">
+                <h3 className="text-base font-bold text-[#FF8A00] flex items-center gap-2">
+                  📦 Gestão de Pedidos Recebidos ({orders.length})
+                </h3>
+                
+                {/* Search orders */}
+                <div className="relative w-full sm:w-64">
+                  <input
+                    type="text"
+                    placeholder="Filtrar por nome, CPF ou pedido..."
+                    value={ordersFilter}
+                    onChange={(e) => setOrdersFilter(e.target.value)}
+                    className="w-full h-9 pl-9 pr-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                </div>
+              </div>
+
+              {/* Orders List */}
+              {(() => {
+                const filtered = orders.filter((ord) => {
+                  const filter = ordersFilter.toLowerCase().trim();
+                  if (!filter) return true;
+                  return (
+                    ord.id.toLowerCase().includes(filter) ||
+                    ord.customerName.toLowerCase().includes(filter) ||
+                    ord.customerCpf.replace(/\D/g, "").includes(filter.replace(/\D/g, "")) ||
+                    ord.customerEmail.toLowerCase().includes(filter)
+                  );
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="text-center py-12 bg-[#15181D] border border-[#282C32]/35 rounded-lg text-white/50 text-xs font-semibold">
+                      Nenhum pedido localizado.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="flex flex-col gap-5">
+                    {filtered.map((ord) => {
+                      const handleStatusChange = async (
+                        field: "payment" | "shipping",
+                        value: any
+                      ) => {
+                        const newPayment = field === "payment" ? value : ord.tags.paymentStatus;
+                        const newShipping = field === "shipping" ? value : ord.tags.shippingStatus;
+                        
+                        try {
+                          const updated = await updateOrderTags(ord.id, newPayment, newShipping);
+                          setOrders(updated);
+                          toast.success(`Pedido ${ord.id} atualizado com sucesso!`);
+                        } catch (e) {
+                          toast.error("Erro ao atualizar o status do pedido.");
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={ord.id}
+                          className="bg-[#15181D] border border-[#282C32]/35 rounded-lg p-5 flex flex-col gap-4 hover:border-[#282C32]/55 transition-colors"
+                        >
+                          {/* Card Header Info */}
+                          <div className="flex flex-wrap justify-between items-center gap-3 border-b border-white/10 pb-3">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs font-black text-white/90">
+                                PEDIDO: <span className="text-[#FF8A00]">{ord.id}</span>
+                              </span>
+                              <span className="text-[10px] text-white/40">
+                                Realizado em: {new Date(ord.createdAt).toLocaleString("pt-BR")}
+                              </span>
+                            </div>
+
+                            {/* Tags Configuration Dropdowns */}
+                            <div className="flex items-center gap-3">
+                              {/* Payment Status Dropdown */}
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[9px] font-bold text-white/40 uppercase">Status Pagamento</label>
+                                <select
+                                  value={ord.tags.paymentStatus}
+                                  onChange={(e) => handleStatusChange("payment", e.target.value)}
+                                  className={`h-7 px-2 text-[10px] font-black uppercase rounded outline-none border cursor-pointer ${
+                                    ord.tags.paymentStatus === "pago"
+                                      ? "bg-green-950/70 border-green-500 text-green-400"
+                                      : ord.tags.paymentStatus === "reembolsado"
+                                      ? "bg-red-950/70 border-red-500 text-red-400"
+                                      : "bg-yellow-950/70 border-yellow-500 text-yellow-400"
+                                  }`}
+                                >
+                                  <option value="pendente">⌛ Pendente</option>
+                                  <option value="pago">✓ Pago</option>
+                                  <option value="reembolsado">✕ Reembolsado</option>
+                                </select>
+                              </div>
+
+                              {/* Shipping Status Dropdown */}
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[9px] font-bold text-white/40 uppercase">Tipo Envio</label>
+                                <select
+                                  value={ord.tags.shippingStatus}
+                                  onChange={(e) => handleStatusChange("shipping", e.target.value)}
+                                  className={`h-7 px-2 text-[10px] font-black uppercase rounded outline-none border cursor-pointer ${
+                                    ord.tags.shippingStatus === "com_frete"
+                                      ? "bg-blue-950/70 border-blue-500 text-blue-400"
+                                      : "bg-gray-950/70 border-gray-600 text-gray-400"
+                                  }`}
+                                >
+                                  <option value="sem_frete">Grátis</option>
+                                  <option value="com_frete">Com Frete</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Customer Details Box */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                            
+                            {/* Customer Profile Info */}
+                            <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-1.5">
+                              <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                Dados do Cliente
+                              </span>
+                              <p className="font-bold text-white/90">{ord.customerName}</p>
+                              <p className="text-white/60">Email: {ord.customerEmail}</p>
+                              <p className="text-white/60">CPF: {ord.customerCpf}</p>
+                              <p className="text-white/60">
+                                WhatsApp:{" "}
+                                <a
+                                  href={`https://wa.me/55${ord.customerPhone.replace(/\D/g, "")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#FF8A00] font-bold hover:underline"
+                                >
+                                  {ord.customerPhone}
+                                </a>
+                              </p>
+                            </div>
+
+                            {/* Shipping Address Box */}
+                            <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-1">
+                              <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                Endereço de Entrega
+                              </span>
+                              <p className="text-white/80">{ord.address.street}, {ord.address.number}</p>
+                              {ord.address.complement && <p className="text-white/60">Compl: {ord.address.complement}</p>}
+                              <p className="text-white/60">Bairro: {ord.address.neighborhood}</p>
+                              <p className="text-white/60">{ord.address.city} - {ord.address.state}</p>
+                              <p className="font-semibold text-white/80 mt-1">CEP: {ord.address.cep}</p>
+                            </div>
+
+                            {/* Summary / Values Box */}
+                            <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col justify-between gap-2">
+                              <div>
+                                <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                  Resumo Financeiro
+                                </span>
+                                <div className="flex justify-between py-0.5 text-white/60">
+                                  <span>Subtotal:</span>
+                                  <span>R$ {ord.subtotal.toFixed(2).replace(".", ",")}</span>
+                                </div>
+                                <div className="flex justify-between py-0.5 text-green-400">
+                                  <span>Desconto (15%):</span>
+                                  <span>- R$ {ord.discount.toFixed(2).replace(".", ",")}</span>
+                                </div>
+                                <div className="flex justify-between py-0.5 text-white/60">
+                                  <span>Custo Envio:</span>
+                                  <span>{ord.shippingCost === 0 ? "Grátis" : `R$ ${ord.shippingCost.toFixed(2).replace(".", ",")}`}</span>
+                                </div>
+                              </div>
+                              <div className="flex justify-between items-baseline border-t border-white/10 pt-2 font-black">
+                                <span className="text-white/80 text-[10px] uppercase">Total:</span>
+                                <span className="text-sm text-[#FF8A00]">
+                                  R$ {ord.total.toFixed(2).replace(".", ",")}
+                                </span>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          {/* Purchased Items List */}
+                          <div className="bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-2">
+                            <span className="font-extrabold text-white border-b border-white/5 pb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                              Itens do Pedido
+                            </span>
+                            {ord.items.map((item: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className="flex justify-between items-center py-1 border-b border-white/5 last:border-0 last:pb-0"
+                              >
+                                <span className="text-white/80 font-bold">
+                                  {item.name} <span className="text-white/40 font-normal ml-1">x{item.quantity}</span>
+                                </span>
+                                <span className="text-white/95 font-semibold">{item.price}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
           {/* TAB: Catalogue Banner */}
-          {activeSection !== "home" && activeTab === "cat-banner" && categoryData && (
+          {activeSection !== "home" && activeSection !== "orders" && activeTab === "cat-banner" && categoryData && (
             <div className="flex flex-col gap-4">
               <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
                 Banner Superior - {categoryData.header.title}

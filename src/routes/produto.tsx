@@ -6,7 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent } from "@/lib/page-service";
 import { useCart } from "@/hooks/use-cart";
-import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft, ShoppingCart } from "lucide-react";
+import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft, ShoppingCart, ShoppingBag } from "lucide-react";
 import { PRODUCTS } from "@/lib/shop-data";
 import { toast } from "sonner";
 
@@ -172,11 +172,18 @@ function ProductDetailsPage() {
   const imageSrc = (product.imageUrl && getDirectDriveUrl(product.imageUrl)) || IMAGE_MAP[product.imageKey] || product.image || PRODUCTS[product.id - 1]?.image;
 
   const handleBuy = () => {
-    addItem(quantity);
+    addItem(product, quantity);
     toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`, {
       description: "Redirecionando para a finalização...",
     });
     navigate({ to: "/checkout" });
+  };
+
+  const handleAddToCartOnly = () => {
+    addItem(product, quantity);
+    toast.success(`${quantity}x ${product.name} adicionado à sacola!`, {
+      description: "Você pode continuar navegando ou finalizar a compra.",
+    });
   };
 
   const handleCalculateShipping = (e: React.FormEvent) => {
@@ -329,32 +336,44 @@ function ProductDetailsPage() {
             </div>
 
             {/* Ações de Compra */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
-              {/* Seletor de Quantidade */}
-              <div className="flex items-center border border-border rounded-lg bg-background p-1 self-start sm:self-auto h-12">
+            <div className="flex flex-col gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                {/* Seletor de Quantidade */}
+                <div className="flex items-center border border-border rounded-lg bg-background p-1 self-start sm:self-auto h-12">
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-12 text-center text-sm font-bold text-ink select-none">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity((q) => q + 1)}
+                    className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Botão de Compra */}
                 <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer"
+                  onClick={handleBuy}
+                  className="flex-1 h-12 bg-brand hover:bg-brand-2 text-white font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
                 >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="w-12 text-center text-sm font-bold text-ink select-none">{quantity}</span>
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer"
-                >
-                  <Plus className="h-4 w-4" />
+                  <ShoppingCart className="h-4 w-4" />
+                  {settings.buttonText || "COMPRAR AGORA"}
                 </button>
               </div>
 
-              {/* Botão de Compra */}
-              <button
-                onClick={handleBuy}
-                className="flex-1 h-12 bg-brand hover:bg-brand-2 text-white font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                {settings.buttonText || "COMPRAR AGORA"}
-              </button>
+              {settings.showButton2 !== false && (
+                <button
+                  onClick={handleAddToCartOnly}
+                  className="w-full h-12 bg-transparent hover:bg-white/5 border-2 border-brand text-brand hover:text-brand-2 font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                >
+                  <ShoppingBag className="h-4.5 w-4.5" />
+                  {settings.button2Text || "ADICIONAR À SACOLA"}
+                </button>
+              )}
             </div>
 
             {/* Simulador de Frete */}

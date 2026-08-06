@@ -184,6 +184,8 @@ export interface HomePageData {
     showShippingCalculator?: boolean;
     defaultShippingTime?: string;
     defaultShippingCost?: string;
+    button2Text?: string;
+    showButton2?: boolean;
   };
 }
 
@@ -197,6 +199,8 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
     showShippingCalculator: true,
     defaultShippingTime: "5 a 8 dias úteis",
     defaultShippingCost: "Grátis",
+    button2Text: "ADICIONAR À SACOLA",
+    showButton2: true,
   },
   promoBar: {
     show: true,
@@ -669,6 +673,8 @@ function mergeWithDefaults(saved: any): HomePageData {
       showShippingCalculator: saved.productPageSettings?.showShippingCalculator !== undefined ? saved.productPageSettings.showShippingCalculator : DEFAULT_HOME_PAGE_DATA.productPageSettings!.showShippingCalculator,
       defaultShippingTime: saved.productPageSettings?.defaultShippingTime !== undefined ? saved.productPageSettings.defaultShippingTime : DEFAULT_HOME_PAGE_DATA.productPageSettings!.defaultShippingTime,
       defaultShippingCost: saved.productPageSettings?.defaultShippingCost !== undefined ? saved.productPageSettings.defaultShippingCost : DEFAULT_HOME_PAGE_DATA.productPageSettings!.defaultShippingCost,
+      button2Text: saved.productPageSettings?.button2Text !== undefined ? saved.productPageSettings.button2Text : DEFAULT_HOME_PAGE_DATA.productPageSettings!.button2Text,
+      showButton2: saved.productPageSettings?.showButton2 !== undefined ? saved.productPageSettings.showButton2 : DEFAULT_HOME_PAGE_DATA.productPageSettings!.showButton2,
     },
   };
 }

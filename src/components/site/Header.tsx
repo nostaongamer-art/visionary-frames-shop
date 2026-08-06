@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
+import { useCustomer } from "@/hooks/use-customer";
 import { Link, useLocation } from "@tanstack/react-router";
 import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 
@@ -85,7 +86,8 @@ function Logo() {
 }
 
 export function Header() {
-  const { count } = useCart();
+  const { count, setCartOpen } = useCart();
+  const { customer, logout } = useCustomer();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
@@ -196,15 +198,51 @@ export function Header() {
           <button aria-label="Buscar" className="cursor-pointer transition-colors hover:text-brand outline-none">
             <Search className="h-5 w-5" />
           </button>
-          <button aria-label="Conta" className="hidden cursor-pointer transition-colors hover:text-brand sm:block outline-none">
-            <User className="h-5 w-5" />
-          </button>
-          <Link to="/checkout" aria-label="Carrinho" className="relative cursor-pointer transition-colors hover:text-brand outline-none">
+          {/* Profile / Account Dropdown */}
+          <div className="relative group hidden sm:block">
+            {customer ? (
+              <div className="flex items-center gap-1 cursor-pointer hover:text-brand py-2">
+                <User className="h-5 w-5 text-brand" />
+                <span className="text-[10px] font-bold max-w-[70px] truncate uppercase">{customer.fullName.split(" ")[0]}</span>
+                {/* Dropdown Options */}
+                <div className="absolute right-0 top-full mt-1 w-44 bg-[#15181D] border border-[#282C32]/45 rounded-md shadow-xl py-1 hidden group-hover:block z-50 text-left">
+                  <Link
+                    to="/checkout"
+                    className="block px-4 py-2 text-xs text-white/80 hover:bg-[#FF8A00] hover:text-white transition-colors font-bold uppercase"
+                  >
+                    📦 Meus Pedidos
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="w-full text-left block px-4 py-2 text-xs text-red-400 hover:bg-red-500 hover:text-white transition-colors font-bold uppercase bg-transparent border-none cursor-pointer"
+                  >
+                    🚪 Sair
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                to="/checkout"
+                search={{ action: "login" }}
+                aria-label="Conta"
+                className="cursor-pointer transition-colors hover:text-brand outline-none block py-2"
+              >
+                <User className="h-5 w-5" />
+              </Link>
+            )}
+          </div>
+          <button
+            onClick={() => setCartOpen(true)}
+            aria-label="Carrinho"
+            className="relative cursor-pointer transition-colors hover:text-brand outline-none bg-transparent border-none p-0"
+          >
             <ShoppingBag className="h-5 w-5" />
-            <span className="absolute -right-2 -top-2 grid h-4 w-4 place-items-center rounded-full bg-brand text-[10px] font-bold text-white">
-              {count}
-            </span>
-          </Link>
+            {count > 0 && (
+              <span className="absolute -right-2 -top-2 grid h-4 w-4 place-items-center rounded-full bg-brand text-[10px] font-bold text-white">
+                {count}
+              </span>
+            )}
+          </button>
           <button
             aria-label="Menu"
             onClick={() => setMenuOpen((o) => !o)}
