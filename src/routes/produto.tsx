@@ -6,7 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent } from "@/lib/page-service";
 import { useCart } from "@/hooks/use-cart";
-import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft } from "lucide-react";
+import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft, ShoppingCart } from "lucide-react";
 import { PRODUCTS } from "@/lib/shop-data";
 import { toast } from "sonner";
 
