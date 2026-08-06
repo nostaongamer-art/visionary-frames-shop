@@ -16,11 +16,56 @@ const NAV_ITEMS = [
 ];
 
 function Logo() {
-  const [logoUrl, setLogoUrl] = useState<string>("");
-  const [logoWidth, setLogoWidth] = useState<string | number>("");
-  const [logoHeight, setLogoHeight] = useState<string | number>("");
+  const [logoUrl, setLogoUrl] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          return parsed?.colors?.logoUrl || "";
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return "";
+  });
+
+  const [logoWidth, setLogoWidth] = useState<string | number>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          return parsed?.colors?.logoWidth || "";
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return "";
+  });
+
+  const [logoHeight, setLogoHeight] = useState<string | number>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("glasses_home_page_content");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          return parsed?.colors?.logoHeight || "";
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return "";
+  });
+
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+
     function readLogo() {
       if (typeof window !== "undefined") {
         try {
@@ -66,6 +111,12 @@ function Logo() {
   }, []);
 
   const directLogoUrl = logoUrl ? getDirectDriveUrl(logoUrl) : "";
+
+  if (!isMounted) {
+    return (
+      <div style={{ height: "40px", width: "150px" }} />
+    );
+  }
 
   if (directLogoUrl) {
     const widthStyle = logoWidth ? `${logoWidth}px` : "auto";
