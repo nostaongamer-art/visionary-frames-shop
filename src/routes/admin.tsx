@@ -224,9 +224,9 @@ function Admin() {
       // Sempre salva as configurações gerais/estruturais da Página Inicial (incluindo customMenus)
       const homeResult = await saveHomePageContent(data);
       
-      let pageResult = { success: true, isLocalOnly: false, error: null };
+      let pageResult: { success: boolean; isLocalOnly: boolean; error: string | null } = { success: true, isLocalOnly: false, error: null };
       if (activeSection !== "home" && categoryData) {
-        pageResult = await savePageContent(activeSection, categoryData);
+        pageResult = await savePageContent(activeSection, categoryData) as { success: boolean; isLocalOnly: boolean; error: string | null };
       }
       
       setSaving(false);
@@ -2390,9 +2390,10 @@ function Admin() {
           {/* TAB: Custom Banners */}
           {activeTab.startsWith("custom-banner-") && (() => {
             const bannerId = activeTab.replace("custom-banner-", "");
-            const bannerIdx = data.customBanners?.findIndex((b: any) => b.id === bannerId);
+            const banners = data.customBanners || [];
+            const bannerIdx = banners.findIndex((b: any) => b.id === bannerId);
             if (bannerIdx === -1 || bannerIdx === undefined) return null;
-            const banner = data.customBanners[bannerIdx];
+            const banner = banners[bannerIdx];
 
             return (
               <div className="flex flex-col gap-5">
