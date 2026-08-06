@@ -28,7 +28,7 @@ function Index() {
       <PromoBar text={homeData.promoBar.text} />
       <Header />
       <main>
-        {homeData.sectionOrder?.map((secKey) => {
+        {homeData.sectionOrder?.map((secKey: string) => {
           if (secKey === "hero") {
             return <Hero key="hero" data={homeData.hero} />;
           }
@@ -52,14 +52,14 @@ function Index() {
           }
           if (secKey.startsWith("custom-sec-")) {
             const customId = secKey.replace("custom-sec-", "");
-            const customSec = homeData.customSections?.find((s) => s.id === customId);
+            const customSec = homeData.customSections?.find((s: any) => s.id === customId);
             if (customSec) {
               return <CustomProductSection key={customSec.id} data={customSec as any} />;
             }
           }
           if (secKey.startsWith("custom-banner-")) {
             const customId = secKey.replace("custom-banner-", "");
-            const customBanner = homeData.customBanners?.find((b) => b.id === customId);
+            const customBanner = homeData.customBanners?.find((b: any) => b.id === customId);
             if (customBanner) {
               return <CustomBanner key={customBanner.id} data={customBanner} />;
             }
