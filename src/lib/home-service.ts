@@ -15,6 +15,7 @@ export interface CustomSectionProduct {
   specsPonte?: string;
   specsLente?: string;
   specsAltura?: string;
+  gallery?: string[];
 }
 
 export interface CustomSectionData {
@@ -103,6 +104,7 @@ export interface HomePageData {
       specsPonte?: string;
       specsLente?: string;
       specsAltura?: string;
+      gallery?: string[];
     }>;
   };
   flashBanner: {

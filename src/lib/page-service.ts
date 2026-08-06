@@ -23,6 +23,7 @@ export interface PageProduct {
   specsPonte?: string;
   specsLente?: string;
   specsAltura?: string;
+  gallery?: string[];
 }
 
 export interface CategoryPageData {
@@ -435,6 +436,7 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
         specsPonte: p.specsPonte || "",
         specsLente: p.specsLente || "",
         specsAltura: p.specsAltura || "",
+        gallery: Array.isArray(p.gallery) ? p.gallery : [],
       })),
       productsShow: saved.productsShow !== undefined ? saved.productsShow : true,
       colors: saved.colors || defaultData.colors,

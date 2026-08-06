@@ -55,6 +55,7 @@ function ProductDetailsPage() {
   const [cep, setCep] = useState("");
   const [shippingResult, setShippingResult] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"description" | "specs">("description");
+  const [activeImage, setActiveImage] = useState<string>("");
 
   useEffect(() => {
     async function loadProduct() {
@@ -122,6 +123,10 @@ function ProductDetailsPage() {
         }
 
         setProduct(foundProduct);
+        if (foundProduct) {
+          const mainSrc = (foundProduct.imageUrl && getDirectDriveUrl(foundProduct.imageUrl)) || IMAGE_MAP[foundProduct.imageKey] || foundProduct.image || PRODUCTS[foundProduct.id - 1]?.image;
+          setActiveImage(mainSrc || "");
+        }
       } catch (err) {
         console.error("Error loading product:", err);
       } finally {
@@ -209,11 +214,49 @@ function ProductDetailsPage() {
           <div className="lg:col-span-6 flex flex-col gap-6">
             <div className="w-full aspect-[4/3] bg-background border border-border/40 rounded-xl overflow-hidden flex items-center justify-center p-4">
               <img
-                src={imageSrc}
+                src={activeImage || imageSrc}
                 alt={product.name}
                 className="w-full h-full object-contain hover:scale-[1.03] transition-transform duration-500"
               />
             </div>
+
+            {/* Galeria de Fotos Miniaturas */}
+            {(() => {
+              const galleryList: string[] = [];
+              const mainSrc = (product.imageUrl && getDirectDriveUrl(product.imageUrl)) || IMAGE_MAP[product.imageKey] || product.image || PRODUCTS[product.id - 1]?.image;
+              if (mainSrc) galleryList.push(mainSrc);
+              
+              if (Array.isArray(product.gallery)) {
+                product.gallery.forEach((url: string) => {
+                  if (url && url.trim()) {
+                    galleryList.push(getDirectDriveUrl(url.trim()));
+                  }
+                });
+              }
+
+              if (galleryList.length > 1) {
+                return (
+                  <div className="flex gap-2 flex-wrap items-center justify-center bg-background border border-border/30 rounded-xl p-3">
+                    {galleryList.map((src, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveImage(src)}
+                        className={`w-14 h-14 rounded border overflow-hidden p-0.5 bg-background hover:border-[#FF8A00] transition-colors cursor-pointer ${
+                          activeImage === src ? "border-[#FF8A00] ring-2 ring-[#FF8A00]/25" : "border-border/60"
+                        }`}
+                      >
+                        <img
+                          src={src}
+                          alt={`Ângulo ${idx + 1}`}
+                          className="w-full h-full object-contain"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             {/* Medidas da Armação */}
             <div className="bg-background border border-border/30 rounded-xl p-4 flex flex-col gap-3">

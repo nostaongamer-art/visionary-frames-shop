@@ -91,6 +91,13 @@ function Admin() {
   const [prodColor, setProdColor] = useState("preto");
   const [prodImageUrl, setProdImageUrl] = useState("");
   const [prodInstallments, setProdInstallments] = useState(12);
+  const [prodDescription, setProdDescription] = useState("");
+  const [prodGender, setProdGender] = useState("Feminino");
+  const [prodSpecsHaste, setProdSpecsHaste] = useState("");
+  const [prodSpecsPonte, setProdSpecsPonte] = useState("");
+  const [prodSpecsLente, setProdSpecsLente] = useState("");
+  const [prodSpecsAltura, setProdSpecsAltura] = useState("");
+  const [prodGallery, setProdGallery] = useState<string[]>([]);
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductPage, setAdminProductPage] = useState(1);
 
@@ -1878,6 +1885,37 @@ function Admin() {
                       />
                     </div>
 
+                    <div className="bg-[#1C1F26]/30 border border-[#282C32]/45 rounded-lg p-3 flex flex-col gap-2 mt-2 mb-3">
+                      <label className="text-[10px] font-bold text-white/70">Galeria de Imagens Adicionais (Até 9 fotos extras)</label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {Array.from({ length: 9 }).map((_, gIdx) => {
+                          const galleryList = Array.isArray(product.gallery) ? product.gallery : [];
+                          const val = galleryList[gIdx] || "";
+                          return (
+                            <div key={gIdx} className="flex flex-col gap-1 border border-white/5 p-1.5 rounded bg-[#15181D]/40">
+                              <label className="text-[9px] font-semibold text-white/50">Foto Extra #{gIdx + 2}</label>
+                              <input
+                                type="text"
+                                value={val}
+                                onChange={(e) => {
+                                  const newProds = [...data.bestSellers.products];
+                                  const updatedGallery = [...galleryList];
+                                  updatedGallery[gIdx] = e.target.value;
+                                  newProds[idx] = { ...product, gallery: updatedGallery };
+                                  setData((prev) => ({
+                                    ...prev,
+                                    bestSellers: { ...prev.bestSellers, products: newProds },
+                                  }));
+                                }}
+                                placeholder="Link no Google Drive"
+                                className="h-7 px-2 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     <ImageInputWithPreview
                       label={`Imagem do Produto - ${product.name}`}
                       value={product.imageUrl || ""}
@@ -2213,6 +2251,36 @@ function Admin() {
                         placeholder="Escreva a descrição do produto que aparecerá abaixo da imagem..."
                         className="w-full p-2.5 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] resize-y mb-3"
                       />
+                    </div>
+
+                    <div className="bg-[#1C1F26]/30 border border-[#282C32]/45 rounded-lg p-3 flex flex-col gap-2 mt-2 mb-3">
+                      <label className="text-[10px] font-bold text-white/70">Galeria de Imagens Adicionais (Até 9 fotos extras)</label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {Array.from({ length: 9 }).map((_, gIdx) => {
+                          const galleryList = Array.isArray(product.gallery) ? product.gallery : [];
+                          const val = galleryList[gIdx] || "";
+                          return (
+                            <div key={gIdx} className="flex flex-col gap-1 border border-white/5 p-1.5 rounded bg-[#15181D]/40">
+                              <label className="text-[9px] font-semibold text-white/50">Foto Extra #{gIdx + 2}</label>
+                              <input
+                                type="text"
+                                value={val}
+                                onChange={(e) => {
+                                  const newProds = [...customSec.products];
+                                  const updatedGallery = [...galleryList];
+                                  updatedGallery[gIdx] = e.target.value;
+                                  newProds[prodIdx] = { ...product, gallery: updatedGallery };
+                                  const newSections = [...currentSections];
+                                  newSections[customSecIdx] = { ...customSec, products: newProds };
+                                  updateSections(newSections);
+                                }}
+                                placeholder="Link no Google Drive"
+                                className="h-7 px-2 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
 
                       <ImageInputWithPreview
@@ -4126,6 +4194,13 @@ function Admin() {
                       setProdColor("preto");
                       setProdImageUrl("");
                       setProdInstallments(12);
+                      setProdDescription("");
+                      setProdGender("Feminino");
+                      setProdSpecsHaste("");
+                      setProdSpecsPonte("");
+                      setProdSpecsLente("");
+                      setProdSpecsAltura("");
+                      setProdGallery([]);
                     }}
                     className="bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
@@ -4607,6 +4682,96 @@ function Admin() {
                         recommendedSize="600 X 600 PX"
                       />
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2 mt-2">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-xs font-semibold text-white/70">Gênero</label>
+                        <select
+                          value={prodGender}
+                          onChange={(e) => setProdGender(e.target.value)}
+                          className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                        >
+                          <option value="Feminino">Feminino</option>
+                          <option value="Masculino">Masculino</option>
+                          <option value="Unissex">Unissex</option>
+                          <option value="Infantil">Infantil</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-xs font-semibold text-white/70">Medidas em mm (Haste / Ponte / Lente / Altura)</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          <input
+                            type="text"
+                            placeholder="Haste"
+                            value={prodSpecsHaste}
+                            onChange={(e) => setProdSpecsHaste(e.target.value)}
+                            className="w-full h-10 px-2 text-center bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Ponte"
+                            value={prodSpecsPonte}
+                            onChange={(e) => setProdSpecsPonte(e.target.value)}
+                            className="w-full h-10 px-2 text-center bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Lente"
+                            value={prodSpecsLente}
+                            onChange={(e) => setProdSpecsLente(e.target.value)}
+                            className="w-full h-10 px-2 text-center bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Altura"
+                            value={prodSpecsAltura}
+                            onChange={(e) => setProdSpecsAltura(e.target.value)}
+                            className="w-full h-10 px-2 text-center bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1 md:col-span-2">
+                      <label className="text-xs font-semibold text-white/70">Descrição Detalhada do Produto</label>
+                      <textarea
+                        value={prodDescription}
+                        onChange={(e) => setProdDescription(e.target.value)}
+                        placeholder="Descreva o produto..."
+                        rows={3}
+                        className="w-full p-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00] resize-y"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 bg-[#1C1F26]/50 border border-[#282C32]/45 rounded-lg p-4 flex flex-col gap-3">
+                      <label className="text-xs font-bold text-white/80">Galeria de Imagens Adicionais (Até 9 fotos extras)</label>
+                      <p className="text-[10px] text-white/40 leading-relaxed -mt-1">
+                        Adicione fotos do produto sob ângulos diferentes para exibir na galeria da página de detalhes.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {Array.from({ length: 9 }).map((_, i) => {
+                          const imgIdx = i;
+                          const currentVal = prodGallery[imgIdx] || "";
+                          return (
+                            <div key={i} className="flex flex-col gap-1 border border-white/5 p-2 rounded bg-[#15181D]/40">
+                              <label className="text-[9px] font-semibold text-white/50">Foto Extra #{i + 2}</label>
+                              <input
+                                type="text"
+                                value={currentVal}
+                                onChange={(e) => {
+                                  const newGallery = [...prodGallery];
+                                  newGallery[imgIdx] = e.target.value;
+                                  setProdGallery(newGallery);
+                                }}
+                                placeholder="Link no Google Drive"
+                                className="h-8 px-2 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex gap-3 justify-end mt-4">
@@ -4653,6 +4818,13 @@ function Admin() {
                           color: prodColor,
                           rating: 5,
                           sales: isEditingProduct && editingProductId !== null ? (categoryData.products.find(p => p.id === editingProductId)?.sales || 10) : Math.floor(Math.random() * 200) + 10,
+                          description: prodDescription,
+                          gender: prodGender,
+                          specsHaste: prodSpecsHaste,
+                          specsPonte: prodSpecsPonte,
+                          specsLente: prodSpecsLente,
+                          specsAltura: prodSpecsAltura,
+                          gallery: prodGallery.filter(Boolean),
                         };
 
                         if (isAddingProduct) {
@@ -4723,6 +4895,13 @@ function Admin() {
                                   setProdMaterial(prod.material);
                                   setProdColor(prod.color);
                                   setProdImageUrl(prod.imageUrl || "");
+                                  setProdDescription(prod.description || "");
+                                  setProdGender(prod.gender || "Feminino");
+                                  setProdSpecsHaste(prod.specsHaste || "");
+                                  setProdSpecsPonte(prod.specsPonte || "");
+                                  setProdSpecsLente(prod.specsLente || "");
+                                  setProdSpecsAltura(prod.specsAltura || "");
+                                  setProdGallery(prod.gallery || []);
                                   
                                   const instMatch = prod.installment ? prod.installment.match(/^(\d+)x/) : null;
                                   const currentInst = instMatch ? parseInt(instMatch[1]) : 12;
