@@ -807,70 +807,78 @@ function Admin() {
                           ➕ Adicionar Seção
                         </button>
 
-                        {categoryData?.sectionOrder?.map((secKey, index) => {
-                          let label = "";
-                          let tabKey: TabType = "cat-banner";
+                        {(() => {
+                          const order = (activeSection === sec.id && categoryData?.sectionOrder)
+                            ? categoryData.sectionOrder
+                            : ["header", "benefits", "products"];
 
-                          if (secKey === "header") {
-                            label = "• Banner Superior";
-                            tabKey = "cat-banner";
-                          } else if (secKey === "benefits") {
-                            label = "• Barra de Benefícios";
-                            tabKey = "cat-benefits";
-                          } else if (secKey === "products") {
-                            label = "• Produtos (CRUD)";
-                            tabKey = "cat-products";
-                          } else if (secKey.startsWith("custom-sec-")) {
-                            const cId = secKey.replace("custom-sec-", "");
-                            const customSec = categoryData.customSections?.find((s) => s.id === cId);
-                            if (!customSec) return null;
-                            label = `• Seção ${customSec.title || "Sem Título"}`;
-                            tabKey = secKey as TabType;
-                          }
+                          return order.map((secKey, index) => {
+                            let label = "";
+                            let tabKey: TabType = "cat-banner";
 
-                          return (
-                            <div key={secKey} className="group flex items-center justify-between w-full rounded hover:bg-white/5 pr-1">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveSection(sec.id);
-                                  setActiveTab(tabKey);
-                                }}
-                                className={`flex-1 text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
-                                  activeSection === sec.id && activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
-                                }`}
-                              >
-                                {label}
-                              </button>
-                              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                            if (secKey === "header") {
+                              label = "• Banner Superior";
+                              tabKey = "cat-banner";
+                            } else if (secKey === "benefits") {
+                              label = "• Barra de Benefícios";
+                              tabKey = "cat-benefits";
+                            } else if (secKey === "products") {
+                              label = "• Produtos (CRUD)";
+                              tabKey = "cat-products";
+                            } else if (secKey.startsWith("custom-sec-")) {
+                              const cId = secKey.replace("custom-sec-", "");
+                              const customSec = categoryData?.customSections?.find((s) => s.id === cId);
+                              if (!customSec) return null;
+                              label = `• Seção ${customSec.title || "Sem Título"}`;
+                              tabKey = secKey as TabType;
+                            }
+
+                            return (
+                              <div key={secKey} className="group flex items-center justify-between w-full rounded hover:bg-white/5 pr-1">
                                 <button
                                   type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    moveCategorySectionUp(secKey);
+                                  onClick={() => {
+                                    setActiveSection(sec.id);
+                                    setActiveTab(tabKey);
                                   }}
-                                  disabled={index === 0}
-                                  className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
-                                  title="Mover para cima"
+                                  className={`flex-1 text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                                    activeSection === sec.id && activeTab === tabKey ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                                  }`}
                                 >
-                                  ▲
+                                  {label}
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    moveCategorySectionDown(secKey);
-                                  }}
-                                  disabled={index === categoryData.sectionOrder!.length - 1}
-                                  className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
-                                  title="Mover para baixo"
-                                >
-                                  ▼
-                                </button>
+                                {activeSection === sec.id && (
+                                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        moveCategorySectionUp(secKey);
+                                      }}
+                                      disabled={index === 0}
+                                      className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                                      title="Mover para cima"
+                                    >
+                                      ▲
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        moveCategorySectionDown(secKey);
+                                      }}
+                                      disabled={index === (categoryData?.sectionOrder?.length || 3) - 1}
+                                      className="p-0.5 text-[9px] text-white/40 hover:text-[#FF8A00] transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                                      title="Mover para baixo"
+                                    >
+                                      ▼
+                                    </button>
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          });
+                        })()}
                       </>
                     )}
                   </div>
