@@ -219,8 +219,6 @@ function RootComponent() {
       <CartProvider>
         <CustomerProvider>
           <CustomStylesInjector />
-          {/* Dev-only helper to flush the HMR gate without spending credits. */}
-          <FlushPreviewButton />
           <CartDrawer />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
