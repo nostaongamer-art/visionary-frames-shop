@@ -2481,7 +2481,7 @@ function Admin() {
                         value={banner.imagePositionY !== undefined ? banner.imagePositionY : 50}
                         onChange={(e) => {
                           const val = parseInt(e.target.value);
-                          const newBanners = [...data.customBanners];
+                          const newBanners = [...banners];
                           newBanners[bannerIdx] = { ...banner, imagePositionY: val };
                           setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                         }}
@@ -2512,7 +2512,7 @@ function Admin() {
                           value={banner.desktopHeight !== undefined ? banner.desktopHeight : 200}
                           onChange={(e) => {
                             const val = parseInt(e.target.value);
-                            const newBanners = [...data.customBanners];
+                            const newBanners = [...banners];
                             newBanners[bannerIdx] = { ...banner, desktopHeight: val };
                             setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                           }}
@@ -2542,7 +2542,7 @@ function Admin() {
                           value={banner.mobileHeight !== undefined ? banner.mobileHeight : 120}
                           onChange={(e) => {
                             const val = parseInt(e.target.value);
-                            const newBanners = [...data.customBanners];
+                            const newBanners = [...banners];
                             newBanners[bannerIdx] = { ...banner, mobileHeight: val };
                             setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                           }}
@@ -2573,7 +2573,7 @@ function Admin() {
                         value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1500}
                         onChange={(e) => {
                           const val = parseInt(e.target.value);
-                          const newBanners = [...data.customBanners];
+                          const newBanners = [...banners];
                           newBanners[bannerIdx] = { ...banner, desktopWidth: val };
                           setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                         }}
