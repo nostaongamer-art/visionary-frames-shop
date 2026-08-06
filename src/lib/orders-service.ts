@@ -106,7 +106,7 @@ export async function saveOrder(orderData: Omit<Order, "id" | "createdAt">): Pro
   try {
     await supabase.from("home_page_content").upsert({
       id: "orders_list",
-      content: { orders: updatedOrders } as unknown as Record<string, unknown>,
+      content: { orders: updatedOrders } as unknown as Json,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {
