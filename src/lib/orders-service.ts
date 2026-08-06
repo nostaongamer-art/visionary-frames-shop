@@ -44,6 +44,13 @@ export interface CustomerAccount {
   createdAt: string;
 }
 
+function asContentRecord(value: unknown): Record<string, unknown> | null {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return null;
+}
+
 // 1. ORDERS MANAGMENT
 export async function fetchOrders(): Promise<Order[]> {
   try {
@@ -57,11 +64,12 @@ export async function fetchOrders(): Promise<Order[]> {
       console.error("Error loading orders from Supabase:", error);
     }
 
-    if (data && data.content && Array.isArray(data.content.orders)) {
+    const content = asContentRecord(data?.content);
+    if (content && Array.isArray(content.orders)) {
       if (typeof window !== "undefined") {
-        localStorage.setItem("glasses_orders_list", JSON.stringify(data.content.orders));
+        localStorage.setItem("glasses_orders_list", JSON.stringify(content.orders));
       }
-      return data.content.orders as Order[];
+      return content.orders as Order[];
     }
   } catch (e) {
     console.error("Failed to fetch orders:", e);
@@ -98,7 +106,7 @@ export async function saveOrder(orderData: Omit<Order, "id" | "createdAt">): Pro
   try {
     await supabase.from("home_page_content").upsert({
       id: "orders_list",
-      content: { orders: updatedOrders },
+      content: { orders: updatedOrders } as unknown as Record<string, unknown>,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {
