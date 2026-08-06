@@ -2405,7 +2405,7 @@ function Admin() {
                     type="button"
                     onClick={() => {
                       if (confirm(`Tem certeza de que deseja excluir o banner "${banner.name}"?`)) {
-                        const newBanners = data.customBanners.filter((b: any) => b.id !== bannerId);
+                        const newBanners = banners.filter((b: any) => b.id !== bannerId);
                         const newOrder = (data.sectionOrder || []).filter(k => k !== `custom-banner-${bannerId}`);
                         setData((prev: any) => ({
                           ...prev,
@@ -2429,7 +2429,7 @@ function Admin() {
                       type="text"
                       value={banner.name}
                       onChange={(e) => {
-                        const newBanners = [...data.customBanners];
+                        const newBanners = [...banners];
                         newBanners[bannerIdx] = { ...banner, name: e.target.value };
                         setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                       }}
@@ -2443,7 +2443,7 @@ function Admin() {
                       placeholder="Ex: /masculino, /solar ou https://..."
                       value={banner.linkUrl}
                       onChange={(e) => {
-                        const newBanners = [...data.customBanners];
+                        const newBanners = [...banners];
                         newBanners[bannerIdx] = { ...banner, linkUrl: e.target.value };
                         setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                       }}
@@ -2458,7 +2458,7 @@ function Admin() {
                     value={banner.imageUrl || ""}
                     recommendedSize="1240 X 260 PX"
                     onChange={(val) => {
-                      const newBanners = [...data.customBanners];
+                      const newBanners = [...banners];
                       newBanners[bannerIdx] = { ...banner, imageUrl: val };
                       setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                     }}
