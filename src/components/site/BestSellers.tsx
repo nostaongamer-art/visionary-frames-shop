@@ -3,6 +3,7 @@ import { Star, ShoppingCart, Heart, ArrowRight } from "lucide-react";
 import { PRODUCTS, type Product } from "@/lib/shop-data";
 import { useCart } from "@/hooks/use-cart";
 import { getDirectDriveUrl } from "@/lib/home-service";
+import { Link } from "@tanstack/react-router";
 
 const IMAGE_MAP: Record<string, string> = {
   prod1: PRODUCTS[0].image,
@@ -56,13 +57,14 @@ function ProductCard({ product }: { product: any }) {
         <p className="mt-0.5 text-[11px] text-muted-foreground">{product.installment}</p>
 
         <div className="mt-4 flex items-center gap-2">
-          <button
-            onClick={addItem}
+          <Link
+            to="/produto"
+            search={{ id: String(product.id), pageId: "home" }}
             className="inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-2.5 text-[11px] font-bold tracking-wide text-white transition-colors hover:bg-brand-2"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
-            ADICIONAR AO CARRINHO
-          </button>
+            VER DETALHES
+          </Link>
           <button
             onClick={() => setLiked((l) => !l)}
             aria-label="Favoritar"

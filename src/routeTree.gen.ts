@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SolarRouteImport } from './routes/solar'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PromocoesRouteImport } from './routes/promocoes'
+import { Route as ProdutoRouteImport } from './routes/produto'
 import { Route as PremiumRouteImport } from './routes/premium'
 import { Route as MasculinoRouteImport } from './routes/masculino'
 import { Route as LoginRouteImport } from './routes/login'
@@ -34,6 +35,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const PromocoesRoute = PromocoesRouteImport.update({
   id: '/promocoes',
   path: '/promocoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProdutoRoute = ProdutoRouteImport.update({
+  id: '/produto',
+  path: '/produto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PremiumRoute = PremiumRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/masculino': typeof MasculinoRoute
   '/premium': typeof PremiumRoute
+  '/produto': typeof ProdutoRoute
   '/promocoes': typeof PromocoesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solar': typeof SolarRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/masculino': typeof MasculinoRoute
   '/premium': typeof PremiumRoute
+  '/produto': typeof ProdutoRoute
   '/promocoes': typeof PromocoesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solar': typeof SolarRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/masculino': typeof MasculinoRoute
   '/premium': typeof PremiumRoute
+  '/produto': typeof ProdutoRoute
   '/promocoes': typeof PromocoesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solar': typeof SolarRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/masculino'
     | '/premium'
+    | '/produto'
     | '/promocoes'
     | '/sitemap.xml'
     | '/solar'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/masculino'
     | '/premium'
+    | '/produto'
     | '/promocoes'
     | '/sitemap.xml'
     | '/solar'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/masculino'
     | '/premium'
+    | '/produto'
     | '/promocoes'
     | '/sitemap.xml'
     | '/solar'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MasculinoRoute: typeof MasculinoRoute
   PremiumRoute: typeof PremiumRoute
+  ProdutoRoute: typeof ProdutoRoute
   PromocoesRoute: typeof PromocoesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SolarRoute: typeof SolarRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/promocoes'
       fullPath: '/promocoes'
       preLoaderRoute: typeof PromocoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produto': {
+      id: '/produto'
+      path: '/produto'
+      fullPath: '/produto'
+      preLoaderRoute: typeof ProdutoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/premium': {
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MasculinoRoute: MasculinoRoute,
   PremiumRoute: PremiumRoute,
+  ProdutoRoute: ProdutoRoute,
   PromocoesRoute: PromocoesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SolarRoute: SolarRoute,

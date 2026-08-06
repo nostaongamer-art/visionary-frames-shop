@@ -17,6 +17,12 @@ export interface PageProduct {
   color: string;
   rating: number;
   sales: number;
+  description?: string;
+  gender?: string;
+  specsHaste?: string;
+  specsPonte?: string;
+  specsLente?: string;
+  specsAltura?: string;
 }
 
 export interface CategoryPageData {
@@ -423,6 +429,12 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
         color: p.color || "preto",
         rating: typeof p.rating === "number" ? p.rating : 5,
         sales: typeof p.sales === "number" ? p.sales : 100,
+        description: p.description || "",
+        gender: p.gender || "Feminino",
+        specsHaste: p.specsHaste || "",
+        specsPonte: p.specsPonte || "",
+        specsLente: p.specsLente || "",
+        specsAltura: p.specsAltura || "",
       })),
       productsShow: saved.productsShow !== undefined ? saved.productsShow : true,
       colors: saved.colors || defaultData.colors,

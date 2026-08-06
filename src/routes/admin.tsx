@@ -631,6 +631,16 @@ function Admin() {
                         >
                           • Banner Promocional
                         </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("product-page")}
+                          className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                            activeTab === "product-page" ? "text-[#FF8A00] font-bold" : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          • Página do Produto
+                        </button>
                         {data.sectionOrder?.map((secKey, index) => {
                           let label = "";
                           let tabKey: TabType = "hero";
@@ -953,6 +963,87 @@ function Admin() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: Configurações da Página do Produto */}
+          {activeTab === "product-page" && (
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
+                Configurações da Página do Produto
+              </h3>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-xs font-semibold text-white/70">Texto do Botão de Compra</label>
+                <input
+                  type="text"
+                  value={data.productPageSettings?.buttonText || "COMPRAR AGORA"}
+                  onChange={(e) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      productPageSettings: {
+                        ...(prev.productPageSettings || {}),
+                        buttonText: e.target.value,
+                      },
+                    }))
+                  }
+                  className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mt-2">
+                <ToggleSwitch
+                  label="Exibir Simulador de Frete na Página do Produto"
+                  checked={data.productPageSettings?.showShippingCalculator !== false}
+                  onChange={(val) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      productPageSettings: {
+                        ...(prev.productPageSettings || {}),
+                        showShippingCalculator: val,
+                      },
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-xs font-semibold text-white/70">Custo do Frete Padrão (Exibido no simulador)</label>
+                <input
+                  type="text"
+                  value={data.productPageSettings?.defaultShippingCost || "Grátis"}
+                  onChange={(e) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      productPageSettings: {
+                        ...(prev.productPageSettings || {}),
+                        defaultShippingCost: e.target.value,
+                      },
+                    }))
+                  }
+                  placeholder="Ex: Grátis, R$ 15,90"
+                  className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 mt-2">
+                <label className="text-xs font-semibold text-white/70">Prazo de Entrega Padrão (Exibido no simulador)</label>
+                <input
+                  type="text"
+                  value={data.productPageSettings?.defaultShippingTime || "5 a 8 dias úteis"}
+                  onChange={(e) =>
+                    setData((prev: any) => ({
+                      ...prev,
+                      productPageSettings: {
+                        ...(prev.productPageSettings || {}),
+                        defaultShippingTime: e.target.value,
+                      },
+                    }))
+                  }
+                  placeholder="Ex: 5 a 8 dias úteis, 2 dias úteis"
+                  className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
+                />
+              </div>
             </div>
           )}
 
@@ -1686,6 +1777,107 @@ function Admin() {
                       </div>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/60">Gênero</label>
+                        <select
+                          value={product.gender || "Feminino"}
+                          onChange={(e) => {
+                            const newProds = [...data.bestSellers.products];
+                            newProds[idx] = { ...product, gender: e.target.value };
+                            setData((prev) => ({
+                              ...prev,
+                              bestSellers: { ...prev.bestSellers, products: newProds },
+                            }));
+                          }}
+                          className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        >
+                          <option value="Feminino">Feminino</option>
+                          <option value="Masculino">Masculino</option>
+                          <option value="Unissex">Unissex</option>
+                          <option value="Infantil">Infantil</option>
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/60">Medidas em mm (Haste / Ponte / Lente / Altura)</label>
+                        <div className="grid grid-cols-4 gap-1">
+                          <input
+                            type="text"
+                            placeholder="Haste"
+                            value={product.specsHaste || ""}
+                            onChange={(e) => {
+                              const newProds = [...data.bestSellers.products];
+                              newProds[idx] = { ...product, specsHaste: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                bestSellers: { ...prev.bestSellers, products: newProds },
+                              }));
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Ponte"
+                            value={product.specsPonte || ""}
+                            onChange={(e) => {
+                              const newProds = [...data.bestSellers.products];
+                              newProds[idx] = { ...product, specsPonte: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                bestSellers: { ...prev.bestSellers, products: newProds },
+                              }));
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Lente"
+                            value={product.specsLente || ""}
+                            onChange={(e) => {
+                              const newProds = [...data.bestSellers.products];
+                              newProds[idx] = { ...product, specsLente: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                bestSellers: { ...prev.bestSellers, products: newProds },
+                              }));
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Altura"
+                            value={product.specsAltura || ""}
+                            onChange={(e) => {
+                              const newProds = [...data.bestSellers.products];
+                              newProds[idx] = { ...product, specsAltura: e.target.value };
+                              setData((prev) => ({
+                                ...prev,
+                                bestSellers: { ...prev.bestSellers, products: newProds },
+                              }));
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 mt-3">
+                      <label className="text-[10px] font-bold text-white/60">Descrição Detalhada do Produto</label>
+                      <textarea
+                        value={product.description || ""}
+                        onChange={(e) => {
+                          const newProds = [...data.bestSellers.products];
+                          newProds[idx] = { ...product, description: e.target.value };
+                          setData((prev) => ({
+                            ...prev,
+                            bestSellers: { ...prev.bestSellers, products: newProds },
+                          }));
+                        }}
+                        rows={3}
+                        placeholder="Escreva a descrição do produto que aparecerá abaixo da imagem..."
+                        className="w-full p-2.5 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] resize-y mb-3"
+                      />
+                    </div>
+
                     <ImageInputWithPreview
                       label={`Imagem do Produto - ${product.name}`}
                       value={product.imageUrl || ""}
@@ -1927,6 +2119,101 @@ function Admin() {
                           />
                         </div>
                       </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/60">Gênero</label>
+                        <select
+                          value={product.gender || "Feminino"}
+                          onChange={(e) => {
+                            const newProds = [...customSec.products];
+                            newProds[prodIdx] = { ...product, gender: e.target.value };
+                            const newSections = [...currentSections];
+                            newSections[customSecIdx] = { ...customSec, products: newProds };
+                            updateSections(newSections);
+                          }}
+                          className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        >
+                          <option value="Feminino">Feminino</option>
+                          <option value="Masculino">Masculino</option>
+                          <option value="Unissex">Unissex</option>
+                          <option value="Infantil">Infantil</option>
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-white/60">Medidas em mm (Haste / Ponte / Lente / Altura)</label>
+                        <div className="grid grid-cols-4 gap-1">
+                          <input
+                            type="text"
+                            placeholder="Haste"
+                            value={product.specsHaste || ""}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, specsHaste: e.target.value };
+                              const newSections = [...currentSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              updateSections(newSections);
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Ponte"
+                            value={product.specsPonte || ""}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, specsPonte: e.target.value };
+                              const newSections = [...currentSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              updateSections(newSections);
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Lente"
+                            value={product.specsLente || ""}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, specsLente: e.target.value };
+                              const newSections = [...currentSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              updateSections(newSections);
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Altura"
+                            value={product.specsAltura || ""}
+                            onChange={(e) => {
+                              const newProds = [...customSec.products];
+                              newProds[prodIdx] = { ...product, specsAltura: e.target.value };
+                              const newSections = [...currentSections];
+                              newSections[customSecIdx] = { ...customSec, products: newProds };
+                              updateSections(newSections);
+                            }}
+                            className="h-9 px-1 text-center bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 mt-3">
+                      <label className="text-[10px] font-bold text-white/60">Descrição Detalhada do Produto</label>
+                      <textarea
+                        value={product.description || ""}
+                        onChange={(e) => {
+                          const newProds = [...customSec.products];
+                          newProds[prodIdx] = { ...product, description: e.target.value };
+                          const newSections = [...currentSections];
+                          newSections[customSecIdx] = { ...customSec, products: newProds };
+                          updateSections(newSections);
+                        }}
+                        rows={3}
+                        placeholder="Escreva a descrição do produto que aparecerá abaixo da imagem..."
+                        className="w-full p-2.5 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] resize-y mb-3"
+                      />
+                    </div>
 
                       <ImageInputWithPreview
                         label={`Imagem do Produto - ${product.name}`}

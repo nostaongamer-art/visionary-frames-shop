@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "@tanstack/react-router";
+import { useLocation, Link } from "@tanstack/react-router";
 import { useCart } from "@/hooks/use-cart";
 import { PromoBar } from "@/components/site/PromoBar";
 import { Header } from "@/components/site/Header";
@@ -904,13 +904,14 @@ export function CategoryPageLayout({ pageId: propPageId }: CategoryPageLayoutPro
                         </p>
                       </div>
                       <div className="flex items-center gap-2 mt-auto">
-                        <button
-                          onClick={addItem}
+                        <Link
+                          to="/produto"
+                          search={{ id: String(product.id), pageId: activePageId }}
                           className="flex-1 h-8 bg-brand hover:bg-brand-2 text-white text-[10px] font-bold tracking-wider rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <ShoppingCart className="h-3.5 w-3.5 shrink-0" />
-                          ADICIONAR AO CARRINHO
-                        </button>
+                          VER DETALHES
+                        </Link>
                       </div>
                     </div>
                   </div>

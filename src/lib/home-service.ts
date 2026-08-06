@@ -9,6 +9,12 @@ export interface CustomSectionProduct {
   price: string;
   installment: string;
   imageUrl?: string;
+  description?: string;
+  gender?: string;
+  specsHaste?: string;
+  specsPonte?: string;
+  specsLente?: string;
+  specsAltura?: string;
 }
 
 export interface CustomSectionData {
@@ -91,6 +97,12 @@ export interface HomePageData {
       installment: string;
       imageKey: string;
       imageUrl?: string;
+      description?: string;
+      gender?: string;
+      specsHaste?: string;
+      specsPonte?: string;
+      specsLente?: string;
+      specsAltura?: string;
     }>;
   };
   flashBanner: {
@@ -165,6 +177,12 @@ export interface HomePageData {
     logoWidth?: string | number;
     logoHeight?: string | number;
   };
+  productPageSettings?: {
+    buttonText?: string;
+    showShippingCalculator?: boolean;
+    defaultShippingTime?: string;
+    defaultShippingCost?: string;
+  };
 }
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
@@ -172,6 +190,12 @@ export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   customBanners: [],
   customMenus: [],
   sectionOrder: ["hero", "hero2", "categories", "bestSellers", "flash", "testimonials", "newsletter"],
+  productPageSettings: {
+    buttonText: "COMPRAR AGORA",
+    showShippingCalculator: true,
+    defaultShippingTime: "5 a 8 dias úteis",
+    defaultShippingCost: "Grátis",
+  },
   promoBar: {
     show: true,
     text: "PROMOÇÃO POR TEMPO LIMITADO! 15% OFF EM TODO O SITE + FRETE GRÁTIS",
@@ -637,6 +661,12 @@ function mergeWithDefaults(saved: any): HomePageData {
       logoUrl: saved.colors?.logoUrl !== undefined ? saved.colors.logoUrl : DEFAULT_HOME_PAGE_DATA.colors!.logoUrl,
       logoWidth: saved.colors?.logoWidth !== undefined ? saved.colors.logoWidth : DEFAULT_HOME_PAGE_DATA.colors!.logoWidth,
       logoHeight: saved.colors?.logoHeight !== undefined ? saved.colors.logoHeight : DEFAULT_HOME_PAGE_DATA.colors!.logoHeight,
+    },
+    productPageSettings: {
+      buttonText: saved.productPageSettings?.buttonText !== undefined ? saved.productPageSettings.buttonText : DEFAULT_HOME_PAGE_DATA.productPageSettings!.buttonText,
+      showShippingCalculator: saved.productPageSettings?.showShippingCalculator !== undefined ? saved.productPageSettings.showShippingCalculator : DEFAULT_HOME_PAGE_DATA.productPageSettings!.showShippingCalculator,
+      defaultShippingTime: saved.productPageSettings?.defaultShippingTime !== undefined ? saved.productPageSettings.defaultShippingTime : DEFAULT_HOME_PAGE_DATA.productPageSettings!.defaultShippingTime,
+      defaultShippingCost: saved.productPageSettings?.defaultShippingCost !== undefined ? saved.productPageSettings.defaultShippingCost : DEFAULT_HOME_PAGE_DATA.productPageSettings!.defaultShippingCost,
     },
   };
 }

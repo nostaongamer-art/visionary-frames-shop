@@ -2,14 +2,14 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 type CartContextValue = {
   count: number;
-  addItem: () => void;
+  addItem: (qty?: number) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [count, setCount] = useState(3);
-  const addItem = () => setCount((c) => c + 1);
+  const addItem = (qty?: number) => setCount((c) => c + (qty !== undefined ? qty : 1));
   return <CartContext.Provider value={{ count, addItem }}>{children}</CartContext.Provider>;
 }
 
