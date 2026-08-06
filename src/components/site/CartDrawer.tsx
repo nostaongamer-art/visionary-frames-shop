@@ -27,7 +27,7 @@ export function CartDrawer() {
 
   const handleCheckout = () => {
     setCartOpen(false);
-    navigate({ to: "/checkout" });
+    navigate({ to: "/checkout", search: { action: "" } });
   };
 
   return (

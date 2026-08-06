@@ -176,7 +176,7 @@ function ProductDetailsPage() {
     toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`, {
       description: "Redirecionando para a finalização...",
     });
-    navigate({ to: "/checkout" });
+    navigate({ to: "/checkout", search: { action: "" } });
   };
 
   const handleAddToCartOnly = () => {
@@ -207,7 +207,7 @@ function ProductDetailsPage() {
       <main className="mx-auto max-w-[var(--content-max-width,1500px)] px-4 sm:px-6 py-6 md:py-10">
         {/* Voltar */}
         <Link 
-          to={pageId === "home" ? "/" : `/${pageId}`}
+          to={(pageId === "home" ? "/" : `/${pageId}`) as any}
           className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-brand transition-colors mb-6 outline-none"
         >
           <ArrowLeft className="h-4 w-4" />
