@@ -224,9 +224,9 @@ function Admin() {
       // Sempre salva as configurações gerais/estruturais da Página Inicial (incluindo customMenus)
       const homeResult = await saveHomePageContent(data);
       
-      let pageResult = { success: true, isLocalOnly: false, error: null };
+      let pageResult: { success: boolean; isLocalOnly: boolean; error: string | null } = { success: true, isLocalOnly: false, error: null };
       if (activeSection !== "home" && categoryData) {
-        pageResult = await savePageContent(activeSection, categoryData);
+        pageResult = await savePageContent(activeSection, categoryData) as { success: boolean; isLocalOnly: boolean; error: string | null };
       }
       
       setSaving(false);
@@ -2390,9 +2390,10 @@ function Admin() {
           {/* TAB: Custom Banners */}
           {activeTab.startsWith("custom-banner-") && (() => {
             const bannerId = activeTab.replace("custom-banner-", "");
-            const bannerIdx = data.customBanners?.findIndex((b: any) => b.id === bannerId);
+            const banners = data.customBanners || [];
+            const bannerIdx = banners.findIndex((b: any) => b.id === bannerId);
             if (bannerIdx === -1 || bannerIdx === undefined) return null;
-            const banner = data.customBanners[bannerIdx];
+            const banner = banners[bannerIdx];
 
             return (
               <div className="flex flex-col gap-5">
@@ -2404,7 +2405,7 @@ function Admin() {
                     type="button"
                     onClick={() => {
                       if (confirm(`Tem certeza de que deseja excluir o banner "${banner.name}"?`)) {
-                        const newBanners = data.customBanners.filter((b: any) => b.id !== bannerId);
+                        const newBanners = banners.filter((b: any) => b.id !== bannerId);
                         const newOrder = (data.sectionOrder || []).filter(k => k !== `custom-banner-${bannerId}`);
                         setData((prev: any) => ({
                           ...prev,
@@ -2428,7 +2429,7 @@ function Admin() {
                       type="text"
                       value={banner.name}
                       onChange={(e) => {
-                        const newBanners = [...data.customBanners];
+                        const newBanners = [...banners];
                         newBanners[bannerIdx] = { ...banner, name: e.target.value };
                         setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                       }}
@@ -2442,7 +2443,7 @@ function Admin() {
                       placeholder="Ex: /masculino, /solar ou https://..."
                       value={banner.linkUrl}
                       onChange={(e) => {
-                        const newBanners = [...data.customBanners];
+                        const newBanners = [...banners];
                         newBanners[bannerIdx] = { ...banner, linkUrl: e.target.value };
                         setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                       }}
@@ -2457,7 +2458,7 @@ function Admin() {
                     value={banner.imageUrl || ""}
                     recommendedSize="1240 X 260 PX"
                     onChange={(val) => {
-                      const newBanners = [...data.customBanners];
+                      const newBanners = [...banners];
                       newBanners[bannerIdx] = { ...banner, imageUrl: val };
                       setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                     }}
@@ -2480,7 +2481,7 @@ function Admin() {
                         value={banner.imagePositionY !== undefined ? banner.imagePositionY : 50}
                         onChange={(e) => {
                           const val = parseInt(e.target.value);
-                          const newBanners = [...data.customBanners];
+                          const newBanners = [...banners];
                           newBanners[bannerIdx] = { ...banner, imagePositionY: val };
                           setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                         }}
@@ -2511,7 +2512,7 @@ function Admin() {
                           value={banner.desktopHeight !== undefined ? banner.desktopHeight : 200}
                           onChange={(e) => {
                             const val = parseInt(e.target.value);
-                            const newBanners = [...data.customBanners];
+                            const newBanners = [...banners];
                             newBanners[bannerIdx] = { ...banner, desktopHeight: val };
                             setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                           }}
@@ -2541,7 +2542,7 @@ function Admin() {
                           value={banner.mobileHeight !== undefined ? banner.mobileHeight : 120}
                           onChange={(e) => {
                             const val = parseInt(e.target.value);
-                            const newBanners = [...data.customBanners];
+                            const newBanners = [...banners];
                             newBanners[bannerIdx] = { ...banner, mobileHeight: val };
                             setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                           }}
@@ -2572,7 +2573,7 @@ function Admin() {
                         value={banner.desktopWidth !== undefined ? banner.desktopWidth : 1500}
                         onChange={(e) => {
                           const val = parseInt(e.target.value);
-                          const newBanners = [...data.customBanners];
+                          const newBanners = [...banners];
                           newBanners[bannerIdx] = { ...banner, desktopWidth: val };
                           setData((prev: any) => ({ ...prev, customBanners: newBanners }));
                         }}

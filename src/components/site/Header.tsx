@@ -208,6 +208,7 @@ export function Header() {
                 <div className="absolute right-0 top-full mt-1 w-44 bg-[#15181D] border border-[#282C32]/45 rounded-md shadow-xl py-1 hidden group-hover:block z-50 text-left">
                   <Link
                     to="/checkout"
+                    search={{ action: "" }}
                     className="block px-4 py-2 text-xs text-white/80 hover:bg-[#FF8A00] hover:text-white transition-colors font-bold uppercase"
                   >
                     📦 Meus Pedidos

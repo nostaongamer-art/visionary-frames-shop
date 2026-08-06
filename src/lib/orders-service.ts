@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 export interface Order {
   id: string;
@@ -44,6 +45,13 @@ export interface CustomerAccount {
   createdAt: string;
 }
 
+function asContentRecord(value: unknown): Record<string, unknown> | null {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return null;
+}
+
 // 1. ORDERS MANAGMENT
 export async function fetchOrders(): Promise<Order[]> {
   try {
@@ -57,11 +65,12 @@ export async function fetchOrders(): Promise<Order[]> {
       console.error("Error loading orders from Supabase:", error);
     }
 
-    if (data && data.content && Array.isArray(data.content.orders)) {
+    const content = asContentRecord(data?.content);
+    if (content && Array.isArray(content.orders)) {
       if (typeof window !== "undefined") {
-        localStorage.setItem("glasses_orders_list", JSON.stringify(data.content.orders));
+        localStorage.setItem("glasses_orders_list", JSON.stringify(content.orders));
       }
-      return data.content.orders as Order[];
+      return content.orders as Order[];
     }
   } catch (e) {
     console.error("Failed to fetch orders:", e);
@@ -98,7 +107,7 @@ export async function saveOrder(orderData: Omit<Order, "id" | "createdAt">): Pro
   try {
     await supabase.from("home_page_content").upsert({
       id: "orders_list",
-      content: { orders: updatedOrders },
+      content: { orders: updatedOrders } as unknown as Json,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {
@@ -133,7 +142,7 @@ export async function updateOrderTags(
   try {
     await supabase.from("home_page_content").upsert({
       id: "orders_list",
-      content: { orders: updatedOrders },
+      content: { orders: updatedOrders } as unknown as Json,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {
@@ -156,11 +165,12 @@ export async function fetchCustomerAccounts(): Promise<CustomerAccount[]> {
       console.error("Error loading customer accounts from Supabase:", error);
     }
 
-    if (data && data.content && Array.isArray(data.content.accounts)) {
+    const content = asContentRecord(data?.content);
+    if (content && Array.isArray(content.accounts)) {
       if (typeof window !== "undefined") {
-        localStorage.setItem("glasses_customer_accounts", JSON.stringify(data.content.accounts));
+        localStorage.setItem("glasses_customer_accounts", JSON.stringify(content.accounts));
       }
-      return data.content.accounts as CustomerAccount[];
+      return content.accounts as CustomerAccount[];
     }
   } catch (e) {
     console.error("Failed to fetch customer accounts:", e);
@@ -200,7 +210,7 @@ export async function saveCustomerAccount(account: Omit<CustomerAccount, "create
   try {
     await supabase.from("home_page_content").upsert({
       id: "customer_accounts",
-      content: { accounts: updatedAccounts },
+      content: { accounts: updatedAccounts } as unknown as Json,
       updated_at: new Date().toISOString(),
     });
   } catch (e) {

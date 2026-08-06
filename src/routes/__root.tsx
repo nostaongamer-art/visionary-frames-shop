@@ -14,7 +14,6 @@ import { fetchPageContent } from "../lib/page-service";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { FlushPreviewButton } from "../components/site/FlushPreviewButton";
 import { CartProvider } from "@/hooks/use-cart";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { CustomerProvider } from "@/hooks/use-customer";
@@ -220,8 +219,6 @@ function RootComponent() {
       <CartProvider>
         <CustomerProvider>
           <CustomStylesInjector />
-          {/* Dev-only helper to flush the HMR gate without spending credits. */}
-          <FlushPreviewButton />
           <CartDrawer />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
