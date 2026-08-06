@@ -20,11 +20,17 @@ import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
 
 export const Route = createFileRoute("/checkout")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      action: (search.action as string) || "",
+    };
+  },
   component: CheckoutPage,
 });
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const { action } = Route.useSearch();
   const { items, clearCart } = useCart();
   const { customer, orders, login, logout, refreshOrders } = useCustomer();
 
@@ -58,7 +64,7 @@ function CheckoutPage() {
   // Post-purchase flow steps: "checkout" | "registration-offer" | "registration-form" | "registration-success" | "thank-you" | "login"
   const [checkoutStep, setCheckoutStep] = useState<
     "checkout" | "registration-offer" | "registration-form" | "registration-success" | "thank-you" | "login"
-  >("checkout");
+  >(action === "login" ? "login" : "checkout");
   
   const [lastSavedOrder, setLastSavedOrder] = useState<any>(null);
 
@@ -718,6 +724,26 @@ function CheckoutPage() {
               >
                 Entrar
               </button>
+              <div className="flex flex-col gap-2.5 mt-3 text-center border-t border-gray-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegName("");
+                    setRegEmail("");
+                    setRegStep(1);
+                    setCheckoutStep("registration-form");
+                  }}
+                  className="text-xs text-brand font-bold hover:underline cursor-pointer bg-transparent border-none"
+                >
+                  Não tem uma conta? Crie uma aqui
+                </button>
+                <Link
+                  to="/"
+                  className="text-xs text-muted-foreground hover:text-ink font-semibold hover:underline"
+                >
+                  Voltar para a Loja
+                </Link>
+              </div>
             </form>
           </div>
         </main>
