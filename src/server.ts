@@ -44,13 +44,38 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// A client that navigates away / reloads mid-render kills the socket. Node surfaces
+// this as `Error: aborted` (ECONNRESET) — it is not an application error.
+function isClientAbort(error: unknown): boolean {
+  const seen = new Set<unknown>();
+  let current: unknown = error;
+  while (current && typeof current === "object" && !seen.has(current)) {
+    seen.add(current);
+    const e = current as { code?: unknown; message?: unknown; name?: unknown; cause?: unknown };
+    if (
+      e.code === "ECONNRESET" ||
+      e.code === "ECONNABORTED" ||
+      e.name === "AbortError" ||
+      e.message === "aborted"
+    ) {
+      return true;
+    }
+    current = e.cause;
+  }
+  return false;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
+      if (response.status >= 500 && request.signal?.aborted) return response;
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
+      if (isClientAbort(error) || request.signal?.aborted) {
+        return new Response(null, { status: 499 });
+      }
       console.error(error);
       return new Response(renderErrorPage(), {
         status: 500,
@@ -59,3 +84,4 @@ export default {
     }
   },
 };
+
