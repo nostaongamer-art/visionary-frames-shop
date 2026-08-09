@@ -5,7 +5,8 @@ import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_P
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
 import { fetchOrders, updateOrderTags } from "@/lib/orders-service";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
 
 const GOOGLE_FONTS_LIST = [
   { value: "default", label: "Padrão do Site (Outfit/Inter)" },
@@ -73,6 +74,11 @@ function Admin() {
   const [activeSection, setActiveSection] = useState<string>("home");
   const [activeTab, setActiveTab] = useState<TabType>("promo");
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ home: true });
+  
+  // Payment settings state
+  const [paymentSettings, setPaymentSettings] = useState<MercadoPagoSettings>(DEFAULT_MERCADO_PAGO_SETTINGS);
+  const [showAccessToken, setShowAccessToken] = useState(false);
+  const [copiedWebhook, setCopiedWebhook] = useState(false);
   
   // Admin form states
   const [data, setData] = useState<HomePageData>(DEFAULT_HOME_PAGE_DATA);
@@ -179,6 +185,9 @@ function Admin() {
       } else if (activeSection === "orders") {
         const list = await fetchOrders();
         setOrders(list);
+      } else if (activeSection === "payments") {
+        const settings = await fetchPaymentSettings();
+        setPaymentSettings(settings);
       } else {
         const content = await fetchPageContent(activeSection);
         setCategoryData(content);
@@ -225,8 +234,15 @@ function Admin() {
       const homeResult = await saveHomePageContent(data);
       
       let pageResult: { success: boolean; isLocalOnly: boolean; error: string | null } = { success: true, isLocalOnly: false, error: null };
-      if (activeSection !== "home" && categoryData) {
+      if (activeSection !== "home" && activeSection !== "orders" && activeSection !== "payments" && categoryData) {
         pageResult = await savePageContent(activeSection, categoryData) as { success: boolean; isLocalOnly: boolean; error: string | null };
+      } else if (activeSection === "payments") {
+        const paymentRes = await savePaymentSettings(paymentSettings);
+        pageResult = {
+          success: paymentRes.success,
+          isLocalOnly: !!paymentRes.isLocalOnly,
+          error: paymentRes.error || null
+        };
       }
       
       setSaving(false);
@@ -901,6 +917,22 @@ function Admin() {
             }`}
           >
             <span>📦 Pedidos Recebidos</span>
+          </button>
+
+          <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mt-4 mb-1">
+            Configurar Pagamentos
+          </h4>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("payments");
+              setActiveTab("mercado-pago");
+            }}
+            className={`w-full text-left px-3 py-2 rounded text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer ${
+              activeSection === "payments" && activeTab === "mercado-pago" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <span>💳 Mercado Pago</span>
           </button>
         </div>
 
@@ -4297,8 +4329,242 @@ function Admin() {
             </div>
           )}
 
+          {/* TAB: Configurar Mercado Pago */}
+          {activeSection === "payments" && activeTab === "mercado-pago" && (
+            <div className="flex flex-col gap-6 text-white text-left select-none animate-fadeIn">
+              <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                <h3 className="text-base font-bold text-[#FF8A00] flex items-center gap-2">
+                  💳 Configurar Mercado Pago
+                </h3>
+              </div>
+
+              {/* Status Integration */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Status da Integração</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-semibold text-white/90">Ativar Gateway de Pagamento</span>
+                    <span className="text-[10px] text-white/40">Se ativado, o checkout processará os pagamentos através do Mercado Pago.</span>
+                  </div>
+                  <ToggleSwitch
+                    label=""
+                    checked={paymentSettings.enabled}
+                    onChange={(val) =>
+                      setPaymentSettings((prev) => ({ ...prev, enabled: val }))
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Sandbox / Production Mode Toggle */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Ambiente de Execução</h4>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-semibold text-white/90">Modo de Operação</span>
+                      <span className="text-[10px] text-white/40">Escolha "Sandbox (Testes)" para simular vendas sem cobranças reais ou "Produção (Real)" para receber de clientes.</span>
+                    </div>
+                    <div className="flex gap-2 bg-[#101217] p-1 rounded border border-[#282C32]/35">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentSettings((prev) => ({ ...prev, mode: "sandbox" }))}
+                        className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                          paymentSettings.mode === "sandbox"
+                            ? "bg-[#FF8A00] text-white"
+                            : "text-white/40 hover:text-white/70"
+                        }`}
+                      >
+                        Sandbox (Testes)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentSettings((prev) => ({ ...prev, mode: "production" }))}
+                        className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                          paymentSettings.mode === "production"
+                            ? "bg-[#FF8A00] text-white"
+                            : "text-white/40 hover:text-white/70"
+                        }`}
+                      >
+                        Produção (Real)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Credentials Fields */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2 flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-[#FF8A00]" />
+                  <span>Credenciais de API</span>
+                </h4>
+                
+                {paymentSettings.mode === "sandbox" ? (
+                  <div className="flex flex-col gap-4 animate-fadeIn">
+                    <div className="p-3 bg-[#FF8A00]/5 border border-[#FF8A00]/20 rounded text-xs text-white/80 flex items-start gap-2.5">
+                      <Info className="h-4 w-4 text-[#FF8A00] shrink-0 mt-0.5" />
+                      <span>Você está configurando o modo <strong>Sandbox (Ambiente de Testes)</strong>. Insira as credenciais de teste fornecidas pelo Mercado Pago.</span>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-white/70">Public Key (Sandbox)</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: APP_USR-xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                        value={paymentSettings.publicKeySandbox || ""}
+                        onChange={(e) =>
+                          setPaymentSettings((prev) => ({ ...prev, publicKeySandbox: e.target.value }))
+                        }
+                        className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 relative">
+                      <label className="text-xs font-semibold text-white/70">Access Token (Sandbox)</label>
+                      <div className="relative">
+                        <input
+                          type={showAccessToken ? "text" : "password"}
+                          placeholder="Ex: APP_USR-xxxxxxxxxxxxxxxxxxxx-xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx"
+                          value={paymentSettings.accessTokenSandbox || ""}
+                          onChange={(e) =>
+                            setPaymentSettings((prev) => ({ ...prev, accessTokenSandbox: e.target.value }))
+                          }
+                          className="w-full h-10 pl-3 pr-10 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowAccessToken(!showAccessToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 cursor-pointer"
+                        >
+                          {showAccessToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4 animate-fadeIn">
+                    <div className="p-3 bg-[#FF8A00]/5 border border-[#FF8A00]/20 rounded text-xs text-white/80 flex items-start gap-2.5">
+                      <Info className="h-4 w-4 text-[#FF8A00] shrink-0 mt-0.5" />
+                      <span>Você está configurando o modo <strong>Produção (Ambiente Real)</strong>. Tenha extremo cuidado ao expor essas credenciais.</span>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-white/70">Public Key (Produção)</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: APP_USR-xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                        value={paymentSettings.publicKeyProduction || ""}
+                        onChange={(e) =>
+                          setPaymentSettings((prev) => ({ ...prev, publicKeyProduction: e.target.value }))
+                        }
+                        className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 relative">
+                      <label className="text-xs font-semibold text-white/70">Access Token (Produção)</label>
+                      <div className="relative">
+                        <input
+                          type={showAccessToken ? "text" : "password"}
+                          placeholder="Ex: APP_USR-xxxxxxxxxxxxxxxxxxxx-xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx"
+                          value={paymentSettings.accessTokenProduction || ""}
+                          onChange={(e) =>
+                            setPaymentSettings((prev) => ({ ...prev, accessTokenProduction: e.target.value }))
+                          }
+                          className="w-full h-10 pl-3 pr-10 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowAccessToken(!showAccessToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 cursor-pointer"
+                        >
+                          {showAccessToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Webhook Configuration */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Notificações de Webhook</h4>
+                <p className="text-[10px] text-white/40 leading-relaxed">
+                  Para atualizar automaticamente o status dos pedidos (Aprovado, Recusado, Pendente) quando o pagamento for processado, configure a URL abaixo no painel de desenvolvedores do Mercado Pago.
+                </p>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70">URL do Webhook de Retorno</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={paymentSettings.webhookUrl || ""}
+                      className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white/60 outline-none select-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(paymentSettings.webhookUrl || "");
+                        setCopiedWebhook(true);
+                        toast.success("URL copiada com sucesso!");
+                        setTimeout(() => setCopiedWebhook(false), 2000);
+                      }}
+                      className="h-10 px-4 bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                    >
+                      {copiedWebhook ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                      {copiedWebhook ? "Copiado!" : "Copiar URL"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/70 font-mono">Chave de Assinatura Webhook / Secret (Opcional)</label>
+                  <input
+                    type="text"
+                    placeholder="Chave para validar integridade das requisições (se aplicável)"
+                    value={paymentSettings.webhookSecret || ""}
+                    onChange={(e) =>
+                      setPaymentSettings((prev) => ({ ...prev, webhookSecret: e.target.value }))
+                    }
+                    className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                  />
+                </div>
+              </div>
+
+              {/* Instructions Panel */}
+              <div className="bg-white/5 border border-white/10 rounded-lg p-5 flex flex-col gap-3">
+                <h4 className="text-xs font-bold uppercase text-white/60 tracking-wider flex items-center gap-1.5">
+                  <Info className="h-3.5 w-3.5 text-[#FF8A00]" />
+                  <span>Passo a Passo para Integrar</span>
+                </h4>
+                <ol className="text-[11px] text-white/70 leading-relaxed list-decimal list-inside flex flex-col gap-2">
+                  <li>
+                    Acesse o painel do <a href="https://www.mercadopago.com.br/developers/panel" target="_blank" rel="noopener noreferrer" className="text-[#FF8A00] hover:underline font-bold">Mercado Pago Developers</a> e faça login.
+                  </li>
+                  <li>
+                    Crie uma nova aplicação (ex: "Site de Óculos") se ainda não tiver feito.
+                  </li>
+                  <li>
+                    Acesse o menu <strong>Credenciais de Produção</strong> ou <strong>Credenciais de Teste</strong> na lateral esquerda da aplicação.
+                  </li>
+                  <li>
+                    Copie a <strong>Chave Pública (Public Key)</strong> e o <strong>Token de Acesso (Access Token)</strong> e cole nos campos correspondentes acima.
+                  </li>
+                  <li>
+                    Na barra lateral do painel de desenvolvedores, acesse <strong>Webhooks</strong> ou <strong>Notificações de IPN</strong>, cole a URL de Webhook de Retorno exibida acima e selecione os eventos: <strong>payment</strong> e <strong>mp-order</strong> para receber as notificações em tempo real.
+                  </li>
+                  <li>
+                    Clique no botão superior direito <strong>Salvar Alterações</strong> aqui no Glasses Admin para persistir suas chaves com segurança.
+                  </li>
+                </ol>
+              </div>
+            </div>
+          )}
+
           {/* TAB: Catalogue Banner */}
-          {activeSection !== "home" && activeSection !== "orders" && activeTab === "cat-banner" && categoryData && (
+          {activeSection !== "home" && activeSection !== "orders" && activeSection !== "payments" && activeTab === "cat-banner" && categoryData && (
             <div className="flex flex-col gap-4">
               <h3 className="text-base font-bold border-b border-white/10 pb-2 text-[#FF8A00]">
                 Banner Superior - {categoryData.header.title}
