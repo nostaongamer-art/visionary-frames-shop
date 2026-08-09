@@ -23,13 +23,19 @@ export const DEFAULT_MERCADO_PAGO_SETTINGS: MercadoPagoSettings = {
 };
 
 export async function fetchPaymentSettings(): Promise<MercadoPagoSettings> {
-  let localFallback = DEFAULT_MERCADO_PAGO_SETTINGS;
+  let localFallback = { ...DEFAULT_MERCADO_PAGO_SETTINGS };
 
   if (typeof window !== "undefined") {
     try {
       const cached = localStorage.getItem("glasses_payment_settings");
       if (cached) {
-        localFallback = JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === "object") {
+          localFallback = {
+            ...DEFAULT_MERCADO_PAGO_SETTINGS,
+            ...parsed,
+          };
+        }
       }
     } catch (e) {
       console.error("Failed to read payment settings from localStorage:", e);
@@ -43,7 +49,7 @@ export async function fetchPaymentSettings(): Promise<MercadoPagoSettings> {
       .eq("id", "payment_settings")
       .single();
 
-    if (error || !data || !data.content) {
+    if (error || !data || !data.content || typeof data.content !== "object") {
       // Auto-upsert standard default values to Supabase to initialize
       savePaymentSettings(localFallback).catch((err) =>
         console.error("Auto-upsert of payment settings failed:", err)
@@ -53,8 +59,8 @@ export async function fetchPaymentSettings(): Promise<MercadoPagoSettings> {
 
     const saved = data.content as any;
     const merged: MercadoPagoSettings = {
-      enabled: saved.enabled !== undefined ? saved.enabled : DEFAULT_MERCADO_PAGO_SETTINGS.enabled,
-      mode: saved.mode || DEFAULT_MERCADO_PAGO_SETTINGS.mode,
+      enabled: saved.enabled !== undefined ? !!saved.enabled : DEFAULT_MERCADO_PAGO_SETTINGS.enabled,
+      mode: (saved.mode === "production" || saved.mode === "sandbox") ? saved.mode : DEFAULT_MERCADO_PAGO_SETTINGS.mode,
       publicKeySandbox: saved.publicKeySandbox || "",
       accessTokenSandbox: saved.accessTokenSandbox || "",
       publicKeyProduction: saved.publicKeyProduction || "",

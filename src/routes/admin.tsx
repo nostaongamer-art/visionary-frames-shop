@@ -4348,9 +4348,9 @@ function Admin() {
                   </div>
                   <ToggleSwitch
                     label=""
-                    checked={paymentSettings.enabled}
+                    checked={paymentSettings?.enabled || false}
                     onChange={(val) =>
-                      setPaymentSettings((prev) => ({ ...prev, enabled: val }))
+                      setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), enabled: val }))
                     }
                   />
                 </div>
@@ -4368,9 +4368,9 @@ function Admin() {
                     <div className="flex gap-2 bg-[#101217] p-1 rounded border border-[#282C32]/35">
                       <button
                         type="button"
-                        onClick={() => setPaymentSettings((prev) => ({ ...prev, mode: "sandbox" }))}
+                        onClick={() => setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), mode: "sandbox" }))}
                         className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
-                          paymentSettings.mode === "sandbox"
+                          paymentSettings?.mode === "sandbox"
                             ? "bg-[#FF8A00] text-white"
                             : "text-white/40 hover:text-white/70"
                         }`}
@@ -4379,9 +4379,9 @@ function Admin() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setPaymentSettings((prev) => ({ ...prev, mode: "production" }))}
+                        onClick={() => setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), mode: "production" }))}
                         className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
-                          paymentSettings.mode === "production"
+                          paymentSettings?.mode === "production"
                             ? "bg-[#FF8A00] text-white"
                             : "text-white/40 hover:text-white/70"
                         }`}
@@ -4400,35 +4400,35 @@ function Admin() {
                   <span>Credenciais de API</span>
                 </h4>
                 
-                {paymentSettings.mode === "sandbox" ? (
+                {paymentSettings?.mode === "production" ? (
                   <div className="flex flex-col gap-4 animate-fadeIn">
                     <div className="p-3 bg-[#FF8A00]/5 border border-[#FF8A00]/20 rounded text-xs text-white/80 flex items-start gap-2.5">
                       <Info className="h-4 w-4 text-[#FF8A00] shrink-0 mt-0.5" />
-                      <span>Você está configurando o modo <strong>Sandbox (Ambiente de Testes)</strong>. Insira as credenciais de teste fornecidas pelo Mercado Pago.</span>
+                      <span>Você está configurando o modo <strong>Produção (Ambiente Real)</strong>. Tenha extremo cuidado ao expor essas credenciais.</span>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-white/70">Public Key (Sandbox)</label>
+                      <label className="text-xs font-semibold text-white/70">Public Key (Produção)</label>
                       <input
                         type="text"
                         placeholder="Ex: APP_USR-xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                        value={paymentSettings.publicKeySandbox || ""}
+                        value={paymentSettings?.publicKeyProduction || ""}
                         onChange={(e) =>
-                          setPaymentSettings((prev) => ({ ...prev, publicKeySandbox: e.target.value }))
+                          setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), publicKeyProduction: e.target.value }))
                         }
                         className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                       />
                     </div>
 
                     <div className="flex flex-col gap-1.5 relative">
-                      <label className="text-xs font-semibold text-white/70">Access Token (Sandbox)</label>
+                      <label className="text-xs font-semibold text-white/70">Access Token (Produção)</label>
                       <div className="relative">
                         <input
                           type={showAccessToken ? "text" : "password"}
                           placeholder="Ex: APP_USR-xxxxxxxxxxxxxxxxxxxx-xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx"
-                          value={paymentSettings.accessTokenSandbox || ""}
+                          value={paymentSettings?.accessTokenProduction || ""}
                           onChange={(e) =>
-                            setPaymentSettings((prev) => ({ ...prev, accessTokenSandbox: e.target.value }))
+                            setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), accessTokenProduction: e.target.value }))
                           }
                           className="w-full h-10 pl-3 pr-10 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                         />
@@ -4446,31 +4446,31 @@ function Admin() {
                   <div className="flex flex-col gap-4 animate-fadeIn">
                     <div className="p-3 bg-[#FF8A00]/5 border border-[#FF8A00]/20 rounded text-xs text-white/80 flex items-start gap-2.5">
                       <Info className="h-4 w-4 text-[#FF8A00] shrink-0 mt-0.5" />
-                      <span>Você está configurando o modo <strong>Produção (Ambiente Real)</strong>. Tenha extremo cuidado ao expor essas credenciais.</span>
+                      <span>Você está configurando o modo <strong>Sandbox (Ambiente de Testes)</strong>. Insira as credenciais de teste fornecidas pelo Mercado Pago.</span>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-white/70">Public Key (Produção)</label>
+                      <label className="text-xs font-semibold text-white/70">Public Key (Sandbox)</label>
                       <input
                         type="text"
                         placeholder="Ex: APP_USR-xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                        value={paymentSettings.publicKeyProduction || ""}
+                        value={paymentSettings?.publicKeySandbox || ""}
                         onChange={(e) =>
-                          setPaymentSettings((prev) => ({ ...prev, publicKeyProduction: e.target.value }))
+                          setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), publicKeySandbox: e.target.value }))
                         }
                         className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                       />
                     </div>
 
                     <div className="flex flex-col gap-1.5 relative">
-                      <label className="text-xs font-semibold text-white/70">Access Token (Produção)</label>
+                      <label className="text-xs font-semibold text-white/70">Access Token (Sandbox)</label>
                       <div className="relative">
                         <input
                           type={showAccessToken ? "text" : "password"}
                           placeholder="Ex: APP_USR-xxxxxxxxxxxxxxxxxxxx-xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx"
-                          value={paymentSettings.accessTokenProduction || ""}
+                          value={paymentSettings?.accessTokenSandbox || ""}
                           onChange={(e) =>
-                            setPaymentSettings((prev) => ({ ...prev, accessTokenProduction: e.target.value }))
+                            setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), accessTokenSandbox: e.target.value }))
                           }
                           className="w-full h-10 pl-3 pr-10 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                         />
@@ -4500,13 +4500,13 @@ function Admin() {
                     <input
                       type="text"
                       readOnly
-                      value={paymentSettings.webhookUrl || ""}
+                      value={paymentSettings?.webhookUrl || ""}
                       className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white/60 outline-none select-all"
                     />
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(paymentSettings.webhookUrl || "");
+                        navigator.clipboard.writeText(paymentSettings?.webhookUrl || "");
                         setCopiedWebhook(true);
                         toast.success("URL copiada com sucesso!");
                         setTimeout(() => setCopiedWebhook(false), 2000);
@@ -4524,9 +4524,9 @@ function Admin() {
                   <input
                     type="text"
                     placeholder="Chave para validar integridade das requisições (se aplicável)"
-                    value={paymentSettings.webhookSecret || ""}
+                    value={paymentSettings?.webhookSecret || ""}
                     onChange={(e) =>
-                      setPaymentSettings((prev) => ({ ...prev, webhookSecret: e.target.value }))
+                      setPaymentSettings((prev) => ({ ...(prev || DEFAULT_MERCADO_PAGO_SETTINGS), webhookSecret: e.target.value }))
                     }
                     className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
                   />
