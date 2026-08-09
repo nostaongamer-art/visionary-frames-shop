@@ -180,12 +180,15 @@ function Admin() {
     async function loadData() {
       setLoading(true);
       if (activeSection === "home") {
+        setCategoryData(null);
         const content = await fetchHomePageContent();
         setData(content);
       } else if (activeSection === "orders") {
+        setCategoryData(null);
         const list = await fetchOrders();
         setOrders(list);
       } else if (activeSection === "payments") {
+        setCategoryData(null);
         const settings = await fetchPaymentSettings();
         setPaymentSettings(settings);
       } else {
