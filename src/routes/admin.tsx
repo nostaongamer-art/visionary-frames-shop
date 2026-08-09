@@ -79,6 +79,17 @@ function Admin() {
   const [paymentSettings, setPaymentSettings] = useState<MercadoPagoSettings>(DEFAULT_MERCADO_PAGO_SETTINGS);
   const [showAccessToken, setShowAccessToken] = useState(false);
   const [copiedWebhook, setCopiedWebhook] = useState(false);
+  const [displayWebhookUrl, setDisplayWebhookUrl] = useState("");
+
+  useEffect(() => {
+    if (paymentSettings?.webhookUrl) {
+      if (paymentSettings.webhookUrl.startsWith("http")) {
+        setDisplayWebhookUrl(paymentSettings.webhookUrl);
+      } else if (typeof window !== "undefined") {
+        setDisplayWebhookUrl(`${window.location.origin}${paymentSettings.webhookUrl}`);
+      }
+    }
+  }, [paymentSettings]);
   
   // Admin form states
   const [data, setData] = useState<HomePageData>(DEFAULT_HOME_PAGE_DATA);
@@ -4503,13 +4514,13 @@ function Admin() {
                     <input
                       type="text"
                       readOnly
-                      value={paymentSettings?.webhookUrl || ""}
+                      value={displayWebhookUrl}
                       className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm text-white/60 outline-none select-all"
                     />
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(paymentSettings?.webhookUrl || "");
+                        navigator.clipboard.writeText(displayWebhookUrl);
                         setCopiedWebhook(true);
                         toast.success("URL copiada com sucesso!");
                         setTimeout(() => setCopiedWebhook(false), 2000);

@@ -18,7 +18,7 @@ export const DEFAULT_MERCADO_PAGO_SETTINGS: MercadoPagoSettings = {
   accessTokenSandbox: "",
   publicKeyProduction: "",
   accessTokenProduction: "",
-  webhookUrl: typeof window !== "undefined" ? `${window.location.origin}/api/webhook/mercado-pago` : "/api/webhook/mercado-pago",
+  webhookUrl: "/api/webhook/mercado-pago",
   webhookSecret: "",
 };
 
