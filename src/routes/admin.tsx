@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Component, ReactNode, ErrorInfo } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
@@ -7,6 +7,49 @@ import { toast } from "sonner";
 import { fetchOrders, updateOrderTags } from "@/lib/orders-service";
 import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check } from "lucide-react";
 import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
+
+class AdminErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("AdminErrorBoundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0D0F12] text-white p-8 flex flex-col gap-4 font-mono select-text">
+          <h1 className="text-xl font-bold text-red-500">⚠️ Erro Detectado no Painel</h1>
+          <p className="text-sm text-white/80">
+            O painel administrativo encontrou um erro ao processar esta ação.
+          </p>
+          <div className="bg-black/50 border border-white/10 p-4 rounded text-xs overflow-auto max-h-[400px] flex flex-col gap-2">
+            <span className="font-bold text-[#FF8A00]">Erro: {this.state.error?.message}</span>
+            <span className="text-white/60 whitespace-pre-wrap">{this.state.error?.stack}</span>
+          </div>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="px-4 py-2 bg-[#FF8A00] hover:bg-[#E97800] text-white font-bold text-xs rounded self-start cursor-pointer"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const GOOGLE_FONTS_LIST = [
   { value: "default", label: "Padrão do Site (Outfit/Inter)" },
@@ -62,7 +105,11 @@ const GOOGLE_FONTS_LIST = [
 ];
 
 export const Route = createFileRoute("/admin")({
-  component: Admin,
+  component: () => (
+    <AdminErrorBoundary>
+      <Admin />
+    </AdminErrorBoundary>
+  ),
 });
 
 type TabType = string;
