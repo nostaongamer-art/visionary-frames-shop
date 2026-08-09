@@ -15,23 +15,16 @@ export function FlushPreviewButton() {
 
   if (!visible) return null;
 
-  async function handleFlush() {
+  function handleFlush() {
     setStatus("flushing");
-    // The /__hmr_flush endpoint only exists on the internal sandbox dev server.
-    // On the preview/published domain it 404s, so we fall back to a hard reload,
-    // which is what actually pulls the latest build into the browser.
-    try {
-      const res = await fetch("/__hmr_flush", { method: "POST" });
-      if (res.ok) {
-        setStatus("done");
-        setTimeout(() => window.location.reload(), 300);
-        return;
-      }
-    } catch {
-      /* endpoint unavailable — fall back to reload below */
-    }
+    // Calling /__hmr_flush from the page restarts the dev server while that
+    // same HTTP request is open, which Node reports as ECONNRESET/"aborted".
+    // A cache-bypassing navigation pulls the latest preview without killing
+    // the active server request or triggering the blank-screen error overlay.
     setStatus("done");
-    setTimeout(() => window.location.reload(), 300);
+    const url = new URL(window.location.href);
+    url.searchParams.set("preview_refresh", Date.now().toString());
+    setTimeout(() => window.location.replace(url), 150);
   }
 
   return (

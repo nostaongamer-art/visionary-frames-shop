@@ -5,7 +5,7 @@ import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_P
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
 import { fetchOrders, updateOrderTags } from "@/lib/orders-service";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock } from "lucide-react";
 import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
 
 class AdminErrorBoundary extends Component<
