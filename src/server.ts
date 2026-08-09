@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { isClientAbort } from "./lib/client-abort";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -42,27 +43,6 @@ function isH3SwallowedErrorBody(body: string): boolean {
   } catch {
     return false;
   }
-}
-
-// A client that navigates away / reloads mid-render kills the socket. Node surfaces
-// this as `Error: aborted` (ECONNRESET) — it is not an application error.
-function isClientAbort(error: unknown): boolean {
-  const seen = new Set<unknown>();
-  let current: unknown = error;
-  while (current && typeof current === "object" && !seen.has(current)) {
-    seen.add(current);
-    const e = current as { code?: unknown; message?: unknown; name?: unknown; cause?: unknown };
-    if (
-      e.code === "ECONNRESET" ||
-      e.code === "ECONNABORTED" ||
-      e.name === "AbortError" ||
-      e.message === "aborted"
-    ) {
-      return true;
-    }
-    current = e.cause;
-  }
-  return false;
 }
 
 export default {
