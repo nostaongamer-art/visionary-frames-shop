@@ -19,6 +19,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
 import type { Order } from "@/lib/orders-service";
+import { fetchPaymentSettings } from "@/lib/payment-service";
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -200,6 +201,54 @@ function CheckoutPage() {
 
         const saved = await saveOrder(orderPayload);
         setLastSavedOrder(saved);
+
+        // Check if Mercado Pago is enabled
+        try {
+          const settings = await fetchPaymentSettings();
+          if (settings && settings.enabled) {
+            const response = await fetch("/api/create-payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderId: saved.id,
+                items: items.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price,
+                  priceVal: item.priceVal,
+                  quantity: item.quantity,
+                })),
+                customer: {
+                  fullName: personalData.fullName,
+                  email: personalData.email,
+                  phone: personalData.phone,
+                  cpf: personalData.cpf,
+                },
+                paymentMethod: paymentMethod,
+                shippingCost: shippingCost,
+              }),
+            });
+
+            const paymentResult = await response.json();
+            if (paymentResult.success && paymentResult.initPoint) {
+              clearCart();
+              setIsSubmitting(false);
+              toast.success("Pedido registrado! Redirecionando para o pagamento...");
+              
+              // Redirect to Mercado Pago checkout
+              window.location.href = paymentResult.initPoint;
+              return;
+            } else {
+              console.error("Failed to generate payment:", paymentResult.error);
+              toast.error("Erro ao iniciar pagamento com Mercado Pago. Continuando com o pedido...");
+            }
+          }
+        } catch (paymentErr) {
+          console.error("Mercado Pago flow error:", paymentErr);
+        }
+
         clearCart();
         setIsSubmitting(false);
         toast.success("Pedido finalizado com sucesso!");
