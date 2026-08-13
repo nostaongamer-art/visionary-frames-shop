@@ -9,67 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SolarRouteImport } from './routes/solar'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as PromocoesRouteImport } from './routes/promocoes'
-import { Route as ProdutoRouteImport } from './routes/produto'
-import { Route as PremiumRouteImport } from './routes/premium'
-import { Route as MasculinoRouteImport } from './routes/masculino'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as FemininoRouteImport } from './routes/feminino'
-import { Route as ColecoesRouteImport } from './routes/colecoes'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ColecoesRouteImport } from './routes/colecoes'
+import { Route as FemininoRouteImport } from './routes/feminino'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MasculinoRouteImport } from './routes/masculino'
+import { Route as PremiumRouteImport } from './routes/premium'
+import { Route as ProdutoRouteImport } from './routes/produto'
+import { Route as PromocoesRouteImport } from './routes/promocoes'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SolarRouteImport } from './routes/solar'
 
-const SolarRoute = SolarRouteImport.update({
-  id: '/solar',
-  path: '/solar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PromocoesRoute = PromocoesRouteImport.update({
-  id: '/promocoes',
-  path: '/promocoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProdutoRoute = ProdutoRouteImport.update({
-  id: '/produto',
-  path: '/produto',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PremiumRoute = PremiumRouteImport.update({
-  id: '/premium',
-  path: '/premium',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MasculinoRoute = MasculinoRouteImport.update({
-  id: '/masculino',
-  path: '/masculino',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FemininoRoute = FemininoRouteImport.update({
-  id: '/feminino',
-  path: '/feminino',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ColecoesRoute = ColecoesRouteImport.update({
-  id: '/colecoes',
-  path: '/colecoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -77,9 +32,54 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ColecoesRoute = ColecoesRouteImport.update({
+  id: '/colecoes',
+  path: '/colecoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FemininoRoute = FemininoRouteImport.update({
+  id: '/feminino',
+  path: '/feminino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MasculinoRoute = MasculinoRouteImport.update({
+  id: '/masculino',
+  path: '/masculino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PremiumRoute = PremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProdutoRoute = ProdutoRouteImport.update({
+  id: '/produto',
+  path: '/produto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromocoesRoute = PromocoesRouteImport.update({
+  id: '/promocoes',
+  path: '/promocoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolarRoute = SolarRouteImport.update({
+  id: '/solar',
+  path: '/solar',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -188,74 +188,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/solar': {
-      id: '/solar'
-      path: '/solar'
-      fullPath: '/solar'
-      preLoaderRoute: typeof SolarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/promocoes': {
-      id: '/promocoes'
-      path: '/promocoes'
-      fullPath: '/promocoes'
-      preLoaderRoute: typeof PromocoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/produto': {
-      id: '/produto'
-      path: '/produto'
-      fullPath: '/produto'
-      preLoaderRoute: typeof ProdutoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/premium': {
-      id: '/premium'
-      path: '/premium'
-      fullPath: '/premium'
-      preLoaderRoute: typeof PremiumRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/masculino': {
-      id: '/masculino'
-      path: '/masculino'
-      fullPath: '/masculino'
-      preLoaderRoute: typeof MasculinoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feminino': {
-      id: '/feminino'
-      path: '/feminino'
-      fullPath: '/feminino'
-      preLoaderRoute: typeof FemininoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/colecoes': {
-      id: '/colecoes'
-      path: '/colecoes'
-      fullPath: '/colecoes'
-      preLoaderRoute: typeof ColecoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -265,11 +202,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/colecoes': {
+      id: '/colecoes'
+      path: '/colecoes'
+      fullPath: '/colecoes'
+      preLoaderRoute: typeof ColecoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feminino': {
+      id: '/feminino'
+      path: '/feminino'
+      fullPath: '/feminino'
+      preLoaderRoute: typeof FemininoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/masculino': {
+      id: '/masculino'
+      path: '/masculino'
+      fullPath: '/masculino'
+      preLoaderRoute: typeof MasculinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/premium': {
+      id: '/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof PremiumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produto': {
+      id: '/produto'
+      path: '/produto'
+      fullPath: '/produto'
+      preLoaderRoute: typeof ProdutoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promocoes': {
+      id: '/promocoes'
+      path: '/promocoes'
+      fullPath: '/promocoes'
+      preLoaderRoute: typeof PromocoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solar': {
+      id: '/solar'
+      path: '/solar'
+      fullPath: '/solar'
+      preLoaderRoute: typeof SolarRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -292,3 +292,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
