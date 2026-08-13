@@ -252,3 +252,55 @@ export async function verifyCustomerCredentials(email: string, password: any): P
     ) || null
   );
 }
+
+export async function deleteOrderAndCustomer(orderId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    // 1. Load orders
+    const currentOrders = await fetchOrders();
+    const orderToDelete = currentOrders.find((ord) => ord.id === orderId);
+    
+    if (!orderToDelete) {
+      return { success: false, error: "Pedido não localizado." };
+    }
+
+    const customerEmail = orderToDelete.customerEmail.trim().toLowerCase();
+    const customerCpf = orderToDelete.customerCpf.replace(/\D/g, "");
+
+    // 2. Remove order from list
+    const updatedOrders = currentOrders.filter((ord) => ord.id !== orderId);
+
+    // 3. Save updated orders list to local storage and DB
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glasses_orders_list", JSON.stringify(updatedOrders));
+    }
+    await supabase.from("home_page_content").upsert({
+      id: "orders_list",
+      content: { orders: updatedOrders } as unknown as Json,
+      updated_at: new Date().toISOString(),
+    });
+
+    // 4. Load customer accounts
+    const currentAccounts = await fetchCustomerAccounts();
+    // Filter out the account matching the email or CPF of this order
+    const updatedAccounts = currentAccounts.filter(
+      (acc) =>
+        acc.email.trim().toLowerCase() !== customerEmail &&
+        acc.cpf.replace(/\D/g, "") !== customerCpf
+    );
+
+    // 5. Save updated customer accounts list to local storage and DB
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glasses_customer_accounts", JSON.stringify(updatedAccounts));
+    }
+    await supabase.from("home_page_content").upsert({
+      id: "customer_accounts",
+      content: { accounts: updatedAccounts } as unknown as Json,
+      updated_at: new Date().toISOString(),
+    });
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error deleting order and customer:", err);
+    return { success: false, error: err.message || "Erro desconhecido ao excluir." };
+  }
+}

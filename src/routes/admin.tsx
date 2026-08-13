@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
-import { fetchOrders, updateOrderTags } from "@/lib/orders-service";
+import { fetchOrders, updateOrderTags, deleteOrderAndCustomer } from "@/lib/orders-service";
 import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock } from "lucide-react";
 import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
 
@@ -4294,6 +4294,35 @@ function Admin() {
                                   <option value="sem_frete">Grátis</option>
                                   <option value="com_frete">Com Frete</option>
                                 </select>
+                              </div>
+
+                              {/* Excluir Pedido e Cliente */}
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[9px] font-bold text-white/40 uppercase block opacity-0 select-none">Excluir</label>
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    if (confirm(`Tem certeza de que deseja excluir permanentemente o pedido ${ord.id} e a conta do cliente (${ord.customerEmail})? Isso apagará todo o histórico de compras e cadastro do usuário.`)) {
+                                      try {
+                                        const res = await deleteOrderAndCustomer(ord.id);
+                                        if (res.success) {
+                                          const updated = orders.filter((o) => o.id !== ord.id);
+                                          setOrders(updated);
+                                          toast.success("Pedido e dados de usuário excluídos com sucesso!");
+                                        } else {
+                                          toast.error(res.error || "Erro ao excluir.");
+                                        }
+                                      } catch (err) {
+                                        toast.error("Erro ao processar exclusão.");
+                                      }
+                                    }
+                                  }}
+                                  className="h-7 px-2.5 bg-red-950/40 border border-red-900/60 hover:bg-red-900/80 text-red-400 hover:text-white transition-colors flex items-center justify-center gap-1.5 rounded cursor-pointer text-[10px] font-bold shrink-0 animate-fadeIn"
+                                  title="Excluir pedido e dados do usuário completamente"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <span>Excluir</span>
+                                </button>
                               </div>
                             </div>
                           </div>
