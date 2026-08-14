@@ -102,22 +102,30 @@ async function handleCreatePayment(request: Request): Promise<Response> {
       });
     }
 
-    // 2. Build items payload
-    const mpItems = items.map((item: any) => ({
-      title: item.name,
+    // 2. Build items payload (Mercado Pago aceita no máximo 2 decimais)
+    const round2 = (v: number) => Math.round((Number(v) || 0) * 100) / 100;
+    const mpItems = items.map((item: any, idx: number) => ({
+      id: String(item.id ?? idx + 1),
+      title: String(item.name || "Produto").slice(0, 250),
+      description: String(item.name || "Produto").slice(0, 250),
+      category_id: "fashion",
       quantity: Number(item.quantity) || 1,
-      unit_price: Number(item.priceVal) || 0,
+      unit_price: round2(item.priceVal),
       currency_id: "BRL"
     }));
 
     if (shippingCost && Number(shippingCost) > 0) {
       mpItems.push({
+        id: "frete",
         title: "Frete de Envio",
+        description: "Frete de Envio",
+        category_id: "services",
         quantity: 1,
-        unit_price: Number(shippingCost),
+        unit_price: round2(shippingCost),
         currency_id: "BRL"
       });
     }
+
 
     // 3. Build payer payload
     const [name, ...surnameParts] = (customer.fullName || "").split(" ");
