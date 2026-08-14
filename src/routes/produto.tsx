@@ -172,6 +172,10 @@ function ProductDetailsPage() {
   const imageSrc = (product.imageUrl && getDirectDriveUrl(product.imageUrl)) || IMAGE_MAP[product.imageKey] || product.image || PRODUCTS[product.id - 1]?.image;
 
   const handleBuy = () => {
+    if (product.stock !== undefined && quantity > product.stock) {
+      toast.error(`Desculpe, temos apenas ${product.stock} unidade(s) deste modelo em estoque.`);
+      return;
+    }
     addItem(product, quantity);
     toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`, {
       description: "Redirecionando para a finalização...",
@@ -180,6 +184,10 @@ function ProductDetailsPage() {
   };
 
   const handleAddToCartOnly = () => {
+    if (product.stock !== undefined && quantity > product.stock) {
+      toast.error(`Desculpe, temos apenas ${product.stock} unidade(s) deste modelo em estoque.`);
+      return;
+    }
     addItem(product, quantity);
     toast.success(`${quantity}x ${product.name} adicionado à sacola!`, {
       description: "Você pode continuar navegando ou finalizar a compra.",
@@ -333,6 +341,27 @@ function ProductDetailsPage() {
               <p className="text-xs sm:text-sm text-muted-foreground font-semibold mt-1">
                 {product.installment || "ou 10x sem juros no cartão"}
               </p>
+              <div className="flex items-center gap-2 mt-2">
+                {product.stock !== undefined ? (
+                  product.stock === 0 ? (
+                    <span className="text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded uppercase tracking-wider">
+                      Fora de Estoque
+                    </span>
+                  ) : product.stock <= 5 ? (
+                    <span className="text-[10px] font-black text-white bg-[#FF8A00] px-2 py-0.5 rounded uppercase tracking-wider">
+                      Restam apenas {product.stock} unidades!
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-black text-white bg-green-600 px-2 py-0.5 rounded uppercase tracking-wider">
+                      Em estoque: {product.stock} unidades
+                    </span>
+                  )
+                ) : (
+                  <span className="text-[10px] font-black text-white bg-green-600 px-2 py-0.5 rounded uppercase tracking-wider">
+                    Em estoque
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Ações de Compra */}
@@ -341,15 +370,27 @@ function ProductDetailsPage() {
                 {/* Seletor de Quantidade */}
                 <div className="flex items-center border border-border rounded-lg bg-background p-1 self-start sm:self-auto h-12">
                   <button
+                    type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer"
+                    disabled={product.stock !== undefined && product.stock <= 0}
+                    className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="w-12 text-center text-sm font-bold text-ink select-none">{quantity}</span>
+                  <span className="w-12 text-center text-sm font-bold text-ink select-none">
+                    {product.stock !== undefined && product.stock <= 0 ? 0 : quantity}
+                  </span>
                   <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer"
+                    type="button"
+                    onClick={() => setQuantity((q) => {
+                      if (product.stock !== undefined && q >= product.stock) {
+                        toast.error(`Desculpe, temos apenas ${product.stock} unidade(s) deste modelo em estoque.`);
+                        return q;
+                      }
+                      return q + 1;
+                    })}
+                    disabled={product.stock !== undefined && (product.stock <= 0 || quantity >= product.stock)}
+                    className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-brand transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -358,17 +399,19 @@ function ProductDetailsPage() {
                 {/* Botão de Compra */}
                 <button
                   onClick={handleBuy}
-                  className="flex-1 h-12 bg-brand hover:bg-brand-2 text-white font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+                  disabled={product.stock !== undefined && product.stock <= 0}
+                  className="flex-1 h-12 bg-brand hover:bg-brand-2 text-white font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingCart className="h-4 w-4" />
-                  {settings.buttonText || "COMPRAR AGORA"}
+                  {product.stock !== undefined && product.stock <= 0 ? "FORA DE ESTOQUE" : (settings.buttonText || "COMPRAR AGORA")}
                 </button>
               </div>
 
               {settings.showButton2 !== false && (
                 <button
                   onClick={handleAddToCartOnly}
-                  className="w-full h-12 bg-transparent hover:bg-white/5 border-2 border-brand text-brand hover:text-brand-2 font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  disabled={product.stock !== undefined && product.stock <= 0}
+                  className="w-full h-12 bg-transparent hover:bg-white/5 border-2 border-brand text-brand hover:text-brand-2 font-bold text-sm tracking-wider uppercase rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingBag className="h-4.5 w-4.5" />
                   {settings.button2Text || "ADICIONAR À SACOLA"}

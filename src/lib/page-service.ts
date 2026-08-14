@@ -24,6 +24,7 @@ export interface PageProduct {
   specsLente?: string;
   specsAltura?: string;
   gallery?: string[];
+  stock?: number;
 }
 
 export interface CategoryPageData {

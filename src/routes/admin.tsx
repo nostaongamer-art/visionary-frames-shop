@@ -169,6 +169,7 @@ function Admin() {
   const [prodSpecsLente, setProdSpecsLente] = useState("");
   const [prodSpecsAltura, setProdSpecsAltura] = useState("");
   const [prodGallery, setProdGallery] = useState<string[]>([]);
+  const [prodStock, setProdStock] = useState("");
   const [adminProductSearch, setAdminProductSearch] = useState("");
   const [adminProductPage, setAdminProductPage] = useState(1);
 
@@ -4880,6 +4881,7 @@ function Admin() {
                       setProdSpecsLente("");
                       setProdSpecsAltura("");
                       setProdGallery([]);
+                      setProdStock("");
                     }}
                     className="bg-[#FF8A00] hover:bg-[#E97800] text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
@@ -5177,6 +5179,18 @@ function Admin() {
                           <option key={num} value={num}>{num}x sem juros</option>
                         ))}
                       </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs font-semibold text-white/70">Estoque (Deixe em branco para ilimitado)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Ex: 50"
+                        value={prodStock}
+                        onChange={(e) => setProdStock(e.target.value)}
+                        className="w-full h-10 px-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-sm text-white outline-none focus:border-[#FF8A00]"
+                      />
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -5504,6 +5518,7 @@ function Admin() {
                           specsLente: prodSpecsLente,
                           specsAltura: prodSpecsAltura,
                           gallery: prodGallery.filter(Boolean),
+                          stock: prodStock.trim() ? parseInt(prodStock) : undefined,
                         };
 
                         if (isAddingProduct) {
@@ -5581,6 +5596,7 @@ function Admin() {
                                   setProdSpecsLente(prod.specsLente || "");
                                   setProdSpecsAltura(prod.specsAltura || "");
                                   setProdGallery(prod.gallery || []);
+                                  setProdStock(prod.stock !== undefined ? prod.stock.toString() : "");
                                   
                                   const instMatch = prod.installment ? prod.installment.match(/^(\d+)x/) : null;
                                   const currentInst = instMatch ? parseInt(instMatch[1]) : 12;

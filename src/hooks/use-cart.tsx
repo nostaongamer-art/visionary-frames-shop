@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { toast } from "sonner";
 
 export interface CartItem {
   id: string | number;
@@ -11,6 +12,7 @@ export interface CartItem {
   discount?: string;
   oldPrice?: string;
   quantity: number;
+  stock?: number;
 }
 
 type CartContextValue = {
@@ -83,14 +85,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((item) => String(item.id) === String(product.id));
       const parsedPriceVal = typeof product.priceVal === "number" ? product.priceVal : parseFloat(String(product.price).replace(/[^\d.,]/g, "").replace(",", ".")) || 199.90;
-      
+      const productStock = product.stock !== undefined ? parseInt(String(product.stock)) : undefined;
+
       if (existing) {
+        const newQty = existing.quantity + qty;
+        if (existing.stock !== undefined && !isNaN(existing.stock) && newQty > existing.stock) {
+          toast.error(`Desculpe, temos apenas ${existing.stock} unidade(s) deste modelo em estoque.`);
+          return prev;
+        }
         return prev.map((item) =>
           String(item.id) === String(product.id)
-            ? { ...item, quantity: item.quantity + qty }
+            ? { ...item, quantity: newQty }
             : item
         );
       }
+
+      if (productStock !== undefined && !isNaN(productStock) && qty > productStock) {
+        toast.error(`Desculpe, temos apenas ${productStock} unidade(s) deste modelo em estoque.`);
+        return prev;
+      }
+
       return [
         ...prev,
         {
@@ -104,6 +118,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           discount: product.discount,
           oldPrice: product.oldPrice,
           quantity: qty,
+          stock: productStock,
         },
       ];
     });
@@ -118,9 +133,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem(id);
       return;
     }
-    setItems((prev) =>
-      prev.map((item) => (String(item.id) === String(id) ? { ...item, quantity: qty } : item))
-    );
+    setItems((prev) => {
+      const existing = prev.find((item) => String(item.id) === String(id));
+      if (existing && existing.stock !== undefined && !isNaN(existing.stock) && qty > existing.stock) {
+        toast.error(`Desculpe, temos apenas ${existing.stock} unidade(s) deste modelo em estoque.`);
+        return prev;
+      }
+      return prev.map((item) => (String(item.id) === String(id) ? { ...item, quantity: qty } : item));
+    });
   };
 
   const clearCart = () => setItems([]);
