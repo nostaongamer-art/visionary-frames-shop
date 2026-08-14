@@ -438,6 +438,7 @@ export async function fetchPageContent(pageId: string): Promise<CategoryPageData
         specsLente: p.specsLente || "",
         specsAltura: p.specsAltura || "",
         gallery: Array.isArray(p.gallery) ? p.gallery : [],
+        stock: p.stock !== undefined ? Number(p.stock) : undefined,
       })),
       productsShow: saved.productsShow !== undefined ? saved.productsShow : true,
       colors: saved.colors || defaultData.colors,
