@@ -127,6 +127,7 @@ function Admin() {
   const [showAccessToken, setShowAccessToken] = useState(false);
   const [copiedWebhook, setCopiedWebhook] = useState(false);
   const [displayWebhookUrl, setDisplayWebhookUrl] = useState("");
+  const [isPaymentSettingsLoaded, setIsPaymentSettingsLoaded] = useState(false);
 
   useEffect(() => {
     if (paymentSettings?.webhookUrl) {
@@ -235,6 +236,19 @@ function Admin() {
   }, [navigate]);
 
   useEffect(() => {
+    async function loadPayments() {
+      try {
+        const settings = await fetchPaymentSettings();
+        setPaymentSettings(settings);
+        setIsPaymentSettingsLoaded(true);
+      } catch (err) {
+        console.error("Error pre-loading payment settings:", err);
+      }
+    }
+    loadPayments();
+  }, []);
+
+  useEffect(() => {
     async function loadData() {
       setLoading(true);
       if (activeSection === "home") {
@@ -249,6 +263,7 @@ function Admin() {
         setCategoryData(null);
         const settings = await fetchPaymentSettings();
         setPaymentSettings(settings);
+        setIsPaymentSettingsLoaded(true);
       } else {
         const content = await fetchPageContent(activeSection);
         setCategoryData(content);
@@ -297,25 +312,37 @@ function Admin() {
       let pageResult: { success: boolean; isLocalOnly: boolean; error: string | null } = { success: true, isLocalOnly: false, error: null };
       if (activeSection !== "home" && activeSection !== "orders" && activeSection !== "payments" && categoryData) {
         pageResult = await savePageContent(activeSection, categoryData) as { success: boolean; isLocalOnly: boolean; error: string | null };
-      } else if (activeSection === "payments") {
+      }
+      
+      // Sempre salva as configurações do Mercado Pago se estiverem carregadas do DB
+      let finalPageResult = pageResult;
+      if (isPaymentSettingsLoaded) {
         const paymentRes = await savePaymentSettings(paymentSettings);
-        pageResult = {
-          success: paymentRes.success,
-          isLocalOnly: !!paymentRes.isLocalOnly,
-          error: paymentRes.error || null
-        };
+        if (!paymentRes.success) {
+          finalPageResult = {
+            success: false,
+            isLocalOnly: !!paymentRes.isLocalOnly,
+            error: paymentRes.error || "Erro ao salvar Mercado Pago"
+          };
+        } else if (activeSection === "payments") {
+          finalPageResult = {
+            success: true,
+            isLocalOnly: !!paymentRes.isLocalOnly,
+            error: null
+          };
+        }
       }
       
       setSaving(false);
 
-      if (homeResult.success && pageResult.success) {
-        if (homeResult.isLocalOnly || pageResult.isLocalOnly) {
+      if (homeResult.success && finalPageResult.success) {
+        if (homeResult.isLocalOnly || finalPageResult.isLocalOnly) {
           toast.warning("Salvo temporariamente no navegador! Sincronização falhou.");
         } else {
           toast.success("Alterações salvas com sucesso!");
         }
       } else {
-        const err = homeResult.error || pageResult.error || "Erro desconhecido";
+        const err = homeResult.error || finalPageResult.error || "Erro desconhecido";
         toast.error(`Erro ao salvar: ${err}`);
       }
     } catch (err: any) {
