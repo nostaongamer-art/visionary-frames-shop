@@ -188,21 +188,22 @@ export function Header() {
               <div className="flex items-center gap-1 cursor-pointer hover:text-brand py-2">
                 <User className="h-5 w-5 text-brand" />
                 <span className="text-[10px] font-bold max-w-[70px] truncate uppercase">{customer.fullName.split(" ")[0]}</span>
-                {/* Dropdown Options */}
-                <div className="absolute right-0 top-full mt-1 w-44 bg-[#15181D] border border-[#282C32]/45 rounded-md shadow-xl py-1 hidden group-hover:block z-50 text-left">
-                  <Link
-                    to="/checkout"
-                    search={{ action: "" }}
-                    className="block px-4 py-2 text-xs text-white/80 hover:bg-[#FF8A00] hover:text-white transition-colors font-bold uppercase"
-                  >
-                    📦 Meus Pedidos
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="w-full text-left block px-4 py-2 text-xs text-red-400 hover:bg-red-500 hover:text-white transition-colors font-bold uppercase bg-transparent border-none cursor-pointer"
-                  >
-                    🚪 Sair
-                  </button>
+                <div className="absolute right-0 top-full w-44 pt-2 hidden group-hover:block z-50 text-left">
+                  <div className="bg-[#15181D] border border-[#282C32]/45 rounded-md shadow-xl py-1">
+                    <Link
+                      to="/checkout"
+                      search={{ action: "" }}
+                      className="block px-4 py-2 text-xs text-white/80 hover:bg-[#FF8A00] hover:text-white transition-colors font-bold uppercase"
+                    >
+                      📦 Meus Pedidos
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="w-full text-left block px-4 py-2 text-xs text-red-400 hover:bg-red-500 hover:text-white transition-colors font-bold uppercase bg-transparent border-none cursor-pointer"
+                    >
+                      🚪 Sair
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

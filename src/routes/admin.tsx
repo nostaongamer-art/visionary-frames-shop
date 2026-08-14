@@ -4213,7 +4213,7 @@ function Admin() {
             <div className="flex flex-col gap-5 text-white text-left select-none animate-fadeIn">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-3">
                 <h3 className="text-base font-bold text-[#FF8A00] flex items-center gap-2">
-                  📦 Gestão de Pedidos Recebidos ({orders.length})
+                  📦 Gestão de Pedidos Recebidos ({orders.filter(o => o.tags?.paymentStatus !== "pendente").length})
                 </h3>
                 
                 {/* Search orders */}
@@ -4232,6 +4232,9 @@ function Admin() {
               {/* Orders List */}
               {(() => {
                 const filtered = orders.filter((ord) => {
+                  // Apenas exibe pedidos cujo pagamento foi concluído (não pendentes)
+                  if (ord.tags?.paymentStatus === "pendente") return false;
+
                   const filter = ordersFilter.toLowerCase().trim();
                   if (!filter) return true;
                   return (
