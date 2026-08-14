@@ -123,15 +123,21 @@ async function handleCreatePayment(request: Request): Promise<Response> {
     const [name, ...surnameParts] = (customer.fullName || "").split(" ");
     const surname = surnameParts.join(" ") || "Silva";
     const cleanCpf = customer.cpf ? customer.cpf.replace(/\D/g, "") : "";
+    const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, "") : "";
 
     const payer: any = {
       name: name || "Cliente",
       surname,
       email: customer.email || "cliente@email.com",
-      phone: {
-        number: customer.phone ? customer.phone.replace(/\D/g, "") : ""
-      }
     };
+
+    // Mercado Pago rejects phone objects without area_code / with empty number
+    if (cleanPhone.length >= 10) {
+      payer.phone = {
+        area_code: cleanPhone.slice(0, 2),
+        number: cleanPhone.slice(2),
+      };
+    }
 
     if (cleanCpf && cleanCpf.length === 11) {
       payer.identification = {
