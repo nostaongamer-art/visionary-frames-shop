@@ -5498,7 +5498,7 @@ function Admin() {
                         const productPayload: PageProduct = {
                           id: isEditingProduct && editingProductId !== null ? editingProductId : Date.now(),
                           name: prodName,
-                          discount: prodOldPrice ? prodDiscount : "",
+                          discount: prodDiscount || "",
                           reviews: isEditingProduct && editingProductId !== null ? (categoryData.products.find(p => p.id === editingProductId)?.reviews || "(0)") : `(${Math.floor(Math.random() * 150) + 15})`,
                           oldPrice: prodOldPrice || "",
                           price: `R$ ${numPrice.toFixed(2).replace(".", ",")}`,
