@@ -122,6 +122,27 @@ function ProductDetailsPage() {
           }
         }
 
+        // Realiza busca cruzada em outras seções de catálogo para herdar o estoque correto do produto
+        if (foundProduct) {
+          const catalogIds = ["colecoes", "feminino", "masculino", "premium", "promocoes", "solar"];
+          for (const catId of catalogIds) {
+            try {
+              const catData = await fetchPageContent(catId);
+              if (catData && Array.isArray(catData.products)) {
+                const match = catData.products.find(
+                  (p: any) => p.name === foundProduct.name || String(p.id) === String(foundProduct.id)
+                );
+                if (match && match.stock !== undefined) {
+                  foundProduct.stock = match.stock;
+                  break;
+                }
+              }
+            } catch (e) {
+              console.error(`Erro ao buscar estoque na seção ${catId}:`, e);
+            }
+          }
+        }
+
         setProduct(foundProduct);
         if (foundProduct) {
           const mainSrc = (foundProduct.imageUrl && getDirectDriveUrl(foundProduct.imageUrl)) || IMAGE_MAP[foundProduct.imageKey] || foundProduct.image || PRODUCTS[foundProduct.id - 1]?.image;
@@ -326,7 +347,12 @@ function ProductDetailsPage() {
               <div className="flex items-baseline gap-2">
                 {product.oldPrice && (
                   <span className="text-xs sm:text-sm text-muted-foreground line-through font-medium">
-                    {product.oldPrice}
+                    {(() => {
+                      const oldPriceVal = parseFloat(String(product.oldPrice).replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
+                      return oldPriceVal > 0 
+                        ? `R$ ${(oldPriceVal * quantity).toFixed(2).replace(".", ",")}`
+                        : product.oldPrice;
+                    })()}
                   </span>
                 )}
                 {product.discount && (
@@ -336,10 +362,15 @@ function ProductDetailsPage() {
                 )}
               </div>
               <div className="text-2xl sm:text-3xl font-black text-brand leading-none">
-                {product.price}
+                R$ ${(product.priceVal * quantity).toFixed(2).replace(".", ",")}
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground font-semibold mt-1">
-                {product.installment || "ou 10x sem juros no cartão"}
+                {(() => {
+                  const instMatch = product.installment ? product.installment.match(/^(\d+)x/) : null;
+                  const installmentsCount = instMatch ? parseInt(instMatch[1]) : 12;
+                  const installmentValue = (product.priceVal * quantity) / installmentsCount;
+                  return `${installmentsCount}x de R$ ${installmentValue.toFixed(2).replace(".", ",")} sem juros`;
+                })()}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 {product.stock !== undefined ? (
