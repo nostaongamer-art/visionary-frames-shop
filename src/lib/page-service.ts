@@ -549,3 +549,37 @@ export async function savePageContent(pageId: string, content: CategoryPageData)
     return { success: true, isLocalOnly: true, error: err.message || "Erro desconhecido" };
   }
 }
+
+export async function decrementProductStock(productName: string, quantityBought: number) {
+  const catalogIds = ["colecoes", "feminino", "masculino", "premium", "promocoes", "solar"];
+  
+  for (const catId of catalogIds) {
+    try {
+      const catData = await fetchPageContent(catId);
+      if (catData && Array.isArray(catData.products)) {
+        let updated = false;
+        const newProducts = catData.products.map((p: any) => {
+          if (p.name && p.name.trim().toLowerCase() === productName.trim().toLowerCase()) {
+            if (p.stock !== undefined && !isNaN(p.stock)) {
+              const currentStock = Number(p.stock);
+              const newStock = Math.max(0, currentStock - quantityBought);
+              updated = true;
+              return { ...p, stock: newStock };
+            }
+          }
+          return p;
+        });
+        
+        if (updated) {
+          await savePageContent(catId, {
+            ...catData,
+            products: newProducts
+          });
+          console.log(`Decremented stock for "${productName}" in section "${catId}" by ${quantityBought}`);
+        }
+      }
+    } catch (e) {
+      console.error(`Error decrementing stock for "${productName}" in section ${catId}:`, e);
+    }
+  }
+}

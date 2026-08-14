@@ -20,6 +20,7 @@ import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
 import type { Order } from "@/lib/orders-service";
 import { fetchPaymentSettings } from "@/lib/payment-service";
+import { decrementProductStock } from "@/lib/page-service";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -239,6 +240,15 @@ function CheckoutPage() {
         setLastSavedOrder(saved);
         if (typeof window !== "undefined") {
           localStorage.setItem("glasses_last_order", JSON.stringify(saved));
+        }
+
+        // Decrementa o estoque de cada item comprado de forma cruzada em todas as coleções
+        for (const item of items) {
+          try {
+            await decrementProductStock(item.name, item.quantity);
+          } catch (e) {
+            console.error("Erro ao decrementar estoque do item:", item.name, e);
+          }
         }
 
         // Envia as informações do pedido diretamente ao backend para processar o pagamento
