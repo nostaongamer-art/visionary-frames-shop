@@ -26,40 +26,13 @@ export function OrderSummary({ shippingType, appliedCoupon: propCoupon, setAppli
 
   const { items } = useCart();
 
-  // Calcular subtotal (original) e desconto (do catálogo) com base nos selos dos produtos
-  let calculatedSubtotal = 0;
-  let catalogDiscount = 0;
-
-  items.forEach((item) => {
-    const pctMatch = item.discount ? item.discount.match(/(\d+)/) : null;
-    const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
-    
-    let oldPriceVal = item.oldPrice ? parseFloat(String(item.oldPrice).replace(/[^\d.,]/g, "").replace(",", ".")) : 0;
-    if (isNaN(oldPriceVal) || oldPriceVal <= 0) {
-      if (pct > 0 && pct < 100) {
-        oldPriceVal = item.priceVal / (1 - pct / 100);
-      } else {
-        oldPriceVal = item.priceVal;
-      }
-    }
-    
-    const itemOriginalTotal = oldPriceVal * item.quantity;
-    const itemFinalTotal = item.priceVal * item.quantity;
-    const itemDiscount = Math.max(0, itemOriginalTotal - itemFinalTotal);
-    
-    calculatedSubtotal += itemOriginalTotal;
-    catalogDiscount += itemDiscount;
-  });
-
-  const subtotal = calculatedSubtotal;
-  const initialDiscount = catalogDiscount;
+  const subtotal = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
   const shippingCost = shippingType === "express" ? 29.90 : 0;
   
-  // O cupom adiciona 10% de desconto extra sobre a soma dos preços de venda
-  const sellingPriceSum = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
-  const extraDiscount = appliedCoupon ? sellingPriceSum * 0.10 : 0;
+  // O cupom adiciona 10% de desconto extra sobre o subtotal
+  const extraDiscount = appliedCoupon ? subtotal * 0.10 : 0;
   
-  const total = Math.max(0, sellingPriceSum - extraDiscount + shippingCost);
+  const total = Math.max(0, subtotal - extraDiscount + shippingCost);
   const installmentAmount = total / 12;
 
   const handleApplyCoupon = () => {
@@ -121,11 +94,7 @@ export function OrderSummary({ shippingType, appliedCoupon: propCoupon, setAppli
           <span>Subtotal</span>
           <span className="font-medium text-white/90">R$ {subtotal.toFixed(2).replace(".", ",")}</span>
         </div>
-        <div className="flex justify-between">
-          <span>Desconto do Catálogo</span>
-          <span className="font-medium text-[#00C83C]">- R$ {initialDiscount.toFixed(2).replace(".", ",")}</span>
-        </div>
-        
+
         {appliedCoupon && (
           <div className="flex justify-between animate-fadeIn">
             <span>Cupom ({appliedCoupon})</span>

@@ -207,37 +207,11 @@ function CheckoutPage() {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        let calculatedSubtotal = 0;
-        let catalogDiscount = 0;
-
-        items.forEach((item) => {
-          const pctMatch = item.discount ? item.discount.match(/(\d+)/) : null;
-          const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
-          
-          let oldPriceVal = item.oldPrice ? parseFloat(String(item.oldPrice).replace(/[^\d.,]/g, "").replace(",", ".")) : 0;
-          if (isNaN(oldPriceVal) || oldPriceVal <= 0) {
-            if (pct > 0 && pct < 100) {
-              oldPriceVal = item.priceVal / (1 - pct / 100);
-            } else {
-              oldPriceVal = item.priceVal;
-            }
-          }
-          
-          const itemOriginalTotal = oldPriceVal * item.quantity;
-          const itemFinalTotal = item.priceVal * item.quantity;
-          const itemDiscount = Math.max(0, itemOriginalTotal - itemFinalTotal);
-          
-          calculatedSubtotal += itemOriginalTotal;
-          catalogDiscount += itemDiscount;
-        });
-
-        const sellingPriceSum = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
-        const extraDiscount = appliedCoupon ? sellingPriceSum * 0.10 : 0;
-        
-        const subtotal = calculatedSubtotal;
-        const discount = catalogDiscount + extraDiscount;
+        const subtotal = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
+        const extraDiscount = appliedCoupon ? subtotal * 0.10 : 0;
+        const discount = extraDiscount;
         const shippingCost = shippingType === "express" ? 29.90 : 0;
-        const total = Math.max(0, sellingPriceSum - extraDiscount + shippingCost);
+        const total = Math.max(0, subtotal - discount + shippingCost);
 
         const orderPayload = {
           customerName: personalData.fullName,
