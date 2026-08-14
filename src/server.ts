@@ -78,16 +78,16 @@ async function handleCreatePayment(request: Request): Promise<Response> {
       .single();
 
     if (dbError || !dbData || !dbData.content) {
-      return new Response(JSON.stringify({ success: false, error: "Configurações de pagamento não encontradas." }), {
-        status: 400,
+      return new Response(JSON.stringify({ success: false, isMpDisabled: true, error: "Configurações de pagamento não encontradas." }), {
+        status: 200,
         headers: { "content-type": "application/json" },
       });
     }
 
     const settings = dbData.content as any;
     if (!settings.enabled) {
-      return new Response(JSON.stringify({ success: false, error: "Pagamento via Mercado Pago está desativado." }), {
-        status: 400,
+      return new Response(JSON.stringify({ success: false, isMpDisabled: true, error: "Pagamento via Mercado Pago está desativado." }), {
+        status: 200,
         headers: { "content-type": "application/json" },
       });
     }
@@ -96,8 +96,8 @@ async function handleCreatePayment(request: Request): Promise<Response> {
     const accessToken = mode === "production" ? settings.accessTokenProduction : settings.accessTokenSandbox;
 
     if (!accessToken) {
-      return new Response(JSON.stringify({ success: false, error: `Token de acesso (${mode}) não configurado.` }), {
-        status: 400,
+      return new Response(JSON.stringify({ success: false, isMpDisabled: true, error: `Token de acesso (${mode}) não configurado.` }), {
+        status: 200,
         headers: { "content-type": "application/json" },
       });
     }

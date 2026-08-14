@@ -212,56 +212,56 @@ function CheckoutPage() {
         const saved = await saveOrder(orderPayload);
         setLastSavedOrder(saved);
 
-        // Check if Mercado Pago is enabled
+        // Envia as informações do pedido diretamente ao backend para processar o pagamento
         try {
-          const settings = await fetchPaymentSettings();
-          if (settings && settings.enabled) {
-            const response = await fetch("/api/create-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
+          const response = await fetch("/api/create-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId: saved.id,
+              items: items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                priceVal: item.priceVal,
+                quantity: item.quantity,
+              })),
+              customer: {
+                fullName: personalData.fullName,
+                email: personalData.email,
+                phone: personalData.phone,
+                cpf: personalData.cpf,
               },
-              body: JSON.stringify({
-                orderId: saved.id,
-                items: items.map((item) => ({
-                  id: item.id,
-                  name: item.name,
-                  price: item.price,
-                  priceVal: item.priceVal,
-                  quantity: item.quantity,
-                })),
-                customer: {
-                  fullName: personalData.fullName,
-                  email: personalData.email,
-                  phone: personalData.phone,
-                  cpf: personalData.cpf,
-                },
-                paymentMethod: paymentMethod,
-                shippingCost: shippingCost,
-              }),
-            });
+              paymentMethod: paymentMethod,
+              shippingCost: shippingCost,
+            }),
+          });
 
-            const paymentResult = await response.json();
-            if (paymentResult.success && paymentResult.initPoint) {
-              clearCart();
-              setIsSubmitting(false);
-              toast.success("Pedido registrado! Redirecionando para o pagamento...");
-              
-              // Se estiver rodando dentro de um iframe (como no preview do Lovable),
-              // abrimos o link do Mercado Pago em uma nova aba para evitar erros de abortamento
-              // e bloqueio de frame. No site de produção real, redirecionamos diretamente.
-              const isIframe = typeof window !== "undefined" && window.self !== window.top;
-              if (isIframe) {
-                window.open(paymentResult.initPoint, "_blank");
-                // Avança a tela para a confirmação de compra realizada no preview
-                setCheckoutStep("registration-offer");
-              } else {
-                window.location.href = paymentResult.initPoint;
-              }
-              return;
+          const paymentResult = await response.json();
+          if (paymentResult.success && paymentResult.initPoint) {
+            clearCart();
+            setIsSubmitting(false);
+            toast.success("Pedido registrado! Redirecionando para o pagamento...");
+            
+            // Se estiver rodando dentro de um iframe (como no preview do Lovable),
+            // abrimos o link do Mercado Pago em uma nova aba para evitar erros de abortamento
+            // e bloqueio de frame. No site de produção real, redirecionamos diretamente.
+            const isIframe = typeof window !== "undefined" && window.self !== window.top;
+            if (isIframe) {
+              window.open(paymentResult.initPoint, "_blank");
+              // Avança a tela para a confirmação de compra realizada no preview
+              setCheckoutStep("registration-offer");
             } else {
-              console.error("Failed to generate payment:", paymentResult.error);
-              toast.error("Erro ao iniciar pagamento com Mercado Pago. Continuando com o pedido...");
+              window.location.href = paymentResult.initPoint;
+            }
+            return;
+          } else {
+            console.error("Failed to generate payment:", paymentResult.error);
+            // Apenas exibe alerta se o Mercado Pago não estiver intencionalmente desativado
+            if (!paymentResult.isMpDisabled) {
+              toast.error(`Erro ao iniciar pagamento: ${paymentResult.error || "Erro desconhecido."}`);
             }
           }
         } catch (paymentErr) {
