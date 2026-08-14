@@ -142,7 +142,7 @@ function CheckoutPage() {
                 }
               }
 
-              // Atualiza o status do pedido na lista global e adiciona a flag de decrementado
+              // Atualiza o status do pedido na lista global, adiciona a flag de decrementado e deleta outros pendentes duplicados do mesmo cliente
               const updated = orders.map((o) => {
                 if (o.id === orderId) {
                   return {
@@ -155,6 +155,19 @@ function CheckoutPage() {
                   };
                 }
                 return o;
+              }).filter((o) => {
+                // Mantém o pedido atual pago
+                if (o.id === orderId) return true;
+                
+                // Se for outro pedido pendente do mesmo cliente, deleta ele!
+                if (
+                  o.tags?.paymentStatus === "pendente" &&
+                  o.customerEmail?.trim().toLowerCase() === order.customerEmail?.trim().toLowerCase()
+                ) {
+                  console.log(`[Checkout] Deletando pedido pendente duplicado ${o.id} de ${o.customerEmail}`);
+                  return false;
+                }
+                return true;
               });
 
               const { data, error } = await supabase.from("home_page_content").upsert({

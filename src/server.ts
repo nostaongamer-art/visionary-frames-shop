@@ -347,43 +347,57 @@ async function handleMercadoPagoWebhook(request: Request): Promise<Response> {
             const content = orderData?.content as any;
             if (content && Array.isArray(content.orders)) {
               let updated = false;
-              const updatedOrders = [];
-              for (const ord of content.orders) {
-                if (ord.id === orderId) {
-                  updated = true;
-                  let stockDecremented = ord.tags?.stockDecremented || false;
-                  if (paymentStatus === "pago" && !stockDecremented) {
-                    stockDecremented = true;
-                    // Decrement stock for all items
-                    if (Array.isArray(ord.items)) {
-                      for (const item of ord.items) {
-                        try {
-                          await decrementProductStockServer(item.name, item.quantity);
-                        } catch (e) {
-                          console.error("Error decrementing stock on server webhook:", item.name, e);
-                        }
+              const targetOrder = content.orders.find((o: any) => o.id === orderId);
+
+              if (targetOrder) {
+                let stockDecremented = targetOrder.tags?.stockDecremented || false;
+                if (paymentStatus === "pago" && !stockDecremented) {
+                  stockDecremented = true;
+                  // Decrement stock for all items
+                  if (Array.isArray(targetOrder.items)) {
+                    for (const item of targetOrder.items) {
+                      try {
+                        await decrementProductStockServer(item.name, item.quantity);
+                      } catch (e) {
+                        console.error("Error decrementing stock on server webhook:", item.name, e);
                       }
                     }
                   }
-                  updatedOrders.push({
-                    ...ord,
-                    tags: {
-                      ...ord.tags,
-                      paymentStatus: paymentStatus,
-                      stockDecremented: stockDecremented
-                    }
-                  });
-                } else {
-                  updatedOrders.push(ord);
                 }
-              }
 
-              if (updated) {
-                await supabase.from("home_page_content").upsert({
-                  id: "orders_list",
-                  content: { orders: updatedOrders },
-                  updated_at: new Date().toISOString()
-                });
+                const updatedOrders = [];
+                for (const ord of content.orders) {
+                  if (ord.id === orderId) {
+                    updated = true;
+                    updatedOrders.push({
+                      ...ord,
+                      tags: {
+                        ...ord.tags,
+                        paymentStatus: paymentStatus,
+                        stockDecremented: stockDecremented
+                      }
+                    });
+                  } else {
+                    // Se for outro pedido pendente do mesmo cliente, deleta ele!
+                    if (
+                      ord.tags?.paymentStatus === "pendente" &&
+                      ord.customerEmail?.trim().toLowerCase() === targetOrder.customerEmail?.trim().toLowerCase()
+                    ) {
+                      updated = true;
+                      console.log(`[Server Webhook] Deleting duplicated pending order ${ord.id} for ${ord.customerEmail}`);
+                      continue; // Pula (deleta)
+                    }
+                    updatedOrders.push(ord);
+                  }
+                }
+
+                if (updated) {
+                  await supabase.from("home_page_content").upsert({
+                    id: "orders_list",
+                    content: { orders: updatedOrders },
+                    updated_at: new Date().toISOString()
+                  });
+                }
               }
             }
           }
