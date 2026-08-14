@@ -7,7 +7,6 @@ import { SecurityBanner } from "@/components/checkout/SecurityBanner";
 import { PersonalDataForm } from "@/components/checkout/PersonalDataForm";
 import { AddressForm } from "@/components/checkout/AddressForm";
 import { ShippingOptions, ShippingType } from "@/components/checkout/ShippingOptions";
-import { PaymentMethods, PaymentMethodType } from "@/components/checkout/PaymentMethods";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { PurchaseBenefits } from "@/components/checkout/PurchaseBenefits";
 import { CustomerTestimonial } from "@/components/checkout/CustomerTestimonial";
@@ -79,6 +78,7 @@ function CheckoutPage() {
   >(action === "login" ? "login" : "checkout");
   
   const [lastSavedOrder, setLastSavedOrder] = useState<any>(null);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
 
   // Registration Form States
   const [regName, setRegName] = useState("");
@@ -204,7 +204,7 @@ function CheckoutPage() {
           shippingCost,
           total,
           tags: {
-            paymentStatus: (paymentMethod === "pix" ? "pendente" : "pago") as Order["tags"]["paymentStatus"],
+            paymentStatus: "pendente" as Order["tags"]["paymentStatus"],
             shippingStatus: (shippingCost > 0 ? "com_frete" : "sem_frete") as Order["tags"]["shippingStatus"],
           },
         };
@@ -234,7 +234,7 @@ function CheckoutPage() {
                 phone: personalData.phone,
                 cpf: personalData.cpf,
               },
-              paymentMethod: paymentMethod,
+              paymentMethod: "all",
               shippingCost: shippingCost,
             }),
           });
@@ -247,9 +247,10 @@ function CheckoutPage() {
 
           const paymentResult = await response.json();
           if (paymentResult.success && paymentResult.initPoint) {
+            setPaymentUrl(paymentResult.initPoint);
             clearCart();
             setIsSubmitting(false);
-            toast.success("Pedido registrado! Redirecionando para o pagamento...");
+            toast.success("Pedido registrado com sucesso!");
             
             // Se estiver rodando dentro de um iframe (como no preview do Lovable),
             // abrimos o link do Mercado Pago em uma nova aba para evitar erros de abortamento
@@ -575,12 +576,7 @@ function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="bg-white border border-[#D9DDE2] rounded-md p-6 flex flex-col gap-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-                  <PaymentMethods
-                    selectedMethod={paymentMethod}
-                    onSelect={setPaymentMethod}
-                  />
-                </div>
+
 
                 <button
                   type="submit"
@@ -610,6 +606,24 @@ function CheckoutPage() {
           <p className="text-sm text-muted-foreground max-w-sm">
             Sua compra de <span className="font-bold text-brand">R$ {lastSavedOrder.total.toFixed(2).replace(".", ",")}</span> foi registrada. Código: <span className="font-bold text-brand">{lastSavedOrder.id}</span>
           </p>
+
+          {paymentUrl && (
+            <div className="bg-[#FFF5E6] border border-[#FFE0B2] p-5 rounded-md w-full flex flex-col items-center gap-3 animate-fadeIn mt-4">
+              <span className="text-xs font-bold text-[#FF8A00] uppercase tracking-wider">Aguardando Pagamento</span>
+              <a
+                href={paymentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-12 bg-[#FF8A00] hover:bg-[#E97800] text-white text-sm font-extrabold flex items-center justify-center gap-2 rounded shadow-md transition-colors cursor-pointer select-none text-center"
+              >
+                <CreditCard className="h-4 w-4" />
+                <span>PAGAR AGORA COM MERCADO PAGO</span>
+              </a>
+              <span className="text-[10px] text-muted-foreground text-center">
+                Clique no botão acima para abrir a tela de pagamento e gerar o seu Pix ou pagar com Cartão de Crédito.
+              </span>
+            </div>
+          )}
 
           <div className="bg-white border border-[#D9DDE2] p-6 rounded-md shadow-sm w-full mt-4 flex flex-col gap-4">
             <h3 className="text-sm font-extrabold text-ink uppercase tracking-wider">
