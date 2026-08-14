@@ -247,8 +247,17 @@ function CheckoutPage() {
               setIsSubmitting(false);
               toast.success("Pedido registrado! Redirecionando para o pagamento...");
               
-              // Redirect to Mercado Pago checkout
-              window.location.href = paymentResult.initPoint;
+              // Se estiver rodando dentro de um iframe (como no preview do Lovable),
+              // abrimos o link do Mercado Pago em uma nova aba para evitar erros de abortamento
+              // e bloqueio de frame. No site de produção real, redirecionamos diretamente.
+              const isIframe = typeof window !== "undefined" && window.self !== window.top;
+              if (isIframe) {
+                window.open(paymentResult.initPoint, "_blank");
+                // Avança a tela para a confirmação de compra realizada no preview
+                setCheckoutStep("registration-offer");
+              } else {
+                window.location.href = paymentResult.initPoint;
+              }
               return;
             } else {
               console.error("Failed to generate payment:", paymentResult.error);
