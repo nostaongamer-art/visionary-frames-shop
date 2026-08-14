@@ -12,23 +12,54 @@ const IMAGE_MAP: Record<string, string> = {
 
 interface OrderSummaryProps {
   shippingType: "free" | "express";
+  appliedCoupon?: string | null;
+  setAppliedCoupon?: (coupon: string | null) => void;
 }
 
-export function OrderSummary({ shippingType }: OrderSummaryProps) {
+export function OrderSummary({ shippingType, appliedCoupon: propCoupon, setAppliedCoupon: propSetCoupon }: OrderSummaryProps) {
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [localCoupon, setLocalCoupon] = useState<string | null>(null);
   const [couponError, setCouponError] = useState("");
+
+  const appliedCoupon = propCoupon !== undefined ? propCoupon : localCoupon;
+  const setAppliedCoupon = propSetCoupon !== undefined ? propSetCoupon : setLocalCoupon;
 
   const { items } = useCart();
 
-  const subtotal = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
-  const initialDiscount = subtotal * 0.15; // 15% OFF standard store discount
+  // Calcular subtotal (original) e desconto (do catálogo) com base nos selos dos produtos
+  let calculatedSubtotal = 0;
+  let catalogDiscount = 0;
+
+  items.forEach((item) => {
+    const pctMatch = item.discount ? item.discount.match(/(\d+)/) : null;
+    const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
+    
+    let oldPriceVal = item.oldPrice ? parseFloat(String(item.oldPrice).replace(/[^\d.,]/g, "").replace(",", ".")) : 0;
+    if (isNaN(oldPriceVal) || oldPriceVal <= 0) {
+      if (pct > 0 && pct < 100) {
+        oldPriceVal = item.priceVal / (1 - pct / 100);
+      } else {
+        oldPriceVal = item.priceVal;
+      }
+    }
+    
+    const itemOriginalTotal = oldPriceVal * item.quantity;
+    const itemFinalTotal = item.priceVal * item.quantity;
+    const itemDiscount = Math.max(0, itemOriginalTotal - itemFinalTotal);
+    
+    calculatedSubtotal += itemOriginalTotal;
+    catalogDiscount += itemDiscount;
+  });
+
+  const subtotal = calculatedSubtotal;
+  const initialDiscount = catalogDiscount;
   const shippingCost = shippingType === "express" ? 29.90 : 0;
   
-  // Calculate extra coupon discount if applicable
-  const extraDiscount = appliedCoupon ? subtotal * 0.10 : 0; // 10% extra coupon discount
+  // O cupom adiciona 10% de desconto extra sobre a soma dos preços de venda
+  const sellingPriceSum = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
+  const extraDiscount = appliedCoupon ? sellingPriceSum * 0.10 : 0;
   
-  const total = Math.max(0, subtotal - initialDiscount - extraDiscount + shippingCost);
+  const total = Math.max(0, sellingPriceSum - extraDiscount + shippingCost);
   const installmentAmount = total / 12;
 
   const handleApplyCoupon = () => {
@@ -91,7 +122,7 @@ export function OrderSummary({ shippingType }: OrderSummaryProps) {
           <span className="font-medium text-white/90">R$ {subtotal.toFixed(2).replace(".", ",")}</span>
         </div>
         <div className="flex justify-between">
-          <span>Desconto (15% OFF)</span>
+          <span>Desconto do Catálogo</span>
           <span className="font-medium text-[#00C83C]">- R$ {initialDiscount.toFixed(2).replace(".", ",")}</span>
         </div>
         
