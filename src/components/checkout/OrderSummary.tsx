@@ -31,8 +31,7 @@ export function OrderSummary({ shippingType }: OrderSummaryProps) {
   const total = Math.max(0, subtotal - initialDiscount - extraDiscount + shippingCost);
   const installmentAmount = total / 12;
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleApplyCoupon = () => {
     if (!couponCode.trim()) return;
 
     if (couponCode.toUpperCase() === "GLASSES10" || couponCode.toUpperCase() === "DESCONTO10") {
@@ -129,21 +128,28 @@ export function OrderSummary({ shippingType }: OrderSummaryProps) {
       {/* Coupon form */}
       <div className="border-t border-white/10 pt-4 mt-2">
         <span className="text-[11px] text-white/70 block mb-2">Tem um cupom de desconto?</span>
-        <form onSubmit={handleApplyCoupon} className="flex gap-2">
+        <div className="flex gap-2">
           <input
             type="text"
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                handleApplyCoupon();
+              }
+            }}
             placeholder="Digite seu cupom"
             className="flex-1 h-9 px-3 bg-[#15181D] border border-white/10 rounded-[4px] text-xs text-white outline-none focus:border-brand transition-colors"
           />
           <button
-            type="submit"
+            type="button"
+            onClick={handleApplyCoupon}
             className="h-9 px-4 bg-transparent border border-brand hover:bg-brand-2 text-white text-xs font-bold rounded-[4px] transition-colors"
           >
             Aplicar
           </button>
-        </form>
+        </div>
 
         {appliedCoupon && (
           <p className="text-[10px] text-[#00C83C] font-semibold mt-1.5 animate-fadeIn">

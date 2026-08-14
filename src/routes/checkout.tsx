@@ -22,6 +22,16 @@ import type { Order } from "@/lib/orders-service";
 import { fetchPaymentSettings } from "@/lib/payment-service";
 
 export const Route = createFileRoute("/checkout")({
+  head: () => ({
+    meta: [
+      { title: "Checkout Seguro | Glasses" },
+      { name: "description", content: "Finalize sua compra de óculos com segurança na Glasses." },
+      { property: "og:title", content: "Checkout Seguro | Glasses" },
+      { property: "og:description", content: "Finalize sua compra de óculos com segurança na Glasses." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>) => {
     return {
       action: (search.action as string) || "",
