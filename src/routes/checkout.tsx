@@ -239,6 +239,12 @@ function CheckoutPage() {
             }),
           });
 
+          const contentType = response.headers.get("content-type") || "";
+          if (!response.ok || !contentType.includes("application/json")) {
+            const errorText = await response.text();
+            throw new Error(`Erro do servidor (${response.status}): ${errorText.substring(0, 100)}`);
+          }
+
           const paymentResult = await response.json();
           if (paymentResult.success && paymentResult.initPoint) {
             clearCart();
@@ -264,8 +270,9 @@ function CheckoutPage() {
               toast.error(`Erro ao iniciar pagamento: ${paymentResult.error || "Erro desconhecido."}`);
             }
           }
-        } catch (paymentErr) {
+        } catch (paymentErr: any) {
           console.error("Mercado Pago flow error:", paymentErr);
+          toast.error(`Erro no processamento do pagamento: ${paymentErr.message || paymentErr}`);
         }
 
         clearCart();
