@@ -192,11 +192,18 @@ async function handleCreatePayment(request: Request): Promise<Response> {
     }
 
     // 6. Create preference via Mercado Pago API
+    // notification_url precisa ser absoluta e https; valores relativos são inválidos
+    const rawWebhook = String(settings.webhookUrl || "");
+    const notificationUrl = rawWebhook.startsWith("https://")
+      ? rawWebhook
+      : `${origin.replace(/^http:/, "https:")}/api/webhook/mercado-pago`;
+
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${accessToken}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Idempotency-Key": `${orderId}-${Date.now()}`
       },
       body: JSON.stringify({
         items: mpItems,
@@ -204,8 +211,9 @@ async function handleCreatePayment(request: Request): Promise<Response> {
         back_urls,
         auto_return: "approved",
         external_reference: orderId,
+        statement_descriptor: "GLASSES",
         payment_methods,
-        notification_url: settings.webhookUrl || `${origin}/api/webhook/mercado-pago`
+        notification_url: notificationUrl
       })
     });
 
