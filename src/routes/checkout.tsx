@@ -80,7 +80,7 @@ function CheckoutPage() {
   >(
     action === "login" 
       ? "login" 
-      : (action === "success" || action === "pending")
+      : (action === "success" || action === "pending" || action === "thank-you")
       ? "registration-offer"
       : "checkout"
   );
@@ -107,6 +107,76 @@ function CheckoutPage() {
       }
     }
   }, []);
+
+  // Limpeza de carrinho e decremento de estoque no retorno do Mercado Pago (ou conclusão local)
+  useEffect(() => {
+    const isSuccessStep = checkoutStep === "registration-offer";
+    const hasSuccessAction = action === "thank-you" || action === "success" || action === "pending";
+
+    if (isSuccessStep || hasSuccessAction) {
+      const orderId = (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("orderId") : null) || lastSavedOrder?.id;
+      if (!orderId) return;
+
+      const processedKey = `glasses_processed_order_${orderId}`;
+      if (localStorage.getItem(processedKey)) {
+        clearCart();
+        return;
+      }
+
+      localStorage.setItem(processedKey, "true");
+      clearCart();
+
+      async function processOrderCompletion() {
+        try {
+          const orders = await fetchOrders();
+          const order = orders.find((o) => o.id === orderId);
+
+          if (order) {
+            if (!order.tags?.stockDecremented) {
+              // Decrementa o estoque de forma cruzada em todas as categorias
+              for (const item of order.items) {
+                try {
+                  await decrementProductStock(item.name, item.quantity);
+                } catch (e) {
+                  console.error("Erro ao decrementar estoque no retorno do MP:", item.name, e);
+                }
+              }
+
+              // Atualiza o status do pedido na lista global e adiciona a flag de decrementado
+              const updated = orders.map((o) => {
+                if (o.id === orderId) {
+                  return {
+                    ...o,
+                    tags: {
+                      ...o.tags,
+                      paymentStatus: "pago" as const,
+                      stockDecremented: true
+                    }
+                  };
+                }
+                return o;
+              });
+
+              const { data, error } = await supabase.from("home_page_content").upsert({
+                id: "orders_list",
+                content: { orders: updated } as any,
+                updated_at: new Date().toISOString(),
+              });
+              if (error) {
+                console.error("Erro ao atualizar status do pedido no Supabase:", error);
+              } else {
+                console.log(`Order ${orderId} marked as approved/pago and stock decremented.`);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error processing order completion on return:", err);
+        }
+      }
+
+      processOrderCompletion();
+    }
+  }, [action, checkoutStep, lastSavedOrder]);
 
   // Registration Form States
   const [regName, setRegName] = useState("");
@@ -208,8 +278,16 @@ function CheckoutPage() {
       setIsSubmitting(true);
       try {
         const subtotal = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
-        const extraDiscount = appliedCoupon ? subtotal * 0.10 : 0;
-        const discount = extraDiscount;
+        
+        let catalogDiscount = 0;
+        items.forEach((item) => {
+          const pctMatch = item.discount ? item.discount.match(/(\d+)/) : null;
+          const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
+          catalogDiscount += (item.priceVal * item.quantity) * (pct / 100);
+        });
+
+        const extraDiscount = appliedCoupon ? (subtotal - catalogDiscount) * 0.10 : 0;
+        const discount = catalogDiscount + extraDiscount;
         const shippingCost = shippingType === "express" ? 29.90 : 0;
         const total = Math.max(0, subtotal - discount + shippingCost);
 
@@ -235,6 +313,7 @@ function CheckoutPage() {
           tags: {
             paymentStatus: "pendente" as Order["tags"]["paymentStatus"],
             shippingStatus: (shippingCost > 0 ? "com_frete" : "sem_frete") as Order["tags"]["shippingStatus"],
+            stockDecremented: false,
           },
         };
 
@@ -242,15 +321,6 @@ function CheckoutPage() {
         setLastSavedOrder(saved);
         if (typeof window !== "undefined") {
           localStorage.setItem("glasses_last_order", JSON.stringify(saved));
-        }
-
-        // Decrementa o estoque de cada item comprado de forma cruzada em todas as coleções
-        for (const item of items) {
-          try {
-            await decrementProductStock(item.name, item.quantity);
-          } catch (e) {
-            console.error("Erro ao decrementar estoque do item:", item.name, e);
-          }
         }
 
         // Envia as informações do pedido diretamente ao backend para processar o pagamento
@@ -268,6 +338,7 @@ function CheckoutPage() {
                 price: item.price,
                 priceVal: item.priceVal,
                 quantity: item.quantity,
+                discount: item.discount, // Envia o selo de desconto
               })),
               customer: {
                 fullName: personalData.fullName,
@@ -277,6 +348,7 @@ function CheckoutPage() {
               },
               paymentMethod: "all",
               shippingCost: shippingCost,
+              couponApplied: !!appliedCoupon, // Envia se cupom foi aplicado
             }),
           });
 
@@ -289,7 +361,6 @@ function CheckoutPage() {
           const paymentResult = await response.json();
           if (paymentResult.success && paymentResult.initPoint) {
             setPaymentUrl(paymentResult.initPoint);
-            clearCart();
             setIsSubmitting(false);
             toast.success("Pedido registrado com sucesso!");
             
@@ -317,9 +388,8 @@ function CheckoutPage() {
           toast.error(`Erro no processamento do pagamento: ${paymentErr.message || paymentErr}`);
         }
 
-        clearCart();
         setIsSubmitting(false);
-        toast.success("Pedido finalizado com sucesso!");
+        toast.success("Pedido registrado com sucesso!");
         
         // Go to registration offer
         setCheckoutStep("registration-offer");

@@ -68,7 +68,7 @@ function isClientAbort(error: unknown): boolean {
 
 async function handleCreatePayment(request: Request): Promise<Response> {
   try {
-    const { orderId, items, customer, paymentMethod, shippingCost } = await request.json();
+    const { orderId, items, customer, paymentMethod, shippingCost, couponApplied } = await request.json();
 
     // 1. Fetch settings from Supabase
     const { data: dbData, error: dbError } = await supabase
@@ -104,15 +104,29 @@ async function handleCreatePayment(request: Request): Promise<Response> {
 
     // 2. Build items payload (Mercado Pago aceita no máximo 2 decimais)
     const round2 = (v: number) => Math.round((Number(v) || 0) * 100) / 100;
-    const mpItems = items.map((item: any, idx: number) => ({
-      id: String(item.id ?? idx + 1),
-      title: String(item.name || "Produto").slice(0, 250),
-      description: String(item.name || "Produto").slice(0, 250),
-      category_id: "fashion",
-      quantity: Number(item.quantity) || 1,
-      unit_price: round2(item.priceVal),
-      currency_id: "BRL"
-    }));
+    const mpItems = items.map((item: any, idx: number) => {
+      const pctMatch = item.discount ? item.discount.match(/(\d+)/) : null;
+      const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
+      
+      let discountedPrice = Number(item.priceVal) || 0;
+      if (pct > 0) {
+        discountedPrice = discountedPrice * (1 - pct / 100);
+      }
+      
+      if (couponApplied) {
+        discountedPrice = discountedPrice * 0.9; // Apply extra 10% coupon
+      }
+
+      return {
+        id: String(item.id ?? idx + 1),
+        title: String(item.name || "Produto").slice(0, 250),
+        description: String(item.name || "Produto").slice(0, 250),
+        category_id: "fashion",
+        quantity: Number(item.quantity) || 1,
+        unit_price: round2(discountedPrice),
+        currency_id: "BRL"
+      };
+    });
 
     if (shippingCost && Number(shippingCost) > 0) {
       mpItems.push({
@@ -241,6 +255,44 @@ async function handleCreatePayment(request: Request): Promise<Response> {
   }
 }
 
+async function decrementProductStockServer(productName: string, quantityToSubtract: number) {
+  const catalogIds = ["colecoes", "feminino", "masculino", "premium", "promocoes", "solar"];
+  for (const catId of catalogIds) {
+    try {
+      const { data } = await supabase
+        .from("home_page_content")
+        .select("content")
+        .eq("id", catId)
+        .single();
+      
+      const pageData = data?.content as any;
+      if (pageData && Array.isArray(pageData.products)) {
+        let updated = false;
+        const updatedProducts = pageData.products.map((p: any) => {
+          if (p.name && p.name.trim().toLowerCase() === productName.trim().toLowerCase()) {
+            if (p.stock !== undefined && !isNaN(p.stock)) {
+              updated = true;
+              return { ...p, stock: Math.max(0, Number(p.stock) - quantityToSubtract) };
+            }
+          }
+          return p;
+        });
+
+        if (updated) {
+          await supabase.from("home_page_content").upsert({
+            id: catId,
+            content: { ...pageData, products: updatedProducts },
+            updated_at: new Date().toISOString()
+          });
+          console.log(`[Server] Decremented stock for "${productName}" in section "${catId}" by ${quantityToSubtract}`);
+        }
+      }
+    } catch (e) {
+      console.error(`[Server] Error decrementing stock for ${productName}:`, e);
+    }
+  }
+}
+
 async function handleMercadoPagoWebhook(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);
@@ -295,19 +347,36 @@ async function handleMercadoPagoWebhook(request: Request): Promise<Response> {
             const content = orderData?.content as any;
             if (content && Array.isArray(content.orders)) {
               let updated = false;
-              const updatedOrders = content.orders.map((ord: any) => {
+              const updatedOrders = [];
+              for (const ord of content.orders) {
                 if (ord.id === orderId) {
                   updated = true;
-                  return {
+                  let stockDecremented = ord.tags?.stockDecremented || false;
+                  if (paymentStatus === "pago" && !stockDecremented) {
+                    stockDecremented = true;
+                    // Decrement stock for all items
+                    if (Array.isArray(ord.items)) {
+                      for (const item of ord.items) {
+                        try {
+                          await decrementProductStockServer(item.name, item.quantity);
+                        } catch (e) {
+                          console.error("Error decrementing stock on server webhook:", item.name, e);
+                        }
+                      }
+                    }
+                  }
+                  updatedOrders.push({
                     ...ord,
                     tags: {
                       ...ord.tags,
-                      paymentStatus: paymentStatus
+                      paymentStatus: paymentStatus,
+                      stockDecremented: stockDecremented
                     }
-                  };
+                  });
+                } else {
+                  updatedOrders.push(ord);
                 }
-                return ord;
-              });
+              }
 
               if (updated) {
                 await supabase.from("home_page_content").upsert({

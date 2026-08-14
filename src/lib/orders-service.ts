@@ -33,6 +33,7 @@ export interface Order {
   tags: {
     paymentStatus: "pago" | "pendente" | "reembolsado";
     shippingStatus: "com_frete" | "sem_frete";
+    stockDecremented?: boolean;
   };
 }
 

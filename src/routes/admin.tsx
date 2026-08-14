@@ -4402,7 +4402,7 @@ function Admin() {
                                   <span>R$ {ord.subtotal.toFixed(2).replace(".", ",")}</span>
                                 </div>
                                 <div className="flex justify-between py-0.5 text-green-400">
-                                  <span>Desconto (15%):</span>
+                                  <span>Desconto:</span>
                                   <span>- R$ {ord.discount.toFixed(2).replace(".", ",")}</span>
                                 </div>
                                 <div className="flex justify-between py-0.5 text-white/60">
