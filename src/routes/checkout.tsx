@@ -8,6 +8,7 @@ import { PersonalDataForm } from "@/components/checkout/PersonalDataForm";
 import { AddressForm } from "@/components/checkout/AddressForm";
 import { ShippingOptions, ShippingType } from "@/components/checkout/ShippingOptions";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
+import type { PaymentMethodType } from "@/components/checkout/PaymentMethods";
 import { PurchaseBenefits } from "@/components/checkout/PurchaseBenefits";
 import { CustomerTestimonial } from "@/components/checkout/CustomerTestimonial";
 import { BenefitsBar } from "@/components/checkout/BenefitsBar";

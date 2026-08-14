@@ -102,36 +102,50 @@ async function handleCreatePayment(request: Request): Promise<Response> {
       });
     }
 
-    // 2. Build items payload
-    const mpItems = items.map((item: any) => ({
-      title: item.name,
+    // 2. Build items payload (Mercado Pago aceita no máximo 2 decimais)
+    const round2 = (v: number) => Math.round((Number(v) || 0) * 100) / 100;
+    const mpItems = items.map((item: any, idx: number) => ({
+      id: String(item.id ?? idx + 1),
+      title: String(item.name || "Produto").slice(0, 250),
+      description: String(item.name || "Produto").slice(0, 250),
+      category_id: "fashion",
       quantity: Number(item.quantity) || 1,
-      unit_price: Number(item.priceVal) || 0,
+      unit_price: round2(item.priceVal),
       currency_id: "BRL"
     }));
 
     if (shippingCost && Number(shippingCost) > 0) {
       mpItems.push({
+        id: "frete",
         title: "Frete de Envio",
+        description: "Frete de Envio",
+        category_id: "services",
         quantity: 1,
-        unit_price: Number(shippingCost),
+        unit_price: round2(shippingCost),
         currency_id: "BRL"
       });
     }
+
 
     // 3. Build payer payload
     const [name, ...surnameParts] = (customer.fullName || "").split(" ");
     const surname = surnameParts.join(" ") || "Silva";
     const cleanCpf = customer.cpf ? customer.cpf.replace(/\D/g, "") : "";
+    const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, "") : "";
 
     const payer: any = {
       name: name || "Cliente",
       surname,
       email: customer.email || "cliente@email.com",
-      phone: {
-        number: customer.phone ? customer.phone.replace(/\D/g, "") : ""
-      }
     };
+
+    // Mercado Pago rejects phone objects without area_code / with empty number
+    if (cleanPhone.length >= 10) {
+      payer.phone = {
+        area_code: cleanPhone.slice(0, 2),
+        number: cleanPhone.slice(2),
+      };
+    }
 
     if (cleanCpf && cleanCpf.length === 11) {
       payer.identification = {
@@ -178,11 +192,18 @@ async function handleCreatePayment(request: Request): Promise<Response> {
     }
 
     // 6. Create preference via Mercado Pago API
+    // notification_url precisa ser absoluta e https; valores relativos são inválidos
+    const rawWebhook = String(settings.webhookUrl || "");
+    const notificationUrl = rawWebhook.startsWith("https://")
+      ? rawWebhook
+      : `${origin.replace(/^http:/, "https:")}/api/webhook/mercado-pago`;
+
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${accessToken}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Idempotency-Key": `${orderId}-${Date.now()}`
       },
       body: JSON.stringify({
         items: mpItems,
@@ -190,8 +211,9 @@ async function handleCreatePayment(request: Request): Promise<Response> {
         back_urls,
         auto_return: "approved",
         external_reference: orderId,
+        statement_descriptor: "GLASSES",
         payment_methods,
-        notification_url: settings.webhookUrl || `${origin}/api/webhook/mercado-pago`
+        notification_url: notificationUrl
       })
     });
 
