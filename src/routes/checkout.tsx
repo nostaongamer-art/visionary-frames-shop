@@ -76,10 +76,35 @@ function CheckoutPage() {
   // Post-purchase flow steps: "checkout" | "registration-offer" | "registration-form" | "registration-success" | "thank-you" | "login"
   const [checkoutStep, setCheckoutStep] = useState<
     "checkout" | "registration-offer" | "registration-form" | "registration-success" | "thank-you" | "login"
-  >(action === "login" ? "login" : "checkout");
+  >(
+    action === "login" 
+      ? "login" 
+      : (action === "success" || action === "pending")
+      ? "registration-offer"
+      : "checkout"
+  );
   
   const [lastSavedOrder, setLastSavedOrder] = useState<any>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+
+  // Recupera o último pedido do localStorage se retornar da tela do Mercado Pago
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("glasses_last_order");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setLastSavedOrder(parsed);
+          setRegName(parsed.customerName || "");
+          setRegEmail(parsed.customerEmail || "");
+          setRegPhone(parsed.customerPhone || "");
+          setRegCpf(parsed.customerCpf || "");
+        }
+      } catch (e) {
+        console.error("Failed to parse last order from localStorage:", e);
+      }
+    }
+  }, []);
 
   // Registration Form States
   const [regName, setRegName] = useState("");
@@ -212,6 +237,9 @@ function CheckoutPage() {
 
         const saved = await saveOrder(orderPayload);
         setLastSavedOrder(saved);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("glasses_last_order", JSON.stringify(saved));
+        }
 
         // Envia as informações do pedido diretamente ao backend para processar o pagamento
         try {
@@ -645,6 +673,9 @@ function CheckoutPage() {
                 onClick={() => {
                   setRegName(lastSavedOrder.customerName);
                   setRegEmail(lastSavedOrder.customerEmail);
+                  setRegPhone(lastSavedOrder.customerPhone || "");
+                  setRegCpf(lastSavedOrder.customerCpf || "");
+                  setRegStep(2);
                   setCheckoutStep("registration-form");
                 }}
                 className="h-11 bg-brand hover:bg-brand-2 text-white rounded text-xs font-bold transition-colors cursor-pointer"
