@@ -5,7 +5,7 @@ import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_P
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
 import { fetchOrders, updateOrderTags, deleteOrderAndCustomer } from "@/lib/orders-service";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock, Truck, MapPin } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock, Truck, MapPin, ChevronDown, ChevronUp } from "lucide-react";
 import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
 import { fetchShippingSettings, saveShippingSettings, MelhorEnvioSettings, DEFAULT_MELHOR_ENVIO_SETTINGS } from "@/lib/shipping-service";
 
@@ -152,6 +152,7 @@ function Admin() {
   // Orders management states
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersFilter, setOrdersFilter] = useState("");
+  const [collapsedOrderIds, setCollapsedOrderIds] = useState<Record<string, boolean>>({});
 
   // Product CRUD states for catalogue sections (2-7)
   const [isEditingProduct, setIsEditingProduct] = useState(false);
@@ -4267,16 +4268,32 @@ function Admin() {
                   📦 Gestão de Pedidos Recebidos ({orders.length})
                 </h3>
                 
-                {/* Search orders */}
-                <div className="relative w-full sm:w-64">
-                  <input
-                    type="text"
-                    placeholder="Filtrar por nome, CPF ou pedido..."
-                    value={ordersFilter}
-                    onChange={(e) => setOrdersFilter(e.target.value)}
-                    className="w-full h-9 pl-9 pr-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const allCollapsed = orders.length > 0 && orders.every((o) => collapsedOrderIds[o.id]);
+                      const newMap: Record<string, boolean> = {};
+                      orders.forEach((o) => { newMap[o.id] = !allCollapsed; });
+                      setCollapsedOrderIds(newMap);
+                    }}
+                    className="h-9 px-3 bg-[#1C1F26] hover:bg-[#282C32] border border-[#282C32]/45 text-white/80 hover:text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5 text-[#FF8A00]" />
+                    Recolher / Expandir Todos
+                  </button>
+
+                  {/* Search orders */}
+                  <div className="relative w-full sm:w-64">
+                    <input
+                      type="text"
+                      placeholder="Filtrar por nome, CPF ou pedido..."
+                      value={ordersFilter}
+                      onChange={(e) => setOrdersFilter(e.target.value)}
+                      className="w-full h-9 pl-9 pr-3 bg-[#1C1F26] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors"
+                    />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                  </div>
                 </div>
               </div>
 
@@ -4302,8 +4319,10 @@ function Admin() {
                 }
 
                 return (
-                  <div className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-4">
                     {filtered.map((ord) => {
+                      const isCollapsed = !!collapsedOrderIds[ord.id];
+
                       const handleStatusChange = async (
                         field: "payment" | "shipping",
                         value: any
@@ -4323,17 +4342,35 @@ function Admin() {
                       return (
                         <div
                           key={ord.id}
-                          className="bg-[#15181D] border border-[#282C32]/35 rounded-lg p-5 flex flex-col gap-4 hover:border-[#282C32]/55 transition-colors"
+                          className="bg-[#15181D] border border-[#282C32]/35 rounded-lg p-4 sm:p-5 flex flex-col gap-4 hover:border-[#282C32]/55 transition-colors"
                         >
                           {/* Card Header Info */}
-                          <div className="flex flex-wrap justify-between items-center gap-3 border-b border-white/10 pb-3">
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-xs font-black text-white/90">
-                                PEDIDO: <span className="text-[#FF8A00]">{ord.id}</span>
-                              </span>
-                              <span className="text-[10px] text-white/40">
-                                Realizado em: {new Date(ord.createdAt).toLocaleString("pt-BR")}
-                              </span>
+                          <div className={`flex flex-wrap justify-between items-center gap-3 ${!isCollapsed ? "border-b border-white/10 pb-3" : ""}`}>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setCollapsedOrderIds((prev) => ({ ...prev, [ord.id]: !isCollapsed }))}
+                                className="p-1.5 bg-[#1C1F26] hover:bg-[#282C32] border border-white/10 rounded transition-colors cursor-pointer text-white/80 hover:text-white"
+                                title={isCollapsed ? "Expandir Pedido" : "Recolher Pedido"}
+                              >
+                                {isCollapsed ? <ChevronDown className="h-4 w-4 text-[#FF8A00]" /> : <ChevronUp className="h-4 w-4 text-[#FF8A00]" />}
+                              </button>
+
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-black text-white/90">
+                                    PEDIDO: <span className="text-[#FF8A00]">{ord.id}</span>
+                                  </span>
+                                  {isCollapsed && (
+                                    <span className="text-xs font-bold text-white/80">
+                                      — {ord.customerName} (R$ {ord.total.toFixed(2).replace(".", ",")})
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[10px] text-white/40">
+                                  Realizado em: {new Date(ord.createdAt).toLocaleString("pt-BR")}
+                                </span>
+                              </div>
                             </div>
 
                             {/* Tags Configuration Dropdowns */}
@@ -4444,89 +4481,93 @@ function Admin() {
                             </div>
                           </div>
 
-                          {/* Customer Details Box */}
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                            
-                            {/* Customer Profile Info */}
-                            <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-1.5">
-                              <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
-                                Dados do Cliente
-                              </span>
-                              <p className="font-bold text-white/90">{ord.customerName}</p>
-                              <p className="text-white/60">Email: {ord.customerEmail}</p>
-                              <p className="text-white/60">CPF: {ord.customerCpf}</p>
-                              <p className="text-white/60">
-                                WhatsApp:{" "}
-                                <a
-                                  href={`https://wa.me/55${ord.customerPhone.replace(/\D/g, "")}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[#FF8A00] font-bold hover:underline"
-                                >
-                                  {ord.customerPhone}
-                                </a>
-                              </p>
-                            </div>
-
-                            {/* Shipping Address Box */}
-                            <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-1">
-                              <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
-                                Endereço de Entrega
-                              </span>
-                              <p className="text-white/80">{ord.address.street}, {ord.address.number}</p>
-                              {ord.address.complement && <p className="text-white/60">Compl: {ord.address.complement}</p>}
-                              <p className="text-white/60">Bairro: {ord.address.neighborhood}</p>
-                              <p className="text-white/60">{ord.address.city} - {ord.address.state}</p>
-                              <p className="font-semibold text-white/80 mt-1">CEP: {ord.address.cep}</p>
-                            </div>
-
-                            {/* Summary / Values Box */}
-                            <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col justify-between gap-2">
-                              <div>
-                                <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
-                                  Resumo Financeiro
-                                </span>
-                                <div className="flex justify-between py-0.5 text-white/60">
-                                  <span>Subtotal:</span>
-                                  <span>R$ {ord.subtotal.toFixed(2).replace(".", ",")}</span>
+                          {/* Order Details Body (Hidden when collapsed) */}
+                          {!isCollapsed && (
+                            <div className="flex flex-col gap-4 animate-fadeIn">
+                              {/* Customer Details Box */}
+                              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                
+                                {/* Customer Profile Info */}
+                                <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-1.5">
+                                  <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                    Dados do Cliente
+                                  </span>
+                                  <p className="font-bold text-white/90">{ord.customerName}</p>
+                                  <p className="text-white/60">Email: {ord.customerEmail}</p>
+                                  <p className="text-white/60">CPF: {ord.customerCpf}</p>
+                                  <p className="text-white/60">
+                                    WhatsApp:{" "}
+                                    <a
+                                      href={`https://wa.me/55${ord.customerPhone.replace(/\D/g, "")}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[#FF8A00] font-bold hover:underline"
+                                    >
+                                      {ord.customerPhone}
+                                    </a>
+                                  </p>
                                 </div>
-                                <div className="flex justify-between py-0.5 text-green-400">
-                                  <span>Desconto:</span>
-                                  <span>- R$ {ord.discount.toFixed(2).replace(".", ",")}</span>
+
+                                {/* Shipping Address Box */}
+                                <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-1">
+                                  <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                    Endereço de Entrega
+                                  </span>
+                                  <p className="text-white/80">{ord.address.street}, {ord.address.number}</p>
+                                  {ord.address.complement && <p className="text-white/60">Compl: {ord.address.complement}</p>}
+                                  <p className="text-white/60">Bairro: {ord.address.neighborhood}</p>
+                                  <p className="text-white/60">{ord.address.city} - {ord.address.state}</p>
+                                  <p className="font-semibold text-white/80 mt-1">CEP: {ord.address.cep}</p>
                                 </div>
-                                <div className="flex justify-between py-0.5 text-white/60">
-                                  <span>Custo Envio:</span>
-                                  <span>{ord.shippingCost === 0 ? "Grátis" : `R$ ${ord.shippingCost.toFixed(2).replace(".", ",")}`}</span>
+
+                                {/* Summary / Values Box */}
+                                <div className="md:col-span-4 bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col justify-between gap-2">
+                                  <div>
+                                    <span className="font-extrabold text-white border-b border-white/5 pb-1 mb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                      Resumo Financeiro
+                                    </span>
+                                    <div className="flex justify-between py-0.5 text-white/60">
+                                      <span>Subtotal:</span>
+                                      <span>R$ {ord.subtotal.toFixed(2).replace(".", ",")}</span>
+                                    </div>
+                                    <div className="flex justify-between py-0.5 text-green-400">
+                                      <span>Desconto:</span>
+                                      <span>- R$ {ord.discount.toFixed(2).replace(".", ",")}</span>
+                                    </div>
+                                    <div className="flex justify-between py-0.5 text-white/60">
+                                      <span>Custo Envio:</span>
+                                      <span>{ord.shippingCost === 0 ? "Grátis" : `R$ ${ord.shippingCost.toFixed(2).replace(".", ",")}`}</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-between items-baseline border-t border-white/10 pt-2 font-black">
+                                    <span className="text-white/80 text-[10px] uppercase">Total:</span>
+                                    <span className="text-sm text-[#FF8A00]">
+                                      R$ {ord.total.toFixed(2).replace(".", ",")}
+                                    </span>
+                                  </div>
                                 </div>
+
                               </div>
-                              <div className="flex justify-between items-baseline border-t border-white/10 pt-2 font-black">
-                                <span className="text-white/80 text-[10px] uppercase">Total:</span>
-                                <span className="text-sm text-[#FF8A00]">
-                                  R$ {ord.total.toFixed(2).replace(".", ",")}
+
+                              {/* Purchased Items List */}
+                              <div className="bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-2">
+                                <span className="font-extrabold text-white border-b border-white/5 pb-1 block uppercase tracking-wider text-[10px] text-white/60">
+                                  Itens do Pedido
                                 </span>
+                                {ord.items.map((item: any, idx: number) => (
+                                  <div
+                                    key={idx}
+                                    className="flex justify-between items-center py-1 border-b border-white/5 last:border-0 last:pb-0"
+                                  >
+                                    <span className="text-white/80 font-bold">
+                                      {item.name} <span className="text-white/40 font-normal ml-1">x{item.quantity}</span>
+                                    </span>
+                                    <span className="text-white/95 font-semibold">{item.price}</span>
+                                  </div>
+                                ))}
                               </div>
                             </div>
-
-                          </div>
-
-                          {/* Purchased Items List */}
-                          <div className="bg-[#1C1F26] p-3.5 rounded border border-[#282C32]/25 text-xs flex flex-col gap-2">
-                            <span className="font-extrabold text-white border-b border-white/5 pb-1 block uppercase tracking-wider text-[10px] text-white/60">
-                              Itens do Pedido
-                            </span>
-                            {ord.items.map((item: any, idx: number) => (
-                              <div
-                                key={idx}
-                                className="flex justify-between items-center py-1 border-b border-white/5 last:border-0 last:pb-0"
-                              >
-                                <span className="text-white/80 font-bold">
-                                  {item.name} <span className="text-white/40 font-normal ml-1">x{item.quantity}</span>
-                                </span>
-                                <span className="text-white/95 font-semibold">{item.price}</span>
-                              </div>
-                            ))}
-                          </div>
-
+                          )}
                         </div>
                       );
                     })}

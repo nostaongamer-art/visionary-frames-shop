@@ -14,7 +14,7 @@ import { CustomerTestimonial } from "@/components/checkout/CustomerTestimonial";
 import { BenefitsBar } from "@/components/checkout/BenefitsBar";
 import { Footer } from "@/components/site/Footer";
 import { toast } from "sonner";
-import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, CheckCircle2, Circle, Truck, ExternalLink } from "lucide-react";
+import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, CheckCircle2, Circle, Truck, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
@@ -92,6 +92,7 @@ function CheckoutPage() {
   const [customShippingPrice, setCustomShippingPrice] = useState<number>(0);
   const [dynamicShippingOptions, setDynamicShippingOptions] = useState<any[]>([]);
   const [shippingLoading, setShippingLoading] = useState(false);
+  const [collapsedCustomerOrders, setCollapsedCustomerOrders] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const rawCep = (addressData.cep || "").replace(/\D/g, "");
@@ -691,17 +692,31 @@ function CheckoutPage() {
               ) : (
                 <div className="flex flex-col gap-4">
                   {orders.map((ord) => {
+                    const isCollapsed = !!collapsedCustomerOrders[ord.id];
+
                     return (
-                      <div key={ord.id} className="border border-[#D9DDE2] rounded-md p-4 bg-[#FAFAFA] flex flex-col gap-4">
+                      <div key={ord.id} className="border border-[#D9DDE2] rounded-md p-4 bg-[#FAFAFA] flex flex-col gap-4 shadow-sm transition-all">
                         
                         {/* Order Meta Header */}
                         <div className="flex flex-wrap justify-between items-center gap-3 bg-white border border-[#D9DDE2] p-3 rounded">
-                          <div className="flex items-center gap-4 text-xs font-bold text-ink">
-                            <span>Código: <span className="text-brand">{ord.id}</span></span>
-                            <span className="flex items-center gap-1 text-muted-foreground">
-                              <Calendar className="h-3.5 w-3.5" />
-                              {new Date(ord.createdAt).toLocaleDateString("pt-BR")}
-                            </span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setCollapsedCustomerOrders((prev) => ({ ...prev, [ord.id]: !isCollapsed }))}
+                              className="p-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded transition-colors cursor-pointer text-ink flex items-center gap-1 text-[11px] font-bold"
+                              title={isCollapsed ? "Expandir Detalhes do Pedido" : "Recolher Pedido"}
+                            >
+                              <span>{isCollapsed ? "Expandir" : "Recolher"}</span>
+                              {isCollapsed ? <ChevronDown className="h-4 w-4 text-brand" /> : <ChevronUp className="h-4 w-4 text-brand" />}
+                            </button>
+
+                            <div className="flex items-center gap-4 text-xs font-bold text-ink">
+                              <span>Código: <span className="text-brand">{ord.id}</span></span>
+                              <span className="flex items-center gap-1 text-muted-foreground">
+                                <Calendar className="h-3.5 w-3.5" />
+                                {new Date(ord.createdAt).toLocaleDateString("pt-BR")}
+                              </span>
+                            </div>
                           </div>
                           
                           <div className="flex items-center gap-2">
@@ -724,43 +739,48 @@ function CheckoutPage() {
                           </div>
                         </div>
 
-                        {/* Tracking Timeline Bar with Real-Time Data */}
-                        <OrderTrackingSection trackingCode={ord.trackingCode} isPaid={ord.tags.paymentStatus === "pago"} />
+                        {/* Order Details Body (Hidden when collapsed) */}
+                        {!isCollapsed && (
+                          <div className="flex flex-col gap-4 animate-fadeIn">
+                            {/* Tracking Timeline Bar with Real-Time Data */}
+                            <OrderTrackingSection trackingCode={ord.trackingCode} isPaid={ord.tags.paymentStatus === "pago"} />
 
-                        {/* Order details */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                          {/* Items Column */}
-                          <div className="md:col-span-8 bg-white border border-[#D9DDE2] p-4 rounded flex flex-col gap-2 text-xs">
-                            <span className="font-extrabold text-ink border-b border-gray-100 pb-1.5 mb-1 block">Produtos Comprados</span>
-                            {ord.items.map((item) => (
-                              <div key={item.id} className="flex justify-between items-center py-1">
-                                <span className="font-semibold text-ink/90">{item.name} <span className="text-muted-foreground text-[10px]">x{item.quantity}</span></span>
-                                <span className="font-bold text-brand">{item.price}</span>
+                            {/* Order details */}
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                              {/* Items Column */}
+                              <div className="md:col-span-8 bg-white border border-[#D9DDE2] p-4 rounded flex flex-col gap-2 text-xs">
+                                <span className="font-extrabold text-ink border-b border-gray-100 pb-1.5 mb-1 block">Produtos Comprados</span>
+                                {ord.items.map((item) => (
+                                  <div key={item.id} className="flex justify-between items-center py-1">
+                                    <span className="font-semibold text-ink/90">{item.name} <span className="text-muted-foreground text-[10px]">x{item.quantity}</span></span>
+                                    <span className="font-bold text-brand">{item.price}</span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                          
-                          {/* Shipping details */}
-                          <div className="md:col-span-4 bg-white border border-[#D9DDE2] p-4 rounded flex flex-col gap-2 text-xs">
-                            <span className="font-extrabold text-ink border-b border-gray-100 pb-1.5 mb-1 block">Endereço de Envio</span>
-                            <div className="flex gap-1.5 items-start text-muted-foreground leading-tight">
-                              <MapPin className="h-4 w-4 shrink-0 text-brand mt-0.5" />
-                              <div>
-                                <p className="font-bold text-ink">{ord.customerName}</p>
-                                <p>{ord.address.street}, {ord.address.number}</p>
-                                <p>{ord.address.neighborhood}</p>
-                                <p>{ord.address.city} - {ord.address.state}</p>
-                                <p className="mt-1 font-semibold">CEP: {ord.address.cep}</p>
+                              
+                              {/* Shipping details */}
+                              <div className="md:col-span-4 bg-white border border-[#D9DDE2] p-4 rounded flex flex-col gap-2 text-xs">
+                                <span className="font-extrabold text-ink border-b border-gray-100 pb-1.5 mb-1 block">Endereço de Envio</span>
+                                <div className="flex gap-1.5 items-start text-muted-foreground leading-tight">
+                                  <MapPin className="h-4 w-4 shrink-0 text-brand mt-0.5" />
+                                  <div>
+                                    <p className="font-bold text-ink">{ord.customerName}</p>
+                                    <p>{ord.address.street}, {ord.address.number}</p>
+                                    <p>{ord.address.neighborhood}</p>
+                                    <p>{ord.address.city} - {ord.address.state}</p>
+                                    <p className="mt-1 font-semibold">CEP: {ord.address.cep}</p>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
 
-                        {/* Financial total */}
-                        <div className="flex justify-between items-baseline bg-white border border-[#D9DDE2] p-3 rounded">
-                          <span className="text-xs font-bold text-muted-foreground">Valor Total do Pedido:</span>
-                          <span className="text-base font-black text-brand">R$ {ord.total.toFixed(2).replace(".", ",")}</span>
-                        </div>
+                            {/* Financial total */}
+                            <div className="flex justify-between items-baseline bg-white border border-[#D9DDE2] p-3 rounded">
+                              <span className="text-xs font-bold text-muted-foreground">Valor Total do Pedido:</span>
+                              <span className="text-base font-black text-brand">R$ {ord.total.toFixed(2).replace(".", ",")}</span>
+                            </div>
+                          </div>
+                        )}
 
                       </div>
                     );
