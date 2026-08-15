@@ -5,8 +5,9 @@ import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_P
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
 import { fetchOrders, updateOrderTags, deleteOrderAndCustomer } from "@/lib/orders-service";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock, Truck } from "lucide-react";
 import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
+import { fetchShippingSettings, saveShippingSettings, MelhorEnvioSettings, DEFAULT_MELHOR_ENVIO_SETTINGS } from "@/lib/shipping-service";
 
 class AdminErrorBoundary extends Component<
   { children: ReactNode },
@@ -139,6 +140,10 @@ function Admin() {
     }
   }, [paymentSettings]);
   
+  // Shipping settings states
+  const [shippingSettings, setShippingSettings] = useState<MelhorEnvioSettings>(DEFAULT_MELHOR_ENVIO_SETTINGS);
+  const [isShippingSettingsLoaded, setIsShippingSettingsLoaded] = useState(false);
+
   // Admin form states
   const [data, setData] = useState<HomePageData>(DEFAULT_HOME_PAGE_DATA);
   const [categoryData, setCategoryData] = useState<CategoryPageData | null>(null);
@@ -245,6 +250,13 @@ function Admin() {
       } catch (err) {
         console.error("Error pre-loading payment settings:", err);
       }
+      try {
+        const shipSettings = await fetchShippingSettings();
+        setShippingSettings(shipSettings);
+        setIsShippingSettingsLoaded(true);
+      } catch (err) {
+        console.error("Error pre-loading shipping settings:", err);
+      }
     }
     loadPayments();
   }, []);
@@ -265,6 +277,11 @@ function Admin() {
         const settings = await fetchPaymentSettings();
         setPaymentSettings(settings);
         setIsPaymentSettingsLoaded(true);
+      } else if (activeSection === "shipping") {
+        setCategoryData(null);
+        const shipSettings = await fetchShippingSettings();
+        setShippingSettings(shipSettings);
+        setIsShippingSettingsLoaded(true);
       } else {
         const content = await fetchPageContent(activeSection);
         setCategoryData(content);
@@ -329,6 +346,24 @@ function Admin() {
           finalPageResult = {
             success: true,
             isLocalOnly: !!paymentRes.isLocalOnly,
+            error: null
+          };
+        }
+      }
+
+      // Sempre salva as configurações do Melhor Envio se estiverem carregadas do DB
+      if (isShippingSettingsLoaded) {
+        const shippingRes = await saveShippingSettings(shippingSettings);
+        if (!shippingRes.success) {
+          finalPageResult = {
+            success: false,
+            isLocalOnly: !!shippingRes.isLocalOnly,
+            error: shippingRes.error || "Erro ao salvar Melhor Envio"
+          };
+        } else if (activeSection === "shipping") {
+          finalPageResult = {
+            success: true,
+            isLocalOnly: !!shippingRes.isLocalOnly,
             error: null
           };
         }
@@ -1022,6 +1057,22 @@ function Admin() {
             }`}
           >
             <span>💳 Mercado Pago</span>
+          </button>
+
+          <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mt-4 mb-1">
+            Configurar Envio
+          </h4>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("shipping");
+              setActiveTab("melhor-envio");
+            }}
+            className={`w-full text-left px-3 py-2 rounded text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer ${
+              activeSection === "shipping" && activeTab === "melhor-envio" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <span>🚚 Melhor Envio</span>
           </button>
         </div>
 
@@ -4324,6 +4375,44 @@ function Admin() {
                                 </select>
                               </div>
 
+                              {/* Código de Rastreio Input */}
+                              <div className="flex flex-col gap-1 sm:w-44">
+                                <label className="text-[9px] font-bold text-white/40 uppercase flex items-center gap-1">
+                                  <Truck className="h-2.5 w-2.5 text-[#FF8A00]" /> Cód. Rastreio
+                                </label>
+                                <div className="flex gap-1">
+                                  <input
+                                    type="text"
+                                    placeholder="Ex: AB123456789BR"
+                                    defaultValue={ord.trackingCode || ""}
+                                    id={`tracking_input_${ord.id}`}
+                                    className="w-full h-7 px-2 bg-[#1C1F26] border border-[#282C32]/45 rounded text-[10px] text-white uppercase outline-none focus:border-[#FF8A00]"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      const val = (document.getElementById(`tracking_input_${ord.id}`) as HTMLInputElement)?.value?.trim();
+                                      try {
+                                        const allOrders = await fetchOrders();
+                                        const updated = allOrders.map((o) => (o.id === ord.id ? { ...o, trackingCode: val } : o));
+                                        await supabase.from("home_page_content").upsert({
+                                          id: "orders_list",
+                                          content: { orders: updated } as any,
+                                          updated_at: new Date().toISOString(),
+                                        });
+                                        setOrders(updated);
+                                        toast.success(`Código de rastreio ${val ? `"${val}" ` : ""}salvo no pedido ${ord.id}!`);
+                                      } catch (err) {
+                                        toast.error("Erro ao salvar código de rastreio.");
+                                      }
+                                    }}
+                                    className="px-2 h-7 bg-[#FF8A00] hover:bg-[#e07900] text-white text-[9px] font-bold rounded transition-colors cursor-pointer shrink-0"
+                                  >
+                                    Salvar
+                                  </button>
+                                </div>
+                              </div>
+
                               {/* Excluir Pedido e Cliente */}
                               <div className="flex flex-col gap-1">
                                 <label className="text-[9px] font-bold text-white/40 uppercase block opacity-0 select-none">Excluir</label>
@@ -4677,6 +4766,96 @@ function Admin() {
                     Clique no botão superior direito <strong>Salvar Alterações</strong> aqui no Glasses Admin para persistir suas chaves com segurança.
                   </li>
                 </ol>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Configurar Melhor Envio */}
+          {activeSection === "shipping" && activeTab === "melhor-envio" && (
+            <div className="flex flex-col gap-6 text-white text-left select-none animate-fadeIn">
+              <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                <h3 className="text-base font-bold text-[#FF8A00] flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-[#FF8A00]" /> Configurar Rastreamento (Melhor Envio)
+                </h3>
+              </div>
+
+              {/* Status Integration */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Status da Integração</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-semibold text-white/90">Ativar Rastreamento Automático</span>
+                    <span className="text-[10px] text-white/40">Se ativado, o sistema consultará o status do pacote no Melhor Envio/Correios para atualizar o cliente.</span>
+                  </div>
+                  <ToggleSwitch
+                    label=""
+                    checked={shippingSettings?.enabled || false}
+                    onChange={(val) =>
+                      setShippingSettings((prev) => ({ ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS), enabled: val }))
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Sandbox / Production Mode Toggle */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Ambiente da API</h4>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-semibold text-white/90">Modo de Operação</span>
+                      <span className="text-[10px] text-white/40">Escolha "Produção (Real)" para consultar encomendas reais ou "Sandbox (Testes)" para testes de desenvolvedor.</span>
+                    </div>
+                    <div className="flex gap-2 bg-[#101217] p-1 rounded border border-[#282C32]/35">
+                      <button
+                        type="button"
+                        onClick={() => setShippingSettings((prev) => ({ ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS), mode: "sandbox" }))}
+                        className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                          shippingSettings?.mode === "sandbox"
+                            ? "bg-[#FF8A00] text-white"
+                            : "text-white/40 hover:text-white/70"
+                        }`}
+                      >
+                        Sandbox (Testes)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShippingSettings((prev) => ({ ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS), mode: "production" }))}
+                        className={`px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                          shippingSettings?.mode === "production"
+                            ? "bg-[#FF8A00] text-white"
+                            : "text-white/40 hover:text-white/70"
+                        }`}
+                      >
+                        Produção (Real)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Token Field */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2 flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-[#FF8A00]" />
+                  <span>Token de Acesso Pessoal (Melhor Envio)</span>
+                </h4>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/80">Token de Produção (Real)</label>
+                  <textarea
+                    rows={3}
+                    value={shippingSettings?.tokenProduction || ""}
+                    onChange={(e) =>
+                      setShippingSettings((prev) => ({ ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS), tokenProduction: e.target.value }))
+                    }
+                    placeholder="Cole seu Token gerado no Melhor Envio (começa com eyJ...)"
+                    className="w-full p-2.5 bg-[#101217] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors font-mono"
+                  />
+                  <span className="text-[10px] text-white/40">
+                    Token gerado no painel do Melhor Envio (Integrações {'>'} Permissões de Acesso / Tokens).
+                  </span>
+                </div>
               </div>
             </div>
           )}

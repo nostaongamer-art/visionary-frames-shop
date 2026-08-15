@@ -14,7 +14,7 @@ import { CustomerTestimonial } from "@/components/checkout/CustomerTestimonial";
 import { BenefitsBar } from "@/components/checkout/BenefitsBar";
 import { Footer } from "@/components/site/Footer";
 import { toast } from "sonner";
-import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, CheckCircle2, Circle } from "lucide-react";
+import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, CheckCircle2, Circle, Truck, ExternalLink } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
@@ -497,6 +497,121 @@ function CheckoutPage() {
     setRegCpf(formatted);
   };
 
+  function OrderTrackingSection({ trackingCode, isPaid }: { trackingCode?: string; isPaid: boolean }) {
+  const [trackingData, setTrackingData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!trackingCode) return;
+    async function loadTracking() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/tracking?code=${encodeURIComponent(trackingCode!)}`);
+        const json = await res.json();
+        if (json.success && json.tracking) {
+          setTrackingData(json.tracking);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar rastreio:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadTracking();
+  }, [trackingCode]);
+
+  const events = trackingData?.events || [];
+  const statusStr = (trackingData?.status || "").toLowerCase();
+  
+  let stepIndex = 0;
+  if (statusStr.includes("entregue") || statusStr === "delivered") {
+    stepIndex = 3;
+  } else if (events.length > 0 || statusStr.includes("transito") || statusStr === "in_transit" || statusStr === "posted") {
+    stepIndex = 2;
+  } else if (isPaid) {
+    stepIndex = 1;
+  }
+
+  const steps = [
+    { label: "Recebido", active: stepIndex >= 0 },
+    { label: "Aprovado", active: stepIndex >= 1 },
+    { label: "Em Trânsito", active: stepIndex >= 2 },
+    { label: "Entregue", active: stepIndex >= 3 },
+  ];
+
+  const progressPercent = stepIndex === 3 ? "100%" : stepIndex === 2 ? "66%" : stepIndex === 1 ? "33%" : "0%";
+
+  return (
+    <div className="flex flex-col gap-3 bg-white border border-[#D9DDE2] p-4 rounded">
+      <div className="flex flex-wrap justify-between items-center gap-2 border-b border-gray-100 pb-2">
+        <span className="text-[11px] font-extrabold text-ink uppercase tracking-wider block flex items-center gap-1.5">
+          <Truck className="h-4 w-4 text-brand" /> Status da Entrega:
+        </span>
+        {trackingCode && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-ink">
+              Cód: <span className="text-brand font-mono">{trackingCode}</span>
+            </span>
+            <a
+              href={`https://rastreamento.correios.com.br/app/index.php?codigo=${encodeURIComponent(trackingCode)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] bg-gray-100 hover:bg-gray-200 text-ink font-bold px-2 py-1 rounded transition-colors flex items-center gap-1"
+            >
+              Rastrear nos Correios <ExternalLink className="h-3 w-3 text-brand" />
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-4 items-center justify-between mt-3 text-center relative">
+        <div className="absolute top-[9px] left-1/8 right-1/8 h-[2px] bg-gray-200 z-0">
+          <div
+            className="h-full bg-brand transition-all duration-500"
+            style={{ width: progressPercent }}
+          />
+        </div>
+
+        {steps.map((step) => (
+          <div key={step.label} className="flex flex-col items-center gap-1.5 z-10 relative">
+            {step.active ? (
+              <CheckCircle2 className="h-5 w-5 text-brand fill-white" />
+            ) : (
+              <Circle className="h-5 w-5 text-gray-300 fill-white" />
+            )}
+            <span className={`text-[10px] font-bold ${step.active ? "text-brand" : "text-gray-400"}`}>
+              {step.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {loading && (
+        <p className="text-[10px] text-muted-foreground animate-pulse text-center mt-2">
+          Consultando movimentações do pacote em tempo real...
+        </p>
+      )}
+
+      {events && events.length > 0 && (
+        <div className="mt-3 bg-[#FAFAFA] border border-gray-100 rounded p-3 flex flex-col gap-2">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Histórico de Movimentação em Tempo Real:</span>
+          <div className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
+            {events.map((evt: any, i: number) => (
+              <div key={i} className="text-[11px] border-l-2 border-brand pl-2 py-0.5 flex flex-col text-left">
+                <span className="font-bold text-ink">{evt.title || evt.description || evt.status || "Atualização"}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {evt.created_at ? new Date(evt.created_at).toLocaleString("pt-BR") : evt.date || ""}
+                  {evt.location ? ` — ${evt.location}` : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
   // If customer is already logged in, render the dashboard page
   if (customer && checkoutStep === "checkout") {
     return (
@@ -544,13 +659,6 @@ function CheckoutPage() {
               ) : (
                 <div className="flex flex-col gap-4">
                   {orders.map((ord) => {
-                    const trackingSteps = [
-                      { label: "Recebido", active: true },
-                      { label: "Aprovado", active: ord.tags.paymentStatus === "pago" },
-                      { label: "Em Trânsito", active: ord.tags.paymentStatus === "pago" },
-                      { label: "Entregue", active: false },
-                    ];
-
                     return (
                       <div key={ord.id} className="border border-[#D9DDE2] rounded-md p-4 bg-[#FAFAFA] flex flex-col gap-4">
                         
@@ -584,34 +692,8 @@ function CheckoutPage() {
                           </div>
                         </div>
 
-                        {/* Tracking Timeline Bar */}
-                        <div className="flex flex-col gap-2 bg-white border border-[#D9DDE2] p-4 rounded">
-                          <span className="text-[11px] font-extrabold text-ink uppercase tracking-wider block">Status da Entrega:</span>
-                          <div className="grid grid-cols-4 items-center justify-between mt-3 text-center relative">
-                            {/* Timeline Line */}
-                            <div className="absolute top-[9px] left-1/8 right-1/8 h-[2px] bg-gray-200 z-0">
-                              <div
-                                className="h-full bg-brand transition-all duration-500"
-                                style={{
-                                  width: ord.tags.paymentStatus === "pago" ? "66%" : "0%"
-                                }}
-                              />
-                            </div>
-
-                            {trackingSteps.map((step, idx) => (
-                              <div key={step.label} className="flex flex-col items-center gap-1.5 z-10 relative">
-                                {step.active ? (
-                                  <CheckCircle2 className="h-5 w-5 text-brand fill-white" />
-                                ) : (
-                                  <Circle className="h-5 w-5 text-gray-300 fill-white" />
-                                )}
-                                <span className={`text-[10px] font-bold ${step.active ? "text-brand" : "text-gray-400"}`}>
-                                  {step.label}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        {/* Tracking Timeline Bar with Real-Time Data */}
+                        <OrderTrackingSection trackingCode={ord.trackingCode} isPaid={ord.tags.paymentStatus === "pago"} />
 
                         {/* Order details */}
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">

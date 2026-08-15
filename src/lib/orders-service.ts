@@ -30,6 +30,7 @@ export interface Order {
   discount: number;
   shippingCost: number;
   total: number;
+  trackingCode?: string;
   tags: {
     paymentStatus: "pago" | "pendente" | "reembolsado";
     shippingStatus: "com_frete" | "sem_frete";
