@@ -89,6 +89,38 @@ function CheckoutPage() {
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
+  const [customShippingPrice, setCustomShippingPrice] = useState<number>(0);
+  const [dynamicShippingOptions, setDynamicShippingOptions] = useState<any[]>([]);
+  const [shippingLoading, setShippingLoading] = useState(false);
+
+  useEffect(() => {
+    const rawCep = (addressData.cep || "").replace(/\D/g, "");
+    if (rawCep.length === 8) {
+      async function calculateRealShipping() {
+        setShippingLoading(true);
+        try {
+          const res = await fetch("/api/calculate-shipping", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cep: rawCep }),
+          });
+          const json = await res.json();
+          if (json.success && Array.isArray(json.options) && json.options.length > 0) {
+            setDynamicShippingOptions(json.options);
+          } else {
+            setDynamicShippingOptions([]);
+          }
+        } catch (err) {
+          console.error("Erro ao calcular frete no checkout:", err);
+          setDynamicShippingOptions([]);
+        } finally {
+          setShippingLoading(false);
+        }
+      }
+      calculateRealShipping();
+    }
+  }, [addressData.cep]);
+
   // Recupera o último pedido do localStorage se retornar da tela do Mercado Pago
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -301,7 +333,7 @@ function CheckoutPage() {
 
         const extraDiscount = appliedCoupon ? (subtotal - catalogDiscount) * 0.10 : 0;
         const discount = catalogDiscount + extraDiscount;
-        const shippingCost = shippingType === "express" ? 29.90 : 0;
+        const shippingCost = shippingType === "free" ? 0 : (shippingType === "express" ? 29.90 : customShippingPrice);
         const total = Math.max(0, subtotal - discount + shippingCost);
 
         const orderPayload = {
@@ -777,7 +809,12 @@ function CheckoutPage() {
                     <span className="text-xs font-semibold text-ink">Forma de Envio</span>
                     <ShippingOptions
                       selectedOption={shippingType}
-                      onSelect={setShippingType}
+                      onSelect={(opt, price) => {
+                        setShippingType(opt);
+                        setCustomShippingPrice(price);
+                      }}
+                      dynamicOptions={dynamicShippingOptions}
+                      loading={shippingLoading}
                     />
                   </div>
                 </div>
@@ -795,7 +832,8 @@ function CheckoutPage() {
 
               <div className="lg:col-span-5 flex flex-col gap-6">
                 <OrderSummary 
-                  shippingType={shippingType} 
+                  shippingType={shippingType}
+                  customShippingCost={customShippingPrice}
                   appliedCoupon={appliedCoupon} 
                   setAppliedCoupon={setAppliedCoupon} 
                 />

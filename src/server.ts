@@ -482,6 +482,97 @@ async function handleTrackingRequest(request: Request): Promise<Response> {
   }
 }
 
+async function handleCalculateShipping(request: Request): Promise<Response> {
+  try {
+    let body: any = {};
+    try {
+      body = await request.json();
+    } catch (e) {
+      const url = new URL(request.url);
+      body = { cep: url.searchParams.get("cep") };
+    }
+
+    const destinationCep = (body.cep || "").replace(/\D/g, "");
+    if (!destinationCep || destinationCep.length !== 8) {
+      return new Response(
+        JSON.stringify({ success: false, error: "CEP de destino inválido." }),
+        { status: 400, headers: { "content-type": "application/json" } }
+      );
+    }
+
+    const { data: shippingData } = await supabase
+      .from("home_page_content")
+      .select("content")
+      .eq("id", "shipping_settings")
+      .single();
+
+    const content = shippingData?.content as any;
+    const token =
+      content?.tokenProduction ||
+      content?.tokenSandbox ||
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOGM0MDEyZTA0ZTNkMDcxNWJlNjM0ODk4NmY2NWMzNzg3YjM1YjMzM2IxMjNkNDgwZmM3ZDNkYzcxZGZlMjUwZTQwYTdhMGZjZTA1Yjk0YjIiLCJpYXQiOjE3ODY3NTA2ODguNjc3MTMyLCJuYmYiOjE3ODY3NTA2ODguNjc3MTMzLCJleHAiOjE4MTgyODY2ODguNjY1MDY0LCJzdWIiOiJjNWZjMGVlNi02MmJjLTQxY2EtOWY5Ny05MDdmYWM0ZTg2OTgiLCJzY29wZXMiOlsiY2FydC1yZWFkIiwiY2FydC13cml0ZSIsImNvbXBhbmllcy1yZWFkIiwiY29tcGFuaWVzLXdyaXRlIiwiY291cG9ucy1yZWFkIiwiY291cG9ucy13cml0ZSIsIm5vdGlmaWNhdGlvbnMtcmVhZCIsIm9yZGVycy1yZWFkIiwicHJvZHVjdHMtcmVhZCIsInByb2R1Y3RzLWRlc3Ryb3kiLCJwcm9kdWN0cy13cml0ZSIsInB1cmNoYXNlcy1yZWFkIiwic2hpcHBpbmctY2FsY3VsYXRlIiwic2hpcHBpbmctY2FuY2VsIiwic2hpcHBpbmctY2hlY2tvdXQiLCJzaGlwcGluZy1jb21wYW5pZXMiLCJzaGlwcGluZy1nZW5lcmF0ZSIsInNoaXBwaW5nLXByZXZpZXciLCJzaGlwcGluZy1wcmludCIsInNoaXBwaW5nLXNoYXJlIiwic2hpcHBpbmctdHJhY2tpbmciLCJlY29tbWVyY2Utc2hpcHBpbmciLCJ0cmFuc2FjdGlvbnMtcmVhZCIsInVzZXJzLXJlYWQiLCJ1c2Vycy13cml0ZSIsIndlYmhvb2tzLXJlYWQiLCJ3ZWJob29rcy13cml0ZSIsIndlYmhvb2tzLWRlbGV0ZSIsInRkZWFsZXItd2ViaG9vayJdfQ.WV-4i4k-hZ-LBITUqhg1fBt2Yq6w7uEyD7olxgzNgyfftQG0__VxqcVzAAR9HGoQLxwXEjy5ZlIZZ7m89hLaAbyWG13Uscbg0XQz1i5Ptxut7xTwqZDqyIvz2f7Z5cg0-s9cmD6hqtcJFBUtM0nmEr4NNsf39IgNY0EuasbmNrnOZ8YRqbQWMNHzx2exnNxPf3Sixspr62AFjhw1W3aTcZ4VeXB4Dc2AJspCxgnaXLOsaew3xJmcOEiswXW1l63EkZ5v_Rh4kyOvTZ_HnFx5F9FE3rYp0aPB_i0tQFJnJvPVUVsRGkObAEP8PJvr028TAWAm4AqEw3VIgXUdQqUyE17PYBC1UEiTznVjOR9M1KVsMhKJGPkq9vVCWqixejGzre8hndOKqo4ENVuj3kXmuHfFGrDkRehXjOSqCRvST0Yu6z2W6tCeQev8eLquJQALuIZWw852xEiK_pmvi0FKx6Qplg8froO9czO74VDmveVgghIVzzHVLMlLrKRpiotE8-QixjoqBiULRNndNPScUVtW1j9Vy5E6izAN1RqmbmcPTfi6Sg8hTlbKSdR-ywOHN_4fZQ8gUWYfdLari8FwmpFgbQcL84SELcEFMkQQiLpU0o_y9IegAI_8cQ4bZG6SloVWB_kXPmlvNDnF9nVmaHwQb_fzs-aaOdazDgk_8iY";
+
+    const originCep = (content?.originCep || "21941395").replace(/\D/g, "");
+    const isSandbox = content?.mode === "sandbox";
+    const baseUrl = isSandbox
+      ? "https://sandbox.melhorenvio.com.br/api/v2/me/shipment/calculate"
+      : "https://melhorenvio.com.br/api/v2/me/shipment/calculate";
+
+    const response = await fetch(baseUrl, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        "User-Agent": "GlassesStore/1.0",
+      },
+      body: JSON.stringify({
+        from: { postal_code: originCep },
+        to: { postal_code: destinationCep },
+        package: {
+          weight: 0.3,
+          width: 15,
+          height: 7,
+          length: 20,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return new Response(
+        JSON.stringify({ success: false, error: `Erro no cálculo de frete (${response.status}): ${errorText.substring(0, 100)}` }),
+        { status: response.status, headers: { "content-type": "application/json" } }
+      );
+    }
+
+    const data = await response.json();
+    const items = Array.isArray(data) ? data : [];
+
+    const options = items
+      .filter((item: any) => !item.error && item.price)
+      .map((item: any) => ({
+        id: String(item.id),
+        name: item.name,
+        company: item.company?.name || "Correios",
+        price: parseFloat(item.custom_price || item.price || "0"),
+        deliveryTime: item.delivery_time || 5,
+        deliveryRange: item.delivery_range ? `${item.delivery_range.min} a ${item.delivery_range.max} dias úteis` : `${item.delivery_time} dias úteis`,
+      }));
+
+    return new Response(
+      JSON.stringify({ success: true, options }),
+      { status: 200, headers: { "content-type": "application/json" } }
+    );
+  } catch (err: any) {
+    console.error("Shipping calculation failed:", err);
+    return new Response(
+      JSON.stringify({ success: false, error: err.message || "Erro ao calcular frete." }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
@@ -497,6 +588,10 @@ export default {
 
       if (url.pathname === "/api/tracking" && (request.method === "GET" || request.method === "POST")) {
         return await handleTrackingRequest(request);
+      }
+
+      if (url.pathname === "/api/calculate-shipping" && (request.method === "GET" || request.method === "POST")) {
+        return await handleCalculateShipping(request);
       }
 
       const handler = await getServerEntry();

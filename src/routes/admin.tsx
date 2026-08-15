@@ -4834,6 +4834,31 @@ function Admin() {
                 </div>
               </div>
 
+              {/* Origin CEP Field */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2 flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-[#FF8A00]" />
+                  <span>CEP de Origem do Estoque (Postagem)</span>
+                </h4>
+
+                <div className="flex flex-col gap-1.5 max-w-xs">
+                  <label className="text-xs font-semibold text-white/80">CEP de Origem (Somente Números)</label>
+                  <input
+                    type="text"
+                    maxLength={9}
+                    value={shippingSettings?.originCep || "21941395"}
+                    onChange={(e) =>
+                      setShippingSettings((prev) => ({ ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS), originCep: e.target.value }))
+                    }
+                    placeholder="Ex: 21941395"
+                    className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-sm font-mono text-white outline-none focus:border-[#FF8A00] transition-colors"
+                  />
+                  <span className="text-[10px] text-white/40">
+                    CEP do local de onde os produtos são postados para cálculo do frete real dos Correios.
+                  </span>
+                </div>
+              </div>
+
               {/* Token Field */}
               <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
                 <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2 flex items-center gap-2">

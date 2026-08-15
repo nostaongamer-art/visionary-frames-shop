@@ -11,12 +11,13 @@ const IMAGE_MAP: Record<string, string> = {
 };
 
 interface OrderSummaryProps {
-  shippingType: "free" | "express";
+  shippingType: string;
+  customShippingCost?: number;
   appliedCoupon?: string | null;
   setAppliedCoupon?: (coupon: string | null) => void;
 }
 
-export function OrderSummary({ shippingType, appliedCoupon: propCoupon, setAppliedCoupon: propSetCoupon }: OrderSummaryProps) {
+export function OrderSummary({ shippingType, customShippingCost = 0, appliedCoupon: propCoupon, setAppliedCoupon: propSetCoupon }: OrderSummaryProps) {
   const [couponCode, setCouponCode] = useState("");
   const [localCoupon, setLocalCoupon] = useState<string | null>(null);
   const [couponError, setCouponError] = useState("");
@@ -37,7 +38,7 @@ export function OrderSummary({ shippingType, appliedCoupon: propCoupon, setAppli
   });
 
   const initialDiscount = catalogDiscount;
-  const shippingCost = shippingType === "express" ? 29.90 : 0;
+  const shippingCost = shippingType === "free" ? 0 : (shippingType === "express" ? 29.90 : customShippingCost);
   
   // O cupom adiciona 10% de desconto extra sobre o subtotal restante
   const extraDiscount = appliedCoupon ? (subtotal - catalogDiscount) * 0.10 : 0;
