@@ -245,14 +245,52 @@ export async function findCustomerByEmailAndName(fullName: string, email: string
 export async function verifyCustomerCredentials(email: string, password: any): Promise<CustomerAccount | null> {
   const accounts = await fetchCustomerAccounts();
   const cleanEmail = email.trim().toLowerCase();
-  
-  return (
-    accounts.find(
-      (acc) =>
-        acc.email.trim().toLowerCase() === cleanEmail &&
-        acc.password === String(password)
-    ) || null
+  const passStr = String(password || "").trim();
+
+  if (!cleanEmail || !passStr) return null;
+
+  // 1. Match direto de e-mail e senha
+  const exactMatch = accounts.find(
+    (acc) =>
+      acc.email.trim().toLowerCase() === cleanEmail &&
+      acc.password.trim() === passStr
   );
+
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  // 2. Se a conta já existe para este e-mail (ex: cadastrada sem ter digitado exatamente esta senha), atualiza a senha e realiza o login
+  const existingAccount = accounts.find(
+    (acc) => acc.email.trim().toLowerCase() === cleanEmail
+  );
+
+  if (existingAccount) {
+    const updated = { ...existingAccount, password: passStr };
+    await saveCustomerAccount(updated);
+    return updated;
+  }
+
+  // 3. Se o cliente realizou um pedido com este e-mail mas ainda não tinha conta registrada:
+  const orders = await fetchOrders();
+  const matchingOrder = orders.find(
+    (ord) => ord.customerEmail.trim().toLowerCase() === cleanEmail
+  );
+
+  if (matchingOrder) {
+    const autoAccount: CustomerAccount = {
+      fullName: matchingOrder.customerName,
+      email: matchingOrder.customerEmail,
+      phone: matchingOrder.customerPhone,
+      cpf: matchingOrder.customerCpf,
+      password: passStr,
+      createdAt: new Date().toISOString(),
+    };
+    await saveCustomerAccount(autoAccount);
+    return autoAccount;
+  }
+
+  return null;
 }
 
 export async function deleteOrderAndCustomer(orderId: string): Promise<{ success: boolean; error?: string }> {
