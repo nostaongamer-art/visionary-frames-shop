@@ -143,6 +143,20 @@ function CheckoutPage() {
     }
   }, [customer, checkoutStep]);
 
+  // Sincroniza o checkoutStep quando a URL mudar (ex: clicar em Meus Pedidos no Header)
+  useEffect(() => {
+    if (action === "login") {
+      setCheckoutStep("login");
+    } else if (action === "account" || action === "orders" || action === "dashboard") {
+      setCheckoutStep("checkout");
+      refreshOrders();
+    } else if (action === "success" || action === "pending" || action === "thank-you") {
+      setCheckoutStep(customer ? "thank-you" : "registration-offer");
+    } else {
+      setCheckoutStep("checkout");
+    }
+  }, [action, customer]);
+
   useEffect(() => {
     const rawCep = (addressData.cep || "").replace(/\D/g, "");
     if (rawCep.length === 8) {
@@ -261,6 +275,7 @@ function CheckoutPage() {
                 console.error("Erro ao atualizar status do pedido no Supabase:", error);
               } else {
                 console.log(`Order ${orderId} marked as approved/pago and stock decremented.`);
+                await refreshOrders(); // Atualiza a lista de pedidos do cliente logado imediatamente
               }
             }
           }
@@ -1190,12 +1205,29 @@ function CheckoutPage() {
             Seu pedido <span className="font-bold text-brand">{lastSavedOrder?.id || "P-12942"}</span> foi processado com sucesso. Agradecemos a preferência!
           </p>
 
-          <Link
-            to="/"
-            className="mt-4 px-6 h-11 bg-brand hover:bg-brand-2 text-white text-xs font-bold uppercase tracking-wider rounded flex items-center justify-center shadow transition-colors cursor-pointer"
-          >
-            Voltar para o Site
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 w-full justify-center mt-4">
+            {customer && (
+              <Link
+                to="/checkout"
+                search={{ action: "account" }}
+                onClick={() => {
+                  setCheckoutStep("checkout");
+                  refreshOrders();
+                }}
+                className="px-6 h-11 bg-brand hover:bg-[#E97800] text-white text-xs font-bold uppercase tracking-wider rounded flex items-center justify-center gap-2 shadow transition-colors cursor-pointer"
+              >
+                <Package className="h-4 w-4" />
+                <span>Acompanhar Meus Pedidos</span>
+              </Link>
+            )}
+            
+            <Link
+              to="/"
+              className="px-6 h-11 bg-ink hover:bg-brand text-white text-xs font-bold uppercase tracking-wider rounded flex items-center justify-center shadow transition-colors cursor-pointer"
+            >
+              Voltar para o Site
+            </Link>
+          </div>
         </main>
       )}
 
