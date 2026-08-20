@@ -3488,174 +3488,24 @@ function Admin() {
                 </div>
               </div>
 
-              {/* Coluna 2: Institucional */}
-              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
-                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 2: Institucional</h4>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
-                  <input
-                    type="text"
-                    value={data.footer?.institucionalTitle || ""}
-                    onChange={(e) =>
-                      setData((prev) => ({
-                        ...prev,
-                        footer: { ...prev.footer, institucionalTitle: e.target.value },
-                      }))
-                    }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
-                </div>
-                <div className="flex flex-col gap-4 mt-2">
-                  {data.footer?.institucionalLinks.map((link, idx) => (
-                    <div key={idx} className="border-l-2 border-brand/25 pl-4 py-1.5 flex flex-col gap-2.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase">Link {idx + 1}</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] text-white/60 font-medium">Exibir Opção</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newLinks = [...data.footer.institucionalLinks];
-                              newLinks[idx] = { ...link, show: link.show !== false ? false : true };
-                              setData((prev) => ({
-                                ...prev,
-                                footer: { ...prev.footer, institucionalLinks: newLinks },
-                              }));
-                            }}
-                            className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
-                              link.show !== false ? "bg-[#FF8A00]" : "bg-white/10"
-                            }`}
-                          >
-                            <span
-                              className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                link.show !== false ? "translate-x-4" : "translate-x-0"
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-white/60">Texto do Link</label>
-                          <input
-                            type="text"
-                            value={link.label}
-                            onChange={(e) => {
-                              const newLinks = [...data.footer.institucionalLinks];
-                              newLinks[idx] = { ...link, label: e.target.value };
-                              setData((prev) => ({
-                                ...prev,
-                                footer: { ...prev.footer, institucionalLinks: newLinks },
-                              }));
-                            }}
-                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
-                          <input
-                            type="text"
-                            value={link.href}
-                            onChange={(e) => {
-                              const newLinks = [...data.footer.institucionalLinks];
-                              newLinks[idx] = { ...link, href: e.target.value };
-                              setData((prev) => ({
-                                ...prev,
-                                footer: { ...prev.footer, institucionalLinks: newLinks },
-                              }));
-                            }}
-                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Coluna 3: Ajuda */}
-              <div className="border border-[#282C32]/45 rounded-lg p-4 bg-[#15181D]/30 flex flex-col gap-4">
-                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide">Coluna 3: Ajuda</h4>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-white/70">Título da Seção</label>
-                  <input
-                    type="text"
-                    value={data.footer?.ajudaTitle || ""}
-                    onChange={(e) =>
-                      setData((prev) => ({
-                        ...prev,
-                        footer: { ...prev.footer, ajudaTitle: e.target.value },
-                      }))
-                    }
-                    className="w-full h-11 px-4 bg-[#15181D] border border-[#282C32]/55 rounded text-sm text-white outline-none focus:border-[#FF8A00] transition-colors"
-                  />
-                </div>
-                <div className="flex flex-col gap-4 mt-2">
-                  {data.footer?.ajudaLinks.map((link, idx) => (
-                    <div key={idx} className="border-l-2 border-brand/25 pl-4 py-1.5 flex flex-col gap-2.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-[#FF8A00] uppercase">Link {idx + 1}</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] text-white/60 font-medium">Exibir Opção</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newLinks = [...data.footer.ajudaLinks];
-                              newLinks[idx] = { ...link, show: link.show !== false ? false : true };
-                              setData((prev) => ({
-                                ...prev,
-                                footer: { ...prev.footer, ajudaLinks: newLinks },
-                              }));
-                            }}
-                            className={`relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
-                              link.show !== false ? "bg-[#FF8A00]" : "bg-white/10"
-                            }`}
-                          >
-                            <span
-                              className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                link.show !== false ? "translate-x-4" : "translate-x-0"
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-white/60">Texto do Link</label>
-                          <input
-                            type="text"
-                            value={link.label}
-                            onChange={(e) => {
-                              const newLinks = [...data.footer.ajudaLinks];
-                              newLinks[idx] = { ...link, label: e.target.value };
-                              setData((prev) => ({
-                                ...prev,
-                                footer: { ...prev.footer, ajudaLinks: newLinks },
-                              }));
-                            }}
-                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-white/60">Destino (URL / Href)</label>
-                          <input
-                            type="text"
-                            value={link.href}
-                            onChange={(e) => {
-                              const newLinks = [...data.footer.ajudaLinks];
-                              newLinks[idx] = { ...link, href: e.target.value };
-                              setData((prev) => ({
-                                ...prev,
-                                footer: { ...prev.footer, ajudaLinks: newLinks },
-                              }));
-                            }}
-                            className="h-9 px-3 bg-[#15181D] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              {/* Informação sobre Colunas Institucional e Ajuda */}
+              <div className="border border-[#FF8A00]/30 rounded-lg p-4 bg-[#FF8A00]/10 flex flex-col gap-2">
+                <h4 className="text-xs font-bold text-[#FF8A00] uppercase tracking-wide flex items-center gap-2">
+                  <FileText className="h-4 w-4" /> Colunas Institucional & Ajuda (Páginas do Rodapé)
+                </h4>
+                <p className="text-xs text-white/80 leading-relaxed">
+                  As opções das colunas <strong>Institucional</strong> (Sobre Nós, Política de Privacidade, Termos, etc.) e <strong>Ajuda</strong> (Como Comprar, Prazos de Entrega, Rastreamento, etc.) agora são configuradas de forma independente na aba <strong className="text-[#FF8A00]">📄 Páginas do Rodapé</strong> no menu lateral (sob Conteúdo Informativo).
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("footer-pages");
+                    setActiveTab("footer-pages-list");
+                  }}
+                  className="mt-1 self-start px-3 py-1.5 bg-[#FF8A00] hover:bg-[#e07900] text-white text-xs font-bold rounded transition-colors cursor-pointer"
+                >
+                  Ir para Páginas do Rodapé →
+                </button>
               </div>
 
               {/* Coluna 4: Atendimento */}

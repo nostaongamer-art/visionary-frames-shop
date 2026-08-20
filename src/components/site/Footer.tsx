@@ -70,35 +70,6 @@ export function Footer() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const openFooterModal = (label: string, category: "institucional" | "ajuda") => {
-    const norm = label.toLowerCase().trim();
-    let page = footerPages.find(p => p.title.toLowerCase().trim() === norm);
-    
-    if (!page) {
-      if (norm.includes("sobre")) page = footerPages.find(p => p.id === "sobre-nos");
-      else if (norm.includes("nossa loja") || norm.includes("loja")) page = footerPages.find(p => p.id === "nossa-loja");
-      else if (norm.includes("privacidade")) page = footerPages.find(p => p.id === "politica-privacidade");
-      else if (norm.includes("troca")) page = footerPages.find(p => p.id === "trocas-devolucoes");
-      else if (norm.includes("termo")) page = footerPages.find(p => p.id === "termos-uso");
-      else if (norm.includes("como comprar")) page = footerPages.find(p => p.id === "como-comprar");
-      else if (norm.includes("prazo") || norm.includes("entrega")) page = footerPages.find(p => p.id === "prazos-entrega");
-      else if (norm.includes("rastre")) page = footerPages.find(p => p.id === "rastreamento");
-      else if (norm.includes("pergunta") || norm.includes("faq")) page = footerPages.find(p => p.id === "perguntas-frequentes");
-    }
-
-    if (!page) {
-      page = {
-        id: norm.replace(/\s+/g, "-"),
-        title: label,
-        category,
-        content: `Informações sobre ${label}.`,
-      };
-    }
-
-    setSelectedPage(page);
-    setIsModalOpen(true);
-  };
-
   const socialsMap = [
     { icon: iconInstagram, label: "Instagram", url: footerData.instagramUrl, show: footerData.showInstagram !== false },
     { icon: iconFacebook, label: "Facebook", url: footerData.facebookUrl, show: footerData.showFacebook !== false },
@@ -151,20 +122,25 @@ export function Footer() {
           {footerData.showInstitucional !== false && (
             <div>
               <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
-                {footerData.institucionalTitle}
+                INSTITUCIONAL
               </h3>
               <ul className="space-y-2.5">
-                {footerData.institucionalLinks.filter(l => l.show !== false).map((link, idx) => (
-                  <li key={idx}>
-                    <button
-                      type="button"
-                      onClick={() => openFooterModal(link.label, "institucional")}
-                      className="text-sm text-white/60 transition-colors hover:text-brand text-left cursor-pointer"
-                    >
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
+                {footerPages
+                  .filter((p) => p.category === "institucional")
+                  .map((page) => (
+                    <li key={page.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedPage(page);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-sm text-white/60 transition-colors hover:text-brand text-left cursor-pointer"
+                      >
+                        {page.title}
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
           )}
@@ -173,20 +149,25 @@ export function Footer() {
           {footerData.showAjuda !== false && (
             <div>
               <h3 className="mb-4 text-sm font-bold tracking-wide text-white uppercase">
-                {footerData.ajudaTitle}
+                AJUDA
               </h3>
               <ul className="space-y-2.5">
-                {footerData.ajudaLinks.filter(l => l.show !== false).map((link, idx) => (
-                  <li key={idx}>
-                    <button
-                      type="button"
-                      onClick={() => openFooterModal(link.label, "ajuda")}
-                      className="text-sm text-white/60 transition-colors hover:text-brand text-left cursor-pointer"
-                    >
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
+                {footerPages
+                  .filter((p) => p.category === "ajuda")
+                  .map((page) => (
+                    <li key={page.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedPage(page);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-sm text-white/60 transition-colors hover:text-brand text-left cursor-pointer"
+                      >
+                        {page.title}
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
           )}
