@@ -7,6 +7,7 @@ import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent } from "@/lib/page-service";
 import { useCart } from "@/hooks/use-cart";
 import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft, ShoppingCart, ShoppingBag, Loader2 } from "lucide-react";
+import { fetchShippingSettings } from "@/lib/shipping-service";
 import { PRODUCTS } from "@/lib/shop-data";
 import { toast } from "sonner";
 
@@ -57,11 +58,20 @@ function ProductDetailsPage() {
   const [shippingOptions, setShippingOptions] = useState<any[] | null>(null);
   const [activeTab, setActiveTab] = useState<"description" | "specs">("description");
   const [activeImage, setActiveImage] = useState<string>("");
+  const [shippingSettings, setShippingSettings] = useState<any>(null);
 
   useEffect(() => {
     async function loadProduct() {
       try {
         setLoading(true);
+        // Carrega configurações de frete
+        try {
+          const settings = await fetchShippingSettings();
+          setShippingSettings(settings);
+        } catch (se) {
+          console.error("Erro ao carregar settings de frete no produto:", se);
+        }
+
         const homeData = await fetchHomePageContent();
         
         if (homeData.productPageSettings) {
@@ -239,30 +249,58 @@ function ProductDetailsPage() {
       }
 
       const resData = await res.json();
-      if (resData.success && Array.isArray(resData.options) && resData.options.length > 0) {
-        setShippingOptions(resData.options);
-      } else {
-        setShippingOptions([
-          {
-            id: "pac",
-            name: "PAC",
+      if (resData.success && Array.isArray(resData.options)) {
+        const finalOptions = [...resData.options];
+        if (shippingSettings?.freeShippingEnabled !== false) {
+          finalOptions.unshift({
+            id: "free",
+            name: "Frete Grátis (Promocional)",
             company: "Correios",
             price: 0,
-            deliveryRange: settings.defaultShippingTime || "5 a 8 dias úteis",
-          },
-        ]);
-      }
-    } catch (err: any) {
-      console.error("Erro ao calcular frete no produto:", err);
-      setShippingOptions([
-        {
+            deliveryRange: "7 a 12 dias úteis",
+          });
+        }
+        setShippingOptions(finalOptions);
+      } else {
+        const fallback = [];
+        if (shippingSettings?.freeShippingEnabled !== false) {
+          fallback.push({
+            id: "free",
+            name: "Frete Grátis (Promocional)",
+            company: "Correios",
+            price: 0,
+            deliveryRange: "7 a 12 dias úteis",
+          });
+        }
+        fallback.push({
           id: "pac",
           name: "PAC",
           company: "Correios",
           price: 0,
           deliveryRange: settings.defaultShippingTime || "5 a 8 dias úteis",
-        },
-      ]);
+        });
+        setShippingOptions(fallback);
+      }
+    } catch (err: any) {
+      console.error("Erro ao calcular frete no produto:", err);
+      const fallback = [];
+      if (shippingSettings?.freeShippingEnabled !== false) {
+        fallback.push({
+          id: "free",
+          name: "Frete Grátis (Promocional)",
+          company: "Correios",
+          price: 0,
+          deliveryRange: "7 a 12 dias úteis",
+        });
+      }
+      fallback.push({
+        id: "pac",
+        name: "PAC",
+        company: "Correios",
+        price: 0,
+        deliveryRange: settings.defaultShippingTime || "5 a 8 dias úteis",
+      });
+      setShippingOptions(fallback);
     } finally {
       setShippingLoading(false);
     }
