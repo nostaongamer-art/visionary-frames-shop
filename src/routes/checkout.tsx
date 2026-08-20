@@ -82,7 +82,7 @@ function CheckoutPage() {
     action === "login" 
       ? "login" 
       : (action === "success" || action === "pending" || action === "thank-you")
-      ? "registration-offer"
+      ? (customer ? "thank-you" : "registration-offer")
       : "checkout"
   );
   
@@ -135,6 +135,13 @@ function CheckoutPage() {
       }
     }
   }, [customer, orders]);
+
+  // Se o cliente já estiver logado, pula a oferta de criação de conta
+  useEffect(() => {
+    if (customer && checkoutStep === "registration-offer") {
+      setCheckoutStep("thank-you");
+    }
+  }, [customer, checkoutStep]);
 
   useEffect(() => {
     const rawCep = (addressData.cep || "").replace(/\D/g, "");
@@ -459,7 +466,7 @@ function CheckoutPage() {
             if (isIframe) {
               window.open(paymentResult.initPoint, "_blank");
               // Avança a tela para a confirmação de compra realizada no preview
-              setCheckoutStep("registration-offer");
+              setCheckoutStep(customer ? "thank-you" : "registration-offer");
             } else {
               window.location.href = paymentResult.initPoint;
             }
@@ -479,8 +486,8 @@ function CheckoutPage() {
         setIsSubmitting(false);
         toast.success("Pedido registrado com sucesso!");
         
-        // Go to registration offer
-        setCheckoutStep("registration-offer");
+        // Go to registration offer (or thank you directly if logged in)
+        setCheckoutStep(customer ? "thank-you" : "registration-offer");
       } catch (error) {
         setIsSubmitting(false);
         console.error(error);
