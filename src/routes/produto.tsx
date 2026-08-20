@@ -6,7 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { fetchHomePageContent, getDirectDriveUrl } from "@/lib/home-service";
 import { fetchPageContent } from "@/lib/page-service";
 import { useCart } from "@/hooks/use-cart";
-import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft, ShoppingCart, ShoppingBag } from "lucide-react";
+import { Star, Plus, Minus, Truck, Ruler, Compass, Eye, MoveVertical, ArrowLeft, ShoppingCart, ShoppingBag, Loader2 } from "lucide-react";
 import { PRODUCTS } from "@/lib/shop-data";
 import { toast } from "sonner";
 
@@ -53,7 +53,8 @@ function ProductDetailsPage() {
 
   const [quantity, setQuantity] = useState(1);
   const [cep, setCep] = useState("");
-  const [shippingResult, setShippingResult] = useState<any>(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState<any[] | null>(null);
   const [activeTab, setActiveTab] = useState<"description" | "specs">("description");
   const [activeImage, setActiveImage] = useState<string>("");
 
@@ -130,7 +131,7 @@ function ProductDetailsPage() {
               const catData = await fetchPageContent(catId);
               if (catData && Array.isArray(catData.products)) {
                 const match = catData.products.find(
-                  (p: any) => p.name === foundProduct.name || String(p.id) === String(foundProduct.id)
+                  (p: any) => p.name && foundProduct.name && p.name.trim().toLowerCase() === foundProduct.name.trim().toLowerCase()
                 );
                 if (match && match.stock !== undefined) {
                   foundProduct.stock = match.stock;
@@ -215,17 +216,56 @@ function ProductDetailsPage() {
     });
   };
 
-  const handleCalculateShipping = (e: React.FormEvent) => {
+  const handleCalculateShipping = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cep.replace(/\D/g, "").length !== 8) {
+    const rawCep = cep.replace(/\D/g, "");
+    if (rawCep.length !== 8) {
       toast.error("Por favor, digite um CEP válido com 8 dígitos.");
       return;
     }
 
-    setShippingResult({
-      cost: settings.defaultShippingCost || "Grátis",
-      time: settings.defaultShippingTime || "5 a 8 dias úteis",
-    });
+    setShippingLoading(true);
+    setShippingOptions(null);
+
+    try {
+      const res = await fetch("/api/calculate-shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cep: rawCep }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Não foi possível consultar os valores no Melhor Envio.");
+      }
+
+      const resData = await res.json();
+      if (resData.success && Array.isArray(resData.options) && resData.options.length > 0) {
+        setShippingOptions(resData.options);
+      } else {
+        setShippingOptions([
+          {
+            id: "pac",
+            name: "PAC",
+            company: "Correios",
+            price: 0,
+            deliveryRange: settings.defaultShippingTime || "5 a 8 dias úteis",
+          },
+        ]);
+      }
+    } catch (err: any) {
+      console.error("Erro ao calcular frete no produto:", err);
+      setShippingOptions([
+        {
+          id: "pac",
+          name: "PAC",
+          company: "Correios",
+          price: 0,
+          deliveryRange: settings.defaultShippingTime || "5 a 8 dias úteis",
+        },
+      ]);
+    } finally {
+      setShippingLoading(false);
+    }
   };
 
   return (
@@ -452,8 +492,8 @@ function ProductDetailsPage() {
 
             {/* Simulador de Frete */}
             {settings.showShippingCalculator !== false && (
-              <div className="border border-border/30 rounded-xl p-4 bg-background/50">
-                <span className="text-xs font-bold text-ink uppercase tracking-wider block mb-2">
+              <div className="border border-border/30 rounded-xl p-4 bg-background/50 flex flex-col gap-3">
+                <span className="text-xs font-bold text-ink uppercase tracking-wider block">
                   Calcular Frete e Prazo
                 </span>
                 <form onSubmit={handleCalculateShipping} className="flex gap-2">
@@ -467,19 +507,58 @@ function ProductDetailsPage() {
                   />
                   <button
                     type="submit"
-                    className="h-10 px-4 bg-ink hover:bg-brand text-white font-bold text-xs rounded transition-colors cursor-pointer"
+                    disabled={shippingLoading}
+                    className="h-10 px-4 bg-ink hover:bg-brand text-white font-bold text-xs rounded transition-colors cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
                   >
-                    Calcular
+                    {shippingLoading ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-brand" />
+                        <span>Calculando...</span>
+                      </>
+                    ) : (
+                      <span>Calcular</span>
+                    )}
                   </button>
                 </form>
 
-                {shippingResult && (
-                  <div className="mt-3 pt-3 border-t border-border/30 flex items-start gap-2.5 text-xs">
-                    <Truck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-bold text-ink">PAC Correios: {shippingResult.cost}</p>
-                      <p className="text-muted-foreground">Prazo estimado de entrega: {shippingResult.time}</p>
-                    </div>
+                {/* Opções Calculadas via Melhor Envio */}
+                {shippingOptions && shippingOptions.length > 0 && (
+                  <div className="pt-3 border-t border-border/30 flex flex-col gap-2 animate-fadeIn">
+                    <span className="text-[11px] font-extrabold text-muted-foreground uppercase tracking-wider mb-1">
+                      Opções de Envio Calculadas:
+                    </span>
+
+                    {shippingOptions.map((opt: any, idx: number) => {
+                      const formattedPrice =
+                        opt.price === 0
+                          ? "Grátis"
+                          : `R$ ${Number(opt.price).toFixed(2).replace(".", ",")}`;
+
+                      return (
+                        <div
+                          key={opt.id || idx}
+                          className="p-3 bg-background border border-border/60 rounded-lg flex items-center justify-between gap-3 text-xs shadow-xs"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-1.5 bg-brand/10 text-brand rounded-md">
+                              <Truck className="h-4 w-4" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-ink">
+                                {opt.name} ({opt.company || "Correios"})
+                              </span>
+                              <span className="text-[11px] text-muted-foreground">
+                                Prazo estimado: {opt.deliveryRange || `${opt.deliveryTime} dias`}
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className={`font-black text-xs px-2.5 py-1 rounded tracking-wide ${opt.price === 0 ? "bg-green-100 text-green-700" : "bg-brand/10 text-brand"}`}>
+                            {formattedPrice}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
