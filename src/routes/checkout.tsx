@@ -94,6 +94,7 @@ function CheckoutPage() {
   const [dynamicShippingOptions, setDynamicShippingOptions] = useState<any[]>([]);
   const [shippingLoading, setShippingLoading] = useState(false);
   const [shippingSettings, setShippingSettings] = useState<any>(null);
+  const [collapsedCustomerOrders, setCollapsedCustomerOrders] = useState<Record<string, boolean>>({});
 
   // Carrega as configurações de frete
   useEffect(() => {
