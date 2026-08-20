@@ -14,7 +14,7 @@ import { CustomerTestimonial } from "@/components/checkout/CustomerTestimonial";
 import { BenefitsBar } from "@/components/checkout/BenefitsBar";
 import { Footer } from "@/components/site/Footer";
 import { toast } from "sonner";
-import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, CheckCircle2, Circle, Truck, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { ShieldCheck, User, Package, Calendar, MapPin, CreditCard, LogOut, CheckCircle2, Circle, Truck, ExternalLink, ChevronDown, ChevronUp, ShoppingBag } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
