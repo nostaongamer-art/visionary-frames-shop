@@ -146,7 +146,12 @@ function CheckoutPage() {
   // Sincroniza o checkoutStep quando a URL mudar (ex: clicar em Meus Pedidos no Header)
   useEffect(() => {
     if (action === "login") {
-      setCheckoutStep("login");
+      if (customer) {
+        navigate({ to: "/checkout", search: { action: "account" } });
+        setCheckoutStep("checkout");
+      } else {
+        setCheckoutStep("login");
+      }
     } else if (action === "account" || action === "orders" || action === "dashboard") {
       setCheckoutStep("checkout");
       refreshOrders();
@@ -576,8 +581,9 @@ function CheckoutPage() {
     const success = await login(loginEmail, loginPassword);
     if (success) {
       toast.success("Login efetuado com sucesso!");
-      // Redirect or refresh orders list
-      setCheckoutStep("checkout"); // The component will render dashboard automatically because customer is logged in!
+      // Redireciona para exibir a página de pedidos (dashboard)
+      navigate({ to: "/checkout", search: { action: "account" } });
+      setCheckoutStep("checkout");
     } else {
       setLoginError("E-mail ou senha incorretos.");
     }
