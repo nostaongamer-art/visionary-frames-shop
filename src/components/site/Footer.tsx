@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Instagram, Facebook, Youtube, MessageCircle, Lock } from "lucide-react";
-import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA, getDirectDriveUrl } from "@/lib/home-service";
+import { Lock } from "lucide-react";
+import { fetchHomePageContent, DEFAULT_HOME_PAGE_DATA, DEFAULT_FOOTER_PAGES, FooterPageContent, getDirectDriveUrl } from "@/lib/home-service";
+import { FooterPageModal } from "@/components/site/FooterPageModal";
 import iconInstagram from "@/assets/icon-instagram.png";
 import iconFacebook from "@/assets/icon-facebook.png";
 import iconWhatsapp from "@/assets/icon-whatsapp.png";
@@ -8,6 +9,9 @@ import iconYoutube from "@/assets/icon-youtube.png";
 
 export function Footer() {
   const [footerData, setFooterData] = useState(DEFAULT_HOME_PAGE_DATA.footer);
+  const [footerPages, setFooterPages] = useState<FooterPageContent[]>(DEFAULT_FOOTER_PAGES);
+  const [selectedPage, setSelectedPage] = useState<FooterPageContent | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // 1. Tentar ler do localStorage primeiro para carregamento instantâneo
@@ -18,6 +22,9 @@ export function Footer() {
           const parsed = JSON.parse(cached);
           if (parsed && parsed.footer) {
             setFooterData(parsed.footer);
+          }
+          if (parsed && Array.isArray(parsed.footerPages)) {
+            setFooterPages(parsed.footerPages);
           }
         }
       } catch (e) {
@@ -31,6 +38,9 @@ export function Footer() {
         const data = await fetchHomePageContent();
         if (data && data.footer) {
           setFooterData(data.footer);
+        }
+        if (data && Array.isArray(data.footerPages)) {
+          setFooterPages(data.footerPages);
         }
       } catch (e) {
         console.error("Failed to fetch footer content:", e);
@@ -48,6 +58,9 @@ export function Footer() {
           if (parsed && parsed.footer) {
             setFooterData(parsed.footer);
           }
+          if (parsed && Array.isArray(parsed.footerPages)) {
+            setFooterPages(parsed.footerPages);
+          }
         }
       } catch (e) {
         console.error(e);
@@ -56,6 +69,35 @@ export function Footer() {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  const openFooterModal = (label: string, category: "institucional" | "ajuda") => {
+    const norm = label.toLowerCase().trim();
+    let page = footerPages.find(p => p.title.toLowerCase().trim() === norm);
+    
+    if (!page) {
+      if (norm.includes("sobre")) page = footerPages.find(p => p.id === "sobre-nos");
+      else if (norm.includes("nossa loja") || norm.includes("loja")) page = footerPages.find(p => p.id === "nossa-loja");
+      else if (norm.includes("privacidade")) page = footerPages.find(p => p.id === "politica-privacidade");
+      else if (norm.includes("troca")) page = footerPages.find(p => p.id === "trocas-devolucoes");
+      else if (norm.includes("termo")) page = footerPages.find(p => p.id === "termos-uso");
+      else if (norm.includes("como comprar")) page = footerPages.find(p => p.id === "como-comprar");
+      else if (norm.includes("prazo") || norm.includes("entrega")) page = footerPages.find(p => p.id === "prazos-entrega");
+      else if (norm.includes("rastre")) page = footerPages.find(p => p.id === "rastreamento");
+      else if (norm.includes("pergunta") || norm.includes("faq")) page = footerPages.find(p => p.id === "perguntas-frequentes");
+    }
+
+    if (!page) {
+      page = {
+        id: norm.replace(/\s+/g, "-"),
+        title: label,
+        category,
+        content: `Informações sobre ${label}.`,
+      };
+    }
+
+    setSelectedPage(page);
+    setIsModalOpen(true);
+  };
 
   const socialsMap = [
     { icon: iconInstagram, label: "Instagram", url: footerData.instagramUrl, show: footerData.showInstagram !== false },
@@ -114,9 +156,13 @@ export function Footer() {
               <ul className="space-y-2.5">
                 {footerData.institucionalLinks.filter(l => l.show !== false).map((link, idx) => (
                   <li key={idx}>
-                    <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
+                    <button
+                      type="button"
+                      onClick={() => openFooterModal(link.label, "institucional")}
+                      className="text-sm text-white/60 transition-colors hover:text-brand text-left cursor-pointer"
+                    >
                       {link.label}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -132,9 +178,13 @@ export function Footer() {
               <ul className="space-y-2.5">
                 {footerData.ajudaLinks.filter(l => l.show !== false).map((link, idx) => (
                   <li key={idx}>
-                    <a href={link.href || "#"} className="text-sm text-white/60 transition-colors hover:text-brand">
+                    <button
+                      type="button"
+                      onClick={() => openFooterModal(link.label, "ajuda")}
+                      className="text-sm text-white/60 transition-colors hover:text-brand text-left cursor-pointer"
+                    >
                       {link.label}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -200,9 +250,16 @@ export function Footer() {
 
       <div className="border-t border-hairline/60 py-5">
         <p className="text-center text-xs text-white/50">
-          © 2024 Glasses. Todos os direitos reservados. | v1.9.7
+          © 2024 Glasses. Todos os direitos reservados.
         </p>
       </div>
+
+      {/* Footer Page Modal Component */}
+      <FooterPageModal
+        page={selectedPage}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </footer>
   );
 }

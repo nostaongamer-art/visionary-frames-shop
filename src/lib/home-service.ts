@@ -36,11 +36,78 @@ export interface CustomBannerData {
   desktopWidth?: number;
 }
 
+export interface FooterPageContent {
+  id: string;
+  title: string;
+  category: "institucional" | "ajuda";
+  content: string;
+  youtubeUrl?: string;
+}
+
+export const DEFAULT_FOOTER_PAGES: FooterPageContent[] = [
+  {
+    id: "sobre-nos",
+    title: "Sobre Nós",
+    category: "institucional",
+    content: "A Glasses nasceu com o objetivo de revolucionar o mercado de óculos no Brasil, unindo qualidade excepcional, design moderno e preços acessíveis. Nossa missão é proporcionar a cada cliente a oportunidade de expressar sua personalidade através de armações estilosas e confortáveis. Selecionamos cuidadosamente nossos materiais para garantir durabilidade, leveza e a melhor experiência de uso.",
+  },
+  {
+    id: "nossa-loja",
+    title: "Nossa Loja",
+    category: "institucional",
+    content: "Nossa loja online atende a todo o território nacional com segurança, rapidez e transparência. Trabalhamos com estoques próprios e parceiros de logística integrados ao Melhor Envio e Correios para que seu pedido chegue com toda a comodidade à sua casa. Navegue pelo nosso catálogo exclusivo e descubra lançamentos diários em armações de grau, óculos de sol e linhas premium.",
+  },
+  {
+    id: "politica-privacidade",
+    title: "Política de Privacidade",
+    category: "institucional",
+    content: "A sua privacidade é nossa prioridade máxima. Coletamos apenas as informações necessárias para processar seus pedidos e aprimorar sua experiência de compra, em total conformidade com a Lei Geral de Proteção de Dados (LGPD). Todos os pagamentos são processados em ambiente criptografado com o Mercado Pago, garantindo que os dados do seu cartão nunca sejam armazenados em nossos servidores.",
+  },
+  {
+    id: "trocas-devolucoes",
+    title: "Trocas e Devoluções",
+    category: "institucional",
+    content: "Queremos que você fique 100% satisfeito com seu novo óculos! Caso precise trocar ou devolver seu produto por qualquer motivo, você pode solicitar a troca em até 7 (sete) dias corridos após o recebimento da encomenda. O produto deve estar em sua embalagem original, sem sinais de uso ou avarias. Entre em contato com o nosso suporte via WhatsApp ou e-mail para receber as instruções de postagem gratuita.",
+  },
+  {
+    id: "termos-uso",
+    title: "Termos de Uso",
+    category: "institucional",
+    content: "Ao acessar e realizar compras em nosso site, você concorda com os termos e condições descritos nesta plataforma. As fotos dos produtos são ilustrativas, podendo haver pequenas variações de tonalidade dependendo da calibração de cor do seu monitor ou tela de celular. Reservamo-nos o direito de corrigir eventuais erros de digitação de preços ou especificações a qualquer momento.",
+  },
+  {
+    id: "como-comprar",
+    title: "Como Comprar",
+    category: "ajuda",
+    content: "Comprar na Glasses é simples, rápido e totalmente seguro! Siga o passo a passo:\n1. Navegue pelas categorias ou pela busca e escolha a sua armação ou óculos de sol favorito.\n2. Clique no botão 'COMPRAR AGORA' ou 'ADICIONAR À SACOLA'.\n3. No checkout, preencha seus dados de entrega (o frete será calculated automaticamente pelos Correios/Melhor Envio).\n4. Escolha sua forma de pagamento preferida (Pix, Cartão de Crédito em até 12x ou Boleto).\n5. Pronto! Assim que o pagamento for aprovado, seu pedido será preparado e você receberá o código de rastreamento para acompanhar a entrega.",
+    youtubeUrl: "",
+  },
+  {
+    id: "prazos-entrega",
+    title: "Prazos de Entrega",
+    category: "ajuda",
+    content: "Os prazos de entrega variam de acordo com o CEP de destino e a modalidade de envio escolhida (PAC, SEDEX ou Frete Grátis). Durante o checkout, o sistema consulta a API oficial do Melhor Envio e dos Correios em tempo real e apresenta a estimativa exata em dias úteis para a sua região. O prazo começa a contar a partir do primeiro dia útil seguinte à aprovação do pagamento.",
+  },
+  {
+    id: "rastreamento",
+    title: "Rastreamento",
+    category: "ajuda",
+    content: "Acompanhar sua encomenda é muito fácil! Assim que seu pedido for despachado, você receberá um código de rastreamento. Você pode consultar o status da entrega a qualquer momento na aba 'Meus Pedidos' dentro do nosso site (basta fazer login com seu e-mail) ou diretamente no site dos Correios. O progresso é atualizado em tempo real!",
+  },
+  {
+    id: "perguntas-frequentes",
+    title: "Perguntas Frequentes",
+    category: "ajuda",
+    content: "• Posso colocar lentes de grau nas armações?\nSim! Todas as nossas armações de grau são projetadas para suportar todos os tipos de lentes (monofocais, multifocais, com filtro de luz azul, antirreflexo, etc.) em qualquer ótica de sua preferência.\n\n• Os óculos de sol possuem proteção UV?\nSim, 100%! Todos os nossos óculos de sol possuem proteção UV400 contra os raios UVA e UVB.\n\n• Quais são as formas de pagamento aceitas?\nAceitamos Pix com aprovação imediata, Cartões de Crédito (Visa, Mastercard, Elo, Hipercard, Amex) em até 12x e Boleto Bancário.\n\n• O site é confiável?\nTotalmente! Utilizamos criptografia SSL de 256 bits e processamento de pagamentos seguro pelo Mercado Pago.",
+  },
+];
+
 export interface HomePageData {
   customSections?: CustomSectionData[];
   customBanners?: CustomBannerData[];
   sectionOrder?: string[];
   customMenus?: Array<{ id: string; title: string }>;
+  footerPages?: FooterPageContent[];
   promoBar: {
     show?: boolean;
     text: string;
@@ -190,6 +257,7 @@ export interface HomePageData {
 }
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
+  footerPages: DEFAULT_FOOTER_PAGES,
   customSections: [],
   customBanners: [],
   customMenus: [],
@@ -676,6 +744,18 @@ function mergeWithDefaults(saved: any): HomePageData {
       button2Text: saved.productPageSettings?.button2Text !== undefined ? saved.productPageSettings.button2Text : DEFAULT_HOME_PAGE_DATA.productPageSettings!.button2Text,
       showButton2: saved.productPageSettings?.showButton2 !== undefined ? saved.productPageSettings.showButton2 : DEFAULT_HOME_PAGE_DATA.productPageSettings!.showButton2,
     },
+    footerPages: Array.isArray(saved.footerPages) && saved.footerPages.length > 0
+      ? DEFAULT_FOOTER_PAGES.map((defPage) => {
+          const savedPage = saved.footerPages.find((p: any) => p.id === defPage.id) || {};
+          return {
+            id: defPage.id,
+            title: savedPage.title || defPage.title,
+            category: defPage.category,
+            content: savedPage.content !== undefined ? savedPage.content : defPage.content,
+            youtubeUrl: savedPage.youtubeUrl !== undefined ? savedPage.youtubeUrl : (defPage.youtubeUrl || ""),
+          };
+        })
+      : DEFAULT_FOOTER_PAGES,
   };
 }
 

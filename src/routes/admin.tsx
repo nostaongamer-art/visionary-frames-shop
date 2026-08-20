@@ -5,7 +5,7 @@ import { fetchHomePageContent, saveHomePageContent, HomePageData, DEFAULT_HOME_P
 import { fetchPageContent, savePageContent, CategoryPageData, PageProduct, DEFAULT_PAGES_DATA } from "@/lib/page-service";
 import { toast } from "sonner";
 import { fetchOrders, updateOrderTags, deleteOrderAndCustomer } from "@/lib/orders-service";
-import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock, Truck, MapPin, ChevronDown, ChevronUp } from "lucide-react";
+import { LogOut, Save, LayoutGrid, Info, Star, Edit, ArrowLeft, RefreshCw, Mail, Image, Link, AlertCircle, Layout, Zap, Plus, Trash2, Palette, Search, Ticket, CreditCard, Eye, EyeOff, Copy, Check, Lock, Truck, MapPin, ChevronDown, ChevronUp, FileText, Video } from "lucide-react";
 import { fetchPaymentSettings, savePaymentSettings, MercadoPagoSettings, DEFAULT_MERCADO_PAGO_SETTINGS } from "@/lib/payment-service";
 import { fetchShippingSettings, saveShippingSettings, MelhorEnvioSettings, DEFAULT_MELHOR_ENVIO_SETTINGS } from "@/lib/shipping-service";
 
@@ -153,6 +153,7 @@ function Admin() {
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersFilter, setOrdersFilter] = useState("");
   const [collapsedOrderIds, setCollapsedOrderIds] = useState<Record<string, boolean>>({});
+  const [selectedFooterPageId, setSelectedFooterPageId] = useState<string>("sobre-nos");
 
   // Product CRUD states for catalogue sections (2-7)
   const [isEditingProduct, setIsEditingProduct] = useState(false);
@@ -1074,6 +1075,22 @@ function Admin() {
             }`}
           >
             <span>🚚 Melhor Envio</span>
+          </button>
+
+          <h4 className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase px-3 py-1 mt-4 mb-1">
+            Conteúdo Informativo
+          </h4>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("footer-pages");
+              setActiveTab("footer-pages-list");
+            }}
+            className={`w-full text-left px-3 py-2 rounded text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer ${
+              activeSection === "footer-pages" && activeTab === "footer-pages-list" ? "bg-[#FF8A00] text-white" : "hover:bg-white/5 text-white/80"
+            }`}
+          >
+            <span>📄 Páginas do Rodapé</span>
           </button>
         </div>
 
@@ -4923,6 +4940,147 @@ function Admin() {
                   </span>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB: Páginas do Rodapé & Pop-ups */}
+          {activeSection === "footer-pages" && activeTab === "footer-pages-list" && (
+            <div className="flex flex-col gap-6 text-white text-left select-none animate-fadeIn">
+              <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                <h3 className="text-base font-bold text-[#FF8A00] flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-[#FF8A00]" /> Configurar Páginas do Rodapé & Pop-ups
+                </h3>
+              </div>
+
+              <div className="bg-[#15181D]/40 border border-[#282C32]/45 rounded-lg p-4 text-xs text-white/70 leading-relaxed">
+                <p>
+                  Edite o conteúdo das páginas institucionais e de ajuda exibidas no rodapé do seu site. Quando o cliente clicar em qualquer uma dessas opções no site, um <strong className="text-white font-bold">Pop-up / Modal interativo</strong> abrirá sobre a tela exibindo estas informações.
+                </p>
+                <p className="mt-1 text-[#FF8A00] font-semibold">
+                  💡 A página <strong>"Como Comprar"</strong> possui um campo exclusivo para você colar o link do seu vídeo do YouTube!
+                </p>
+              </div>
+
+              {/* Sub-Tabs: Selector for the 9 pages */}
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
+                  <span className="text-[11px] font-bold text-white/40 uppercase self-center mr-2 w-full sm:w-auto">Institucional:</span>
+                  {(data.footerPages || DEFAULT_FOOTER_PAGES)
+                    .filter((p) => p.category === "institucional")
+                    .map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setSelectedFooterPageId(p.id)}
+                        className={`px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
+                          selectedFooterPageId === p.id
+                            ? "bg-[#FF8A00] text-white shadow"
+                            : "bg-[#1C1F26] text-white/70 hover:text-white hover:bg-[#282C32]"
+                        }`}
+                      >
+                        {p.title}
+                      </button>
+                    ))}
+                </div>
+
+                <div className="flex flex-wrap gap-2 border-b border-white/10 pb-3">
+                  <span className="text-[11px] font-bold text-white/40 uppercase self-center mr-2 w-full sm:w-auto">Ajuda:</span>
+                  {(data.footerPages || DEFAULT_FOOTER_PAGES)
+                    .filter((p) => p.category === "ajuda")
+                    .map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setSelectedFooterPageId(p.id)}
+                        className={`px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
+                          selectedFooterPageId === p.id
+                            ? "bg-[#FF8A00] text-white shadow"
+                            : "bg-[#1C1F26] text-white/70 hover:text-white hover:bg-[#282C32]"
+                        }`}
+                      >
+                        {p.title} {p.id === "como-comprar" && "🎬"}
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Active Page Form Editor */}
+              {(() => {
+                const currentPages = data.footerPages || DEFAULT_FOOTER_PAGES;
+                const currentPageIndex = currentPages.findIndex((p) => p.id === selectedFooterPageId);
+                const currentPage = currentPages[currentPageIndex] || currentPages[0];
+
+                if (!currentPage) return null;
+
+                const updateCurrentPage = (field: string, value: string) => {
+                  const updatedPages = [...currentPages];
+                  updatedPages[currentPageIndex] = {
+                    ...currentPage,
+                    [field]: value,
+                  };
+                  setData((prev) => ({
+                    ...prev,
+                    footerPages: updatedPages,
+                  }));
+                };
+
+                return (
+                  <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4 animate-fadeIn">
+                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-[#FF8A00] uppercase tracking-wider">
+                          {currentPage.category === "ajuda" ? "Aba Ajuda" : "Aba Institucional"}
+                        </span>
+                        <span className="text-white/40 text-xs">•</span>
+                        <h4 className="text-sm font-bold text-white">{currentPage.title}</h4>
+                      </div>
+                    </div>
+
+                    {/* Page Title Input */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-white/80">Título Exibido no Pop-up</label>
+                      <input
+                        type="text"
+                        value={currentPage.title}
+                        onChange={(e) => updateCurrentPage("title", e.target.value)}
+                        className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                      />
+                    </div>
+
+                    {/* YouTube Video URL Field (Only for Como Comprar) */}
+                    {currentPage.id === "como-comprar" && (
+                      <div className="bg-[#15181D] border border-[#FF8A00]/30 rounded-lg p-4 flex flex-col gap-3">
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#FF8A00]">
+                          <Video className="h-4 w-4" />
+                          <span>Link do Vídeo do YouTube (Exclusivo para "Como Comprar")</span>
+                        </div>
+                        <input
+                          type="text"
+                          value={currentPage.youtubeUrl || ""}
+                          onChange={(e) => updateCurrentPage("youtubeUrl", e.target.value)}
+                          placeholder="Cole a URL do YouTube (ex: https://www.youtube.com/watch?v=...) ou (https://youtu.be/...)"
+                          className="w-full h-10 px-3 bg-[#101217] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00]"
+                        />
+                        <span className="text-[10px] text-white/50">
+                          O vídeo será incorporado e exibido automaticamente dentro da janela Pop-up quando o cliente clicar em "Como Comprar".
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Content Textarea */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-white/80">Conteúdo do Texto (Suporta quebras de linha)</label>
+                      <textarea
+                        rows={10}
+                        value={currentPage.content}
+                        onChange={(e) => updateCurrentPage("content", e.target.value)}
+                        className="w-full p-3 bg-[#101217] border border-[#282C32]/45 rounded text-xs text-white outline-none focus:border-[#FF8A00] transition-colors leading-relaxed"
+                        placeholder="Digite o texto detalhado da página..."
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
