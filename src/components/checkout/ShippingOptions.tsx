@@ -16,6 +16,7 @@ interface ShippingOptionsProps {
   onSelect: (option: ShippingType, price: number) => void;
   dynamicOptions?: DynamicShippingOption[];
   loading?: boolean;
+  freeShippingEnabled?: boolean;
 }
 
 export function ShippingOptions({
@@ -23,6 +24,7 @@ export function ShippingOptions({
   onSelect,
   dynamicOptions = [],
   loading = false,
+  freeShippingEnabled = true,
 }: ShippingOptionsProps) {
   if (loading) {
     return (
@@ -41,34 +43,36 @@ export function ShippingOptions({
         </span>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Always offer Free Shipping option as 1st choice if promotion active */}
-          <div
-            onClick={() => onSelect("free", 0)}
-            className={`border rounded-[4px] p-3 flex items-center justify-between cursor-pointer transition-all ${
-              selectedOption === "free"
-                ? "border-brand bg-white ring-1 ring-brand/10"
-                : "border-[#D9DDE2] bg-white hover:border-gray-300"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center">
-                <div
-                  className={`h-4 w-4 rounded-full border flex items-center justify-center ${
-                    selectedOption === "free" ? "border-brand" : "border-gray-400"
-                  }`}
-                >
-                  {selectedOption === "free" && (
-                    <div className="h-2 w-2 rounded-full bg-brand"></div>
-                  )}
+          {freeShippingEnabled && (
+            <div
+              onClick={() => onSelect("free", 0)}
+              className={`border rounded-[4px] p-3 flex items-center justify-between cursor-pointer transition-all ${
+                selectedOption === "free"
+                  ? "border-brand bg-white ring-1 ring-brand/10"
+                  : "border-[#D9DDE2] bg-white hover:border-gray-300"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center">
+                  <div
+                    className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                      selectedOption === "free" ? "border-brand" : "border-gray-400"
+                    }`}
+                  >
+                    {selectedOption === "free" && (
+                      <div className="h-2 w-2 rounded-full bg-brand"></div>
+                    )}
+                  </div>
+                </div>
+                <Truck className={`h-5 w-5 stroke-[1.5] ${selectedOption === "free" ? "text-brand" : "text-gray-400"}`} />
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-ink">Frete Grátis (Promocional)</span>
+                  <span className="text-[10px] text-[#666A72]">7 a 12 dias úteis</span>
                 </div>
               </div>
-              <Truck className={`h-5 w-5 stroke-[1.5] ${selectedOption === "free" ? "text-brand" : "text-gray-400"}`} />
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-ink">Frete Grátis (Promocional)</span>
-                <span className="text-[10px] text-[#666A72]">7 a 12 dias úteis</span>
-              </div>
+              <span className="text-xs font-black text-green-600 uppercase">Grátis</span>
             </div>
-            <span className="text-xs font-black text-green-600 uppercase">Grátis</span>
-          </div>
+          )}
 
           {/* Dynamic Correios / Carrier options */}
           {dynamicOptions.map((opt) => {
@@ -114,37 +118,39 @@ export function ShippingOptions({
 
   // Fallback default static options
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 select-none">
+    <div className={`w-full grid select-none gap-4 ${freeShippingEnabled ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
       {/* Option 1: Free Shipping */}
-      <div
-        onClick={() => onSelect("free", 0)}
-        className={`h-[74px] border rounded-[4px] p-3 flex items-center justify-between cursor-pointer transition-all ${
-          selectedOption === "free"
-            ? "border-brand bg-white ring-1 ring-brand/10"
-            : "border-[#D9DDE2] bg-white hover:border-gray-300"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center">
-            <div
-              className={`h-4 w-4 rounded-full border flex items-center justify-center ${
-                selectedOption === "free" ? "border-brand" : "border-gray-400"
-              }`}
-            >
-              {selectedOption === "free" && (
-                <div className="h-2 w-2 rounded-full bg-brand"></div>
-              )}
+      {freeShippingEnabled && (
+        <div
+          onClick={() => onSelect("free", 0)}
+          className={`h-[74px] border rounded-[4px] p-3 flex items-center justify-between cursor-pointer transition-all ${
+            selectedOption === "free"
+              ? "border-brand bg-white ring-1 ring-brand/10"
+              : "border-[#D9DDE2] bg-white hover:border-gray-300"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center">
+              <div
+                className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                  selectedOption === "free" ? "border-brand" : "border-gray-400"
+                }`}
+              >
+                {selectedOption === "free" && (
+                  <div className="h-2 w-2 rounded-full bg-brand"></div>
+                )}
+              </div>
+            </div>
+
+            <Truck className={`h-6 w-6 stroke-[1.5] ${selectedOption === "free" ? "text-brand" : "text-gray-400"}`} />
+
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-bold text-ink">Frete Grátis</span>
+              <span className="text-[10px] text-[#666A72]">7 a 12 dias úteis</span>
             </div>
           </div>
-
-          <Truck className={`h-6 w-6 stroke-[1.5] ${selectedOption === "free" ? "text-brand" : "text-gray-400"}`} />
-
-          <div className="flex flex-col text-left">
-            <span className="text-xs font-bold text-ink">Frete Grátis</span>
-            <span className="text-[10px] text-[#666A72]">7 a 12 dias úteis</span>
-          </div>
         </div>
-      </div>
+      )}
 
       {/* Option 2: Express Shipping */}
       <div

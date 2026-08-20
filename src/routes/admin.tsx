@@ -4705,6 +4705,24 @@ function Admin() {
                 </div>
               </div>
 
+              {/* Opção de Frete Grátis */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Frete Grátis</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-semibold text-white/90">Oferecer Frete Grátis (Promocional)</span>
+                    <span className="text-[10px] text-white/40">Se ativado, a opção "Frete Grátis (Promocional)" de 7 a 12 dias úteis estará disponível para todos os CEPs no checkout.</span>
+                  </div>
+                  <ToggleSwitch
+                    label=""
+                    checked={shippingSettings?.freeShippingEnabled !== false}
+                    onChange={(val) =>
+                      setShippingSettings((prev) => ({ ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS), freeShippingEnabled: val }))
+                    }
+                  />
+                </div>
+              </div>
+
               {/* Sandbox / Production Mode Toggle */}
               <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
                 <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Ambiente da API</h4>

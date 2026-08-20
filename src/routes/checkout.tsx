@@ -20,6 +20,7 @@ import { useCustomer } from "@/hooks/use-customer";
 import { saveOrder, saveCustomerAccount, findCustomerByEmailAndName } from "@/lib/orders-service";
 import type { Order } from "@/lib/orders-service";
 import { fetchPaymentSettings } from "@/lib/payment-service";
+import { fetchShippingSettings } from "@/lib/shipping-service";
 import { decrementProductStock } from "@/lib/page-service";
 
 export const Route = createFileRoute("/checkout")({
@@ -92,6 +93,21 @@ function CheckoutPage() {
   const [customShippingPrice, setCustomShippingPrice] = useState<number>(0);
   const [dynamicShippingOptions, setDynamicShippingOptions] = useState<any[]>([]);
   const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingSettings, setShippingSettings] = useState<any>(null);
+
+  // Carrega as configurações de frete
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const settings = await fetchShippingSettings();
+        setShippingSettings(settings);
+      } catch (e) {
+        console.error("Erro ao carregar settings no checkout:", e);
+      }
+    }
+    loadSettings();
+  }, []);
+
   // Auto-preenche os dados pessoais e de endereço no checkout se o cliente estiver logado
   useEffect(() => {
     if (customer) {
@@ -881,6 +897,7 @@ function CheckoutPage() {
                       }}
                       dynamicOptions={dynamicShippingOptions}
                       loading={shippingLoading}
+                      freeShippingEnabled={shippingSettings?.freeShippingEnabled !== false}
                     />
                   </div>
                 </div>
