@@ -192,7 +192,7 @@ export function Header() {
                   <div className="bg-[#15181D] border border-[#282C32]/45 rounded-md shadow-xl py-1">
                     <Link
                       to="/checkout"
-                      search={{ action: "" }}
+                      search={{ action: "account" }}
                       className="block px-4 py-2 text-xs text-white/80 hover:bg-[#FF8A00] hover:text-white transition-colors font-bold uppercase"
                     >
                       📦 Meus Pedidos

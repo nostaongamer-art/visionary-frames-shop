@@ -92,7 +92,33 @@ function CheckoutPage() {
   const [customShippingPrice, setCustomShippingPrice] = useState<number>(0);
   const [dynamicShippingOptions, setDynamicShippingOptions] = useState<any[]>([]);
   const [shippingLoading, setShippingLoading] = useState(false);
-  const [collapsedCustomerOrders, setCollapsedCustomerOrders] = useState<Record<string, boolean>>({});
+  // Auto-preenche os dados pessoais e de endereço no checkout se o cliente estiver logado
+  useEffect(() => {
+    if (customer) {
+      setPersonalData((prev) => ({
+        fullName: prev.fullName || customer.fullName || "",
+        email: prev.email || customer.email || "",
+        phone: prev.phone || customer.phone || "",
+        cpf: prev.cpf || customer.cpf || "",
+        acceptOffers: prev.acceptOffers,
+      }));
+
+      if (orders && orders.length > 0) {
+        const lastOrder = orders[0];
+        if (lastOrder.address) {
+          setAddressData((prev) => ({
+            cep: prev.cep || lastOrder.address.cep || "",
+            street: prev.street || lastOrder.address.street || "",
+            number: prev.number || lastOrder.address.number || "",
+            complement: prev.complement || lastOrder.address.complement || "",
+            neighborhood: prev.neighborhood || lastOrder.address.neighborhood || "",
+            city: prev.city || lastOrder.address.city || "",
+            state: prev.state || lastOrder.address.state || "",
+          }));
+        }
+      }
+    }
+  }, [customer, orders]);
 
   useEffect(() => {
     const rawCep = (addressData.cep || "").replace(/\D/g, "");
@@ -645,8 +671,11 @@ function CheckoutPage() {
   );
 }
 
-  // If customer is already logged in, render the dashboard page
-  if (customer && checkoutStep === "checkout") {
+  // Exibe a página Meus Pedidos apenas se o cliente clicar explicitamente em Meus Pedidos/Conta ou se a sacola estiver vazia
+  const isExplicitAccountView = action === "account" || action === "orders" || action === "dashboard";
+  const showDashboard = customer && (isExplicitAccountView || (items.length === 0 && checkoutStep === "checkout"));
+
+  if (showDashboard) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] font-sans antialiased text-ink">
         <PromotionalBar />
@@ -666,13 +695,30 @@ function CheckoutPage() {
                   <p className="text-xs text-muted-foreground">E-mail: {customer.email} | CPF: {customer.cpf}</p>
                 </div>
               </div>
-              <button
-                onClick={logout}
-                className="h-10 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border border-red-200"
-              >
-                <LogOut className="h-4 w-4" />
-                Sair da Conta
-              </button>
+
+              <div className="flex items-center gap-3">
+                {items.length > 0 && (
+                  <button
+                    onClick={() => {
+                      // Permite ir direto para a finalização de compra dos itens da sacola
+                      navigate({ to: "/checkout", search: { action: "" } });
+                      setCheckoutStep("checkout");
+                    }}
+                    className="h-10 px-4 bg-[#FF8A00] hover:bg-[#e07900] text-white rounded text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer shadow-xs"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Ir para o Checkout / Comprar ({items.reduce((acc, i) => acc + i.quantity, 0)})
+                  </button>
+                )}
+
+                <button
+                  onClick={logout}
+                  className="h-10 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer border border-red-200"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sair da Conta
+                </button>
+              </div>
             </div>
 
             {/* Dashboard Content */}
