@@ -32,21 +32,30 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshOrders = async () => {
-    if (!customer) {
-      setOrders([]);
-      return;
-    }
-    const allOrders = await fetchOrders();
-    const cleanCustomerCpf = customer.cpf.replace(/\D/g, "");
-    const cleanCustomerEmail = customer.email.trim().toLowerCase();
+    try {
+      if (!customer) {
+        setOrders([]);
+        return;
+      }
+      const allOrders = await fetchOrders();
+      const cleanCustomerCpf = (customer.cpf || "").replace(/\D/g, "");
+      const cleanCustomerEmail = (customer.email || "").trim().toLowerCase();
 
-    // Match orders by email or CPF
-    const matched = allOrders.filter(
-      (ord) =>
-        ord.customerCpf.replace(/\D/g, "") === cleanCustomerCpf ||
-        ord.customerEmail.trim().toLowerCase() === cleanCustomerEmail
-    );
-    setOrders(matched);
+      // Match orders by email or CPF
+      const matched = allOrders.filter((ord) => {
+        if (!ord) return false;
+        const ordCpf = (ord.customerCpf || "").replace(/\D/g, "");
+        const ordEmail = (ord.customerEmail || "").trim().toLowerCase();
+        
+        return (
+          (cleanCustomerCpf && ordCpf === cleanCustomerCpf) ||
+          (cleanCustomerEmail && ordEmail === cleanCustomerEmail)
+        );
+      });
+      setOrders(matched);
+    } catch (e) {
+      console.error("Error refreshing orders:", e);
+    }
   };
 
   useEffect(() => {
