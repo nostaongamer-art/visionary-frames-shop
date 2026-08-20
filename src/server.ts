@@ -549,6 +549,31 @@ async function handleCalculateShipping(request: Request): Promise<Response> {
     const data = await response.json();
     const items = Array.isArray(data) ? data : [];
 
+    const disabledCarriers = Array.isArray(content?.disabledCarriers) ? content.disabledCarriers : [];
+
+    const getCarrierKey = (companyName: string, serviceName: string) => {
+      const co = companyName.toLowerCase();
+      const sv = serviceName.toLowerCase();
+      if (co.includes("correios")) {
+        if (sv.includes("pac")) return "correios-pac";
+        if (sv.includes("sedex")) return "correios-sedex";
+      }
+      if (co.includes("jadlog")) {
+        if (sv.includes("centralizado")) return "jadlog-centralizado";
+        if (sv.includes("package")) return "jadlog-package";
+        if (sv.includes(".com")) return "jadlog-com";
+      }
+      if (co.includes("buslog")) return "buslog";
+      if (co.includes("loggi")) {
+        if (sv.includes("express")) return "loggi-express";
+        if (sv.includes("coleta")) return "loggi-coleta";
+        if (sv.includes("ponto")) return "loggi-ponto";
+      }
+      if (co.includes("jet")) return "jet";
+      if (co.includes("total express")) return "total-express";
+      return "";
+    };
+
     const options = items
       .filter((item: any) => !item.error && item.price)
       .map((item: any) => ({
@@ -558,7 +583,14 @@ async function handleCalculateShipping(request: Request): Promise<Response> {
         price: parseFloat(item.custom_price || item.price || "0"),
         deliveryTime: item.delivery_time || 5,
         deliveryRange: item.delivery_range ? `${item.delivery_range.min} a ${item.delivery_range.max} dias úteis` : `${item.delivery_time} dias úteis`,
-      }));
+      }))
+      .filter((opt: any) => {
+        const key = getCarrierKey(opt.company, opt.name);
+        if (key && disabledCarriers.includes(key)) {
+          return false;
+        }
+        return true;
+      });
 
     return new Response(
       JSON.stringify({ success: true, options }),

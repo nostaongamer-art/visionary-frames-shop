@@ -4760,6 +4760,54 @@ function Admin() {
                 </div>
               </div>
 
+              {/* Opções de Transportadoras Individuais */}
+              <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4 animate-fadeIn">
+                <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2">Ativar / Desativar Serviços de Envio</h4>
+                <p className="text-xs text-white/60">Selecione quais serviços de entrega do Melhor Envio/Correios você deseja disponibilizar para os seus clientes no site:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    { key: "correios-pac", label: "Correios - PAC", logo: "📦" },
+                    { key: "correios-sedex", label: "Correios - SEDEX", logo: "⚡" },
+                    { key: "jadlog-package", label: "Jadlog - .Package", logo: "🚛" },
+                    { key: "jadlog-com", label: "Jadlog - .Com", logo: "🚛" },
+                    { key: "jadlog-centralizado", label: "Jadlog - .Package Centralizado", logo: "🚛" },
+                    { key: "buslog", label: "Buslog - Rodoviário", logo: "🚌" },
+                    { key: "loggi-express", label: "Loggi - Express", logo: "🛵" },
+                    { key: "loggi-coleta", label: "Loggi - Coleta", logo: "🛵" },
+                    { key: "loggi-ponto", label: "Loggi - Loggi Ponto", logo: "🛵" },
+                    { key: "jet", label: "JeT - Standard", logo: "✈️" },
+                    { key: "total-express", label: "Total Express - Standard", logo: "📦" },
+                  ].map((carrier) => {
+                    const isDisabled = (shippingSettings?.disabledCarriers || []).includes(carrier.key);
+                    return (
+                      <div key={carrier.key} className="flex items-center justify-between p-3 bg-[#101217] border border-[#282C32]/35 rounded-lg transition-colors">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-base">{carrier.logo}</span>
+                          <span className="text-xs font-semibold text-white/95">{carrier.label}</span>
+                        </div>
+                        <ToggleSwitch
+                          label=""
+                          checked={!isDisabled}
+                          onChange={(val) => {
+                            const currentList = [...(shippingSettings?.disabledCarriers || [])];
+                            let newList;
+                            if (val) {
+                              newList = currentList.filter(k => k !== carrier.key);
+                            } else {
+                              newList = [...currentList, carrier.key];
+                            }
+                            setShippingSettings((prev) => ({
+                              ...(prev || DEFAULT_MELHOR_ENVIO_SETTINGS),
+                              disabledCarriers: newList,
+                            }));
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Origin CEP Field */}
               <div className="bg-[#1C1F26] border border-[#282C32]/45 rounded-lg p-5 flex flex-col gap-4">
                 <h4 className="text-sm font-bold text-white/80 border-b border-white/5 pb-2 flex items-center gap-2">
